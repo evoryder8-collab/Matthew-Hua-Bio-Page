@@ -14,9 +14,18 @@ A self-contained, **static** single page. No build step — GitHub Pages serves 
 
 ## Experience route
 
-`Hero → Recognition → The Journey → The Archive → Philosophy → Method → Experience`
+`Hero → Recognition → Journey → Six Elements → Technology → Archive → Philosophy → Studio`
 
-One clear idea per section, calm pauses between intense moments, and a single signature WebGL moment (the hero) rather than effects competing everywhere.
+A premium digital business card and legacy profile, not a booking funnel. Refined actions only (Discover the Six Elements, View the Technology, Enter the Archive, Private Inquiry). Each block has its own motion logic; calm pauses between intense moments; a single signature WebGL moment (the hero).
+
+## Signature sections
+
+- **The Six Elements** — an accessible tablist "control room" with the exact six forces in order: Hot / Cold, Breathwork, Mindset, Body, Movement, Community. Each has its own atmosphere and signature motion (thermal shift, breathing, alignment, pressure, kinetic arcs, network), animated only while active and in view.
+- **The Instruments Behind the Method** — split-screen Technology section: Release Cutter (Pro Labo Japan, copper, spiral current) and Zimmer Soleo Series (Zimmer, ice blue, ultrasound waves + sensor-verified dose readout). Pointer-aware lighting, progressive-disclosure spec drawers, comparison block, and a reputation close back to Matthew.
+
+### Compliance (Technology)
+
+Supportive language only — no diagnosis, cure, or guaranteed-outcome claims. Device names are manufacturer marks. **Values to verify before public publishing** (flagged with `VERIFY` HTML comments in `index.html`): SonoSwing simultaneous 0.8 / 2.4 MHz, vacuum suction range, and pulsed-suction cycle. A visible note states figures are indicative and being verified. Confirm device indications and advertising compliance for Switzerland / EU before final publication.
 
 ## Tech (core stack)
 
