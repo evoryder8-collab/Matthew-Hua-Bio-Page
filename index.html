@@ -697,7 +697,7 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
     var hv=document.getElementById('heroVideo');
     if(hv && !REDUCED){ var hp=hv.play(); if(hp&&hp.then) hp.then(function(){ hv.classList.add('ready'); }).catch(function(){}); }
 
-    if(window.Lenis && !REDUCED){
+    if(window.Lenis && !REDUCED && DESKTOP){   /* desktop only — native scroll on touch (no hijack) */
       var lenis=new Lenis({ duration:1.1, smoothWheel:true }); window.__lenis=lenis;
       (function raf(t){ lenis.raf(t); requestAnimationFrame(raf); })(0);
       document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener('click', function(e){ var id=a.getAttribute('href'); if(id.length<2) return; var el=document.querySelector(id); if(!el) return; e.preventDefault(); lenis.scrollTo(el,{offset:-8}); }); });
