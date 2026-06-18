@@ -4,101 +4,118 @@ A cinematic, editorial biography site for **Matthew Hua** — Zurich-based trans
 
 > **Transformation starts in the body.**
 
-Live preview (GitHub Pages): **https://evoryder8-collab.github.io/Matthew-Hua-Bio-Page/**
+**Live:** https://evoryder8-collab.github.io/Matthew-Hua-Bio-Page/
 
 ---
 
 ## What this is
 
-A self-contained, **static** single-page site. No build step, no framework, no toolchain — GitHub Pages serves `index.html` directly, so the preview is always online as long as the files are in the repo.
+A self-contained, **static** single page. No build step — GitHub Pages serves `index.html` directly, so the preview is always online as long as the files are in the repo. Designed to feel like a private cinematic exhibition: beautiful, guided, calm, and effortless on every screen.
 
-It implements the full creative brief:
+## Experience route
 
-1. **Cinematic hero** — fullscreen WebGL shader backdrop (warm/cold flowing gradient + grain), with an optional looping film and a graceful fallback.
-2. **Recognition strip** — awards + certifications marquee.
-3. **Editorial biography** — typographic, pull-quote driven.
-4. **Cinematic awards archive** — the centerpiece: an intelligent video gallery with parallax depth, scroll reveal, hover preview, an accessible lightbox, lazy-loaded video and offscreen pausing.
-5. **The Method** — bodywork, breathwork, contrast therapy, cold, heat, mindset.
-6. **The Philosophy** — emotional, memorable.
-7. **Experience / booking CTA.**
-8. **Footer** — Zurich · healwell · social + legal placeholders.
+`Hero → Recognition → The Journey → The Archive → Philosophy → Method → Experience`
 
-## Tech
+One clear idea per section, calm pauses between intense moments, and a single signature WebGL moment (the hero) rather than effects competing everywhere.
 
-- Hand-authored HTML + CSS (design-token system; no build needed)
-- **GSAP + ScrollTrigger** — scroll-based cinematic sequences (CDN)
-- **Lenis** — smooth scrolling (CDN)
-- **Three.js (r128)** — single-draw-call hero shader (CDN)
-- Progressive enhancement: the page is fully readable with JavaScript disabled.
+## Tech (core stack)
+
+- Hand-authored HTML + CSS (design-token system, no build)
+- **GSAP + ScrollTrigger** — scroll reveals + gentle desktop-only parallax
+- **Lenis** — smooth scrolling (desktop, disabled under reduced-motion)
+- **Three.js (r128)** — a single-draw-call "breathing" hero shader, **lazy-loaded desktop-only**
+- Progressive enhancement: fully readable and navigable with JavaScript disabled.
+
+## Mobile & accessibility
+
+- Mobile has its own choreography — no shader, no parallax, no scroll-hijack; large touch targets (≥44px), tap to open, swipe to navigate the archive.
+- Every gallery interaction works with **touch, mouse, and keyboard** (`Enter`/`Space` open, `←`/`→` navigate, `Esc` close, focus trap, swipe).
+- `prefers-reduced-motion` disables smooth scroll, the shader, parallax, the grain and reveals.
+- Dimmed label color raised for ~4.7:1 contrast; visible focus rings; semantic landmarks + skip link.
+- Video is **muted, never autoplays sound**.
 
 ## File structure
 
 ```
 .
-├── index.html            # the entire site (markup, styles, scripts, gallery data)
+├── index.html            # the whole site (markup, styles, scripts, archive data)
 ├── README.md
-├── .nojekyll             # tells GitHub Pages to serve files as-is
+├── .nojekyll             # serve files as-is on Pages
 ├── assets/
-│   └── og-image.jpg      # 1200×630 social card  (ADD THIS — see below)
-└── videos/               # your media (ADD THESE — see videos/README.md)
+│   └── og-image.jpg      # 1200×630 social card  (ADD THIS)
+└── videos/               # your media (ADD THESE — see below)
     ├── hero-loop.webm / .mp4
-    ├── awards/
-    ├── stage/
-    └── practice/
+    ├── awards/   stage/   practice/
+    └── posters/
 ```
 
-## Add the real media
+## Video strategy — preview vs. full
 
-The gallery is driven by a **typed data array** near the bottom of `index.html`
-(look for `var galleryItems = [ … ]`). Each item defines:
+The system is designed for **compressed cinematic clips**, never raw footage. Each archive item references two qualities:
+
+- **`preview`** — a small, low-res, short loop (used on the gallery card; plays on hover on desktop)
+- **`full`** — a higher-quality version (used only inside the immersive lightbox)
+- **`poster`** — a still for every clip (an elegant gradient placeholder shows until you add one)
+
+Naming is clean and content-driven, e.g.:
+
+```
+videos/awards/european-championship-2024-preview.webm   (+ .mp4)   ← card
+videos/awards/european-championship-2024.webm           (+ .mp4)   ← lightbox
+videos/posters/european-championship-2024.jpg                      ← still
+```
+
+Rules of thumb: loops **4–12s**, **WebM primary + MP4 fallback**, **muted**, preview ≤ ~1.5 MB, full ≤ ~5 MB, poster ~1280px. Non-hero videos are lazy (`preload="none"`), play only when needed, and **pause when offscreen**.
+
+### ffmpeg
+
+```bash
+# PREVIEW — small, low-res loop for the card (≈640px wide, no audio)
+ffmpeg -i source.mov -an -t 8 -c:v libvpx-vp9 -b:v 0 -crf 38 -vf "scale=-2:640" european-championship-2024-preview.webm
+ffmpeg -i source.mov -an -t 8 -c:v libx264 -crf 30 -preset slow -movflags +faststart -vf "scale=-2:640" european-championship-2024-preview.mp4
+
+# FULL — higher quality for the lightbox (≈1080p, no audio)
+ffmpeg -i source.mov -an -c:v libvpx-vp9 -b:v 0 -crf 32 -vf "scale=-2:1080" european-championship-2024.webm
+ffmpeg -i source.mov -an -c:v libx264 -crf 22 -preset slow -movflags +faststart -vf "scale=-2:1080" european-championship-2024.mp4
+
+# POSTER — grab a strong frame
+ffmpeg -i source.mov -ss 00:00:02 -frames:v 1 -vf "scale=1280:-2" posters/european-championship-2024.jpg
+```
+
+After adding files, optionally set the `poster:` path in the `items` array (near the bottom of `index.html`). Replace-me spots are marked with `TODO`.
+
+## Archive data model (typed)
+
+Edit the `items` array in `index.html`:
 
 | field | meaning |
 |------|---------|
-| `title`, `year`, `location` | card labels |
-| `role` | `winner` · `judge` · `awarding` · `demonstration` · `practice` (controls accent) |
+| `title`, `year`, `location` | card + lightbox labels |
+| `role` / `group` | `winner`·`judge`·`awarding`·`practice` / filter group (`wins`·`stage`·`practice`) |
 | `award` | e.g. `Gold` |
-| `description` | shown in the lightbox |
-| `sources.webm` / `sources.mp4` | video paths in `/videos/…` |
-| `poster` | optional poster image; an elegant gradient is generated until you add one |
-| `ratio` | `r45` `r169` `r11` `r219` (card aspect) |
-| `span` | `w4` `w5` `w6` `w7` `w8` (grid width) |
-| `mood`, `tags` | gradient placeholder + lightbox chips |
-
-To activate videos: drop optimized files in `/videos/` (see `videos/README.md`),
-add both `.webm` and `.mp4`, and optionally a poster in `/videos/posters/`.
-Until then, cards show tasteful gradient posters — the site looks intentional with no media at all.
-
-Replace-me spots are marked with `TODO` comments in `index.html`
-(booking link, social links, OG image).
+| `description` | lightbox copy |
+| `preview` / `full` | `{webm, mp4}` low-res card loop / hi-res lightbox |
+| `poster` | optional still (gradient fallback otherwise) |
+| `ratio` / `span` | card aspect (`r45`·`r169`·`r11`) / grid width (`w4`–`w8`) |
+| `mood` / `tags` | gradient placeholder + lightbox chips |
 
 ## Performance
 
-- Static-first; minimal JS; libraries deferred.
-- Videos use `preload="none"`, **posters first**, lazy hover playback, and are **paused offscreen** via `IntersectionObserver`.
-- WebM + MP4 fallbacks. Keep hero loop short (6–12s) and small (≤ ~3 MB); see `videos/README.md`.
-- Hero shader is a single fullscreen quad and pauses when the tab is hidden.
-- Target: Lighthouse 90+ on desktop. Biggest lever is video weight — compress aggressively.
-
-## Accessibility
-
-- Semantic landmarks, skip link, visible focus states.
-- Gallery + lightbox are keyboard operable (`Enter`/`Space` to open, `←`/`→` to navigate, `Esc` to close) with a focus trap.
-- `prefers-reduced-motion` disables smooth scroll, the shader, parallax and reveals.
-- Video is **muted, no autoplay audio**. Add `<track kind="captions">` when you ship real footage.
+- Static-first; tiny JS; GSAP/Lenis deferred; **Three.js lazy-loaded desktop-only**.
+- `transform`/`opacity` animations only; reveals via `ScrollTrigger`; hero shader is one draw call and **pauses offscreen / when the tab is hidden**.
+- Videos: posters first, `preload="none"`, low-res previews, hi-res only in the lightbox, paused offscreen via `IntersectionObserver`.
+- Target Lighthouse 90+ desktop; the dominant lever is video weight — compress per the commands above.
 
 ## Local preview
 
-It's just static files — open `index.html`, or:
-
 ```bash
-python3 -m http.server 8080      # then visit http://localhost:8080
+python3 -m http.server 8080   # http://localhost:8080
 ```
 
 ## Deployment (GitHub Pages)
 
-Settings → **Pages** → Source: **Deploy from a branch** → Branch: **main** / **/(root)** → Save.
-Pages rebuilds automatically on every push to `main`.
+Settings → **Pages** → Source **Deploy from a branch** → **main** / **/(root)**. Rebuilds on every push to `main`.
 
 ---
 
-*Built as a first production-ready version. Copy is cinematic placeholder, ready to refine — swap in real footage and photography to push it toward award-level.*
+*First production-ready version. Copy is cinematic placeholder, ready to refine — drop in real footage and photography to push it toward award level.*
