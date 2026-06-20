@@ -337,9 +337,11 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .attn-label.lbl-good{ color:#ffe2ab; border-color:rgba(255,210,122,.42); }
 
 /* HUD: kicker, copy, progress, controls over the scrim. Empty areas let signal taps through. */
-.el-attn .el-scrim{ z-index:2; pointer-events:none; background:linear-gradient(180deg, transparent 46%, rgba(10,7,16,.58) 74%, rgba(10,7,16,.88)); }
+.el-attn .el-scrim{ z-index:2; pointer-events:none; background:linear-gradient(180deg, transparent 54%, rgba(10,7,16,.86)); }
+.el-attn[data-phase="lifeIntegration"] .el-scrim{ background:linear-gradient(180deg, transparent 46%, rgba(10,7,16,.58) 74%, rgba(10,7,16,.88)); }
 .attn-hud{ position:absolute; left:0; right:0; bottom:0; z-index:4; padding:clamp(22px,3vw,42px); display:flex; flex-direction:column; align-items:flex-start; pointer-events:none; isolation:isolate; }
-.attn-hud::before{ content:""; position:absolute; z-index:-1; left:clamp(12px,1.8vw,28px); right:clamp(12px,24vw,260px); top:clamp(8px,1vw,18px); bottom:clamp(12px,1.6vw,26px); border-radius:28px; background:radial-gradient(100% 92% at 16% 28%, rgba(255,194,228,.12), transparent 58%), linear-gradient(105deg, rgba(7,5,12,.9) 0%, rgba(9,7,15,.78) 54%, rgba(9,7,15,.32) 100%); box-shadow:0 34px 90px -38px rgba(0,0,0,.88), 0 0 0 1px rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.07); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); pointer-events:none; }
+.attn-hud::before{ content:""; position:absolute; z-index:-1; left:clamp(12px,1.8vw,28px); right:clamp(12px,24vw,260px); top:clamp(8px,1vw,18px); bottom:clamp(12px,1.6vw,26px); border-radius:28px; opacity:0; background:radial-gradient(100% 92% at 16% 28%, rgba(255,194,228,.12), transparent 58%), linear-gradient(105deg, rgba(7,5,12,.9) 0%, rgba(9,7,15,.78) 54%, rgba(9,7,15,.32) 100%); box-shadow:0 34px 90px -38px rgba(0,0,0,.88), 0 0 0 1px rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.07); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); pointer-events:none; transition:opacity .35s var(--ease); }
+.el-attn[data-phase="lifeIntegration"] .attn-hud::before{ opacity:1; }
 .attn-hud .attn-btn,.attn-hud .attn-controls{ pointer-events:auto; }
 .attn-title{ font-size:clamp(1.5rem,3vw,2.4rem); margin:10px 0 0; letter-spacing:-.02em; }
 .el-attn:not([data-phase="intro"]) .attn-title{ display:none; }
