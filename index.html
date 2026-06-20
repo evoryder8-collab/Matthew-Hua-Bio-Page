@@ -79,7 +79,7 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .skip:focus{ left:0; }
 .container{ width:100%; max-width:var(--max); margin-inline:auto; padding-inline:var(--pad); }
 .eyebrow{ font-family:var(--font-sans); font-size:12px; font-weight:500; letter-spacing:.3em; text-transform:uppercase; color:var(--text-2); display:inline-flex; align-items:center; gap:.7em; }
-.eyebrow::before{ content:""; width:32px; height:1px; background:var(--gold); display:inline-block; }
+.eyebrow::before{ display:none; }
 .eyebrow .num{ color:var(--gold); }
 .reveal{ opacity:0; transform:translateY(22px); }
 .is-in,.no-js .reveal,.no-anim .reveal{ opacity:1; transform:none; }
@@ -121,21 +121,58 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .actions{ display:flex; flex-wrap:wrap; gap:14px; }
 
 /* =========================== HERO =========================== */
-.hero{ position:relative; min-height:100svh; display:flex; align-items:flex-end; overflow:hidden;
-  background:radial-gradient(140% 110% at 78% 8%, rgba(239,132,190,.16), transparent 52%), radial-gradient(120% 90% at 12% 30%, rgba(143,227,176,.07), transparent 55%), linear-gradient(180deg,#16121c 0%, #0e0b14 60%, var(--bg) 100%); }
-.hero .breathe{ position:absolute; inset:0; z-index:0; pointer-events:none; background:radial-gradient(60% 50% at 70% 28%, rgba(247,168,212,.10), transparent 70%); animation:breathe 9s var(--ease) infinite; }
+.hero{ position:relative; min-height:100svh; display:flex; align-items:center; overflow:hidden;
+  background:radial-gradient(125% 100% at 50% 6%, #ffe6f1 0%, #f5ecf5 30%, #e2f7ec 66%, #d2f0e0 100%); }
 @keyframes breathe{ 0%,100%{ opacity:.5; transform:scale(1); } 50%{ opacity:1; transform:scale(1.08); } }
-#hero-canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; z-index:1; opacity:0; transition:opacity 1.4s var(--ease); }
-#hero-canvas.on{ opacity:.9; }
-.hero-scrim{ position:absolute; inset:0; z-index:3; pointer-events:none; background:linear-gradient(180deg, rgba(16,15,13,.5) 0%, transparent 30%, rgba(16,15,13,.5) 70%, var(--bg) 100%); }
-.hero-inner{ position:relative; z-index:4; width:100%; padding-bottom:clamp(56px,9vh,120px); padding-top:124px; will-change:transform; }
-.hero h1{ font-size:clamp(3rem,13vw,12.5rem); line-height:.86; letter-spacing:-.04em; text-transform:uppercase; }
+#hero-canvas{ display:none; }
+
+/* bright breathing aurora: equal parts bright green + bright muted pink */
+.hero-aurora{ position:absolute; inset:-12%; z-index:0; pointer-events:none; filter:blur(58px) saturate(120%); }
+.hero-aurora .blob{ position:absolute; width:46vw; height:46vw; border-radius:50%; opacity:.85; will-change:transform; }
+.hero-aurora .g1{ background:radial-gradient(circle,#4fe6a0 0%,transparent 66%); left:-6%; top:-6%; animation:auroraDrift 17s ease-in-out infinite; }
+.hero-aurora .p1{ background:radial-gradient(circle,#ff8fc6 0%,transparent 66%); right:-8%; top:-3%; animation:auroraDrift 21s ease-in-out infinite reverse; }
+.hero-aurora .g2{ background:radial-gradient(circle,#66f0b4 0%,transparent 66%); right:5%; bottom:-14%; animation:auroraDrift2 23s ease-in-out infinite; }
+.hero-aurora .p2{ background:radial-gradient(circle,#ffa3d2 0%,transparent 66%); left:3%; bottom:-15%; animation:auroraDrift2 19s ease-in-out infinite reverse; }
+.hero-aurora .g3{ background:radial-gradient(circle,#5cf0aa 0%,transparent 64%); left:28%; top:26%; width:40vw; height:40vw; animation:auroraDrift 27s ease-in-out infinite; }
+.hero-aurora .p3{ background:radial-gradient(circle,#ff97c9 0%,transparent 64%); left:44%; top:6%; width:38vw; height:38vw; animation:auroraDrift2 25s ease-in-out infinite reverse; }
+@keyframes auroraDrift{ 0%,100%{ transform:translate(0,0) scale(1); } 33%{ transform:translate(7%,5%) scale(1.12); } 66%{ transform:translate(-5%,8%) scale(.94); } }
+@keyframes auroraDrift2{ 0%,100%{ transform:translate(0,0) scale(1.04); } 50%{ transform:translate(6%,-6%) scale(.9); } }
+.hero-scrim{ position:absolute; inset:0; z-index:1; pointer-events:none; background:radial-gradient(130% 92% at 50% 24%, transparent 48%, rgba(255,255,255,.16) 100%); }
+
+/* Matthew x Tony portrait with layered aura, top of the centered hero column */
+.hero-figure{ position:relative; z-index:1; width:min(440px,64vw); margin:0 auto clamp(6px,1.4vh,18px); display:flex; justify-content:center; pointer-events:none; }
+.hero-figure::before{ content:""; position:absolute; left:50%; top:48%; transform:translate(-50%,-50%); width:128%; height:122%; z-index:-2; border-radius:50%; background:radial-gradient(circle at 36% 42%, rgba(79,230,160,.82), transparent 60%), radial-gradient(circle at 68% 56%, rgba(255,143,198,.88), transparent 62%); filter:blur(46px); opacity:.92; animation:auraPulse 7s var(--ease) infinite; }
+.hero-figure::after{ content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:82%; height:94%; z-index:-1; border-radius:48% 52% 50% 50%; background:radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 62%); filter:blur(18px); }
+@keyframes auraPulse{ 0%,100%{ transform:translate(-50%,-50%) scale(1); opacity:.82; } 50%{ transform:translate(-50%,-50%) scale(1.08); opacity:1; } }
+.hero-portrait{ display:block; width:auto; height:auto; max-width:100%; max-height:clamp(168px,28vh,300px); filter:drop-shadow(0 20px 40px rgba(40,10,30,.42)) drop-shadow(0 0 24px rgba(255,143,198,.5)) drop-shadow(0 0 30px rgba(79,230,160,.4)); -webkit-mask-image:linear-gradient(180deg,#000 91%,transparent); mask-image:linear-gradient(180deg,#000 91%,transparent); }
+.hero-figure.no-img{ display:none; }
+
+/* hero text and chrome read dark on the bright field */
+.hero .eyebrow{ color:#5b3f54; }
+.hero .btn-primary{ background:#16121c; color:#fff5fb; border-color:#16121c; box-shadow:0 16px 34px -12px rgba(22,18,28,.5); }
+.hero .btn-primary:hover{ background:#241a2e; border-color:#241a2e; }
+.hero .btn-ghost{ border-color:rgba(28,16,24,.32); color:#1c1018; }
+.hero .btn-ghost:hover{ border-color:#16121c; color:#16121c; }
+.hero .scroll-hint{ color:rgba(28,16,24,.55); }
+.hero .scroll-hint .bar{ background:linear-gradient(#16121c,transparent); }
+/* nav over the bright hero (before scroll) flips to dark ink */
+.nav:not(.scrolled) .brand{ color:#16121c; }
+.nav:not(.scrolled) .brand .dot{ background:#c81d77; box-shadow:0 0 14px rgba(200,29,119,.55); }
+.nav:not(.scrolled) .nav-links:not(.open) a{ color:#3a2a36; }
+.nav:not(.scrolled) .nav-links:not(.open) a:hover{ color:#16121c; }
+.nav:not(.scrolled) .nav-links:not(.open) .nav-cta{ border-color:rgba(28,16,24,.32); color:#16121c!important; }
+.nav:not(.scrolled) .nav-links:not(.open) .nav-cta:hover{ background:#16121c; border-color:#16121c; color:#fff!important; }
+.nav:not(.scrolled) .burger span{ background:#16121c; }
+.nav .burger[aria-expanded="true"] span{ background:var(--text); }
+@media (prefers-reduced-motion:reduce){ .hero-aurora .blob, .hero-figure::before{ animation:none; } }
+.hero-inner{ position:relative; z-index:4; width:100%; display:flex; flex-direction:column; align-items:center; text-align:center; padding-top:clamp(74px,10vh,104px); padding-bottom:clamp(32px,5vh,68px); will-change:transform; }
+.hero h1{ font-size:clamp(2.4rem,8.2vw,6.6rem); line-height:.9; letter-spacing:-.035em; text-transform:uppercase; color:#1c1018; }
 .hero h1 .ln{ display:block; overflow:hidden; }
 .hero h1 .ln>span{ display:block; will-change:transform; }
-.hero h1 .thin{ font-family:var(--font-serif); font-weight:300; font-style:italic; text-transform:none; letter-spacing:-.01em; color:var(--gold-bright); }
-.hero-tag{ font-family:var(--font-serif); font-size:clamp(1.15rem,2.1vw,1.6rem); color:var(--text); font-weight:300; margin:34px 0 0; }
-.hero-sub{ color:var(--text-2); font-size:clamp(.95rem,1.4vw,1.05rem); margin-top:16px; max-width:60ch; }
-.hero-actions{ margin-top:38px; }
+.hero h1 .thin{ font-family:var(--font-serif); font-weight:300; font-style:italic; text-transform:none; letter-spacing:-.01em; color:#c81d77; }
+.hero-tag{ font-family:var(--font-serif); font-size:clamp(1.15rem,2.1vw,1.6rem); color:#241420; font-weight:300; margin:18px 0 0; }
+.hero-sub{ color:#4c3a48; font-size:clamp(.95rem,1.4vw,1.05rem); margin-top:12px; max-width:56ch; margin-inline:auto; }
+.hero-actions{ margin-top:24px; justify-content:center; }
 .scroll-hint{ position:absolute; bottom:24px; right:var(--pad); z-index:4; display:flex; align-items:center; gap:12px; color:var(--text-3); font-family:var(--font-sans); font-size:11px; letter-spacing:.28em; text-transform:uppercase; writing-mode:vertical-rl; }
 .scroll-hint .bar{ width:1px; height:48px; background:linear-gradient(var(--gold),transparent); animation:slide 2.4s var(--ease) infinite; }
 @keyframes slide{ 0%{ transform:scaleY(.3); transform-origin:top; opacity:.4 } 50%{ transform:scaleY(1); opacity:1 } 100%{ transform:scaleY(.3); transform-origin:bottom; opacity:.4 } }
@@ -569,10 +606,13 @@ body.has-cursor, body.has-cursor a, body.has-cursor button, body.has-cursor .car
 
 <!-- =========================== HERO =========================== -->
 <section class="hero" aria-label="Introduction">
-  <div class="breathe" aria-hidden="true"></div>
-  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-aurora" aria-hidden="true">
+    <span class="blob g1"></span><span class="blob p1"></span><span class="blob g2"></span>
+    <span class="blob p2"></span><span class="blob g3"></span><span class="blob p3"></span>
+  </div>
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="container hero-inner" id="heroInner">
+    <figure class="hero-figure" aria-hidden="true"><img class="hero-portrait" src="assets/v2-mat-x-tony.webp" alt="" loading="eager" decoding="async" onerror="this.closest('.hero-figure').classList.add('no-img')" /></figure>
     <span class="eyebrow">Zurich · Transformational Therapy · healwell</span>
     <h1 aria-label="Matthew Hua">
       <span class="ln"><span>Matthew</span></span>
@@ -1365,7 +1405,7 @@ body.has-cursor, body.has-cursor a, body.has-cursor button, body.has-cursor .car
   }
 
   /* HERO WEBGL — lazy, desktop-only, breathing field, pauses offscreen */
-  if(DESKTOP && window.WebGLRenderingContext){ var s=document.createElement('script'); s.src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"; s.async=true; s.onload=initHero; document.body.appendChild(s); }
+  /* hero background is now a bright CSS aurora (no WebGL). initHero is retained but unused. */
   function initHero(){ if(!window.THREE)return; try{
     var hero=document.querySelector('.hero'),canvas=document.getElementById('hero-canvas');
     var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:false,alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));
