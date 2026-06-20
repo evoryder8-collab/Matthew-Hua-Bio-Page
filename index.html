@@ -127,13 +127,13 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 @keyframes breathe{ 0%,100%{ opacity:.5; transform:scale(1); } 50%{ opacity:1; transform:scale(1.08); } }
 #hero-canvas{ display:none; }
 
-.hero-ribbon{ position:absolute; z-index:5; top:clamp(78px,10vh,108px); left:clamp(-76px,-5vw,-52px); width:clamp(246px,23vw,320px); transform:rotate(-38deg); pointer-events:none; display:flex; justify-content:center; align-items:center; gap:8px; padding:9px 18px; color:#2b1824; background:linear-gradient(90deg, rgba(255,255,255,.78), rgba(255,246,252,.94) 28%, rgba(223,248,232,.92) 72%, rgba(255,255,255,.76)); border-block:1px solid rgba(255,255,255,.72); box-shadow:0 12px 28px -18px rgba(28,16,24,.52), inset 0 1px 0 rgba(255,255,255,.82); font-family:var(--font-sans); font-weight:700; font-size:clamp(10px,1vw,12px); letter-spacing:.1em; text-transform:uppercase; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
-.hero-ribbon::before,.hero-ribbon::after{ content:""; position:absolute; top:0; bottom:0; width:1px; background:linear-gradient(transparent,rgba(200,29,119,.28),transparent); }
-.hero-ribbon::before{ left:14px; } .hero-ribbon::after{ right:14px; }
+.hero-ribbon{ position:absolute; z-index:3; top:clamp(86px,11vh,118px); left:var(--pad); width:max-content; max-width:calc(100vw - (var(--pad) * 2)); transform:rotate(-7deg); transform-origin:left center; pointer-events:none; display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:10px 16px; color:#2b1824; background:linear-gradient(90deg, rgba(255,255,255,.78), rgba(255,246,252,.94) 28%, rgba(223,248,232,.92) 72%, rgba(255,255,255,.76)); border:1px solid rgba(255,255,255,.72); border-radius:999px 999px 999px 10px; box-shadow:0 14px 32px -22px rgba(28,16,24,.55), inset 0 1px 0 rgba(255,255,255,.82); font-family:var(--font-sans); font-weight:700; font-size:clamp(9px,1vw,12px); letter-spacing:.1em; line-height:1; text-transform:uppercase; white-space:nowrap; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+.hero-ribbon::before,.hero-ribbon::after{ content:""; position:absolute; top:50%; width:12px; height:1px; background:linear-gradient(90deg,transparent,rgba(200,29,119,.32),transparent); }
+.hero-ribbon::before{ left:8px; } .hero-ribbon::after{ right:8px; }
 .swiss-flag{ position:relative; width:16px; height:16px; flex:0 0 16px; border-radius:2px; background:#e31b23; box-shadow:0 0 0 1px rgba(255,255,255,.72), 0 3px 8px rgba(28,16,24,.16); }
 .swiss-flag::before,.swiss-flag::after{ content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; border-radius:1px; }
 .swiss-flag::before{ width:10px; height:3px; } .swiss-flag::after{ width:3px; height:10px; }
-@media (max-width:760px){ .hero-ribbon{ top:72px; left:-72px; width:236px; padding-block:8px; font-size:9px; letter-spacing:.08em; } .swiss-flag{ width:14px; height:14px; flex-basis:14px; } }
+@media (max-width:760px){ .hero-ribbon{ top:76px; left:20px; max-width:calc(100vw - 40px); transform:rotate(-6deg); padding:9px 13px; font-size:8.8px; letter-spacing:.07em; } .swiss-flag{ width:14px; height:14px; flex-basis:14px; } }
 
 /* bright breathing aurora: equal parts bright green + bright muted pink */
 .hero-aurora{ position:absolute; inset:-12%; z-index:0; pointer-events:none; filter:blur(58px) saturate(120%); }
@@ -248,7 +248,7 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 
 /* ===== Mindset 01 — Attention Field (spatial memory experiment) =====
    Tune signal colors, size and glow in the .el-attn variables below.
-   Timings live in the JS createAttention (ENCODE_MS, REVEAL_MS).
+   Timings live in the JS createAttention (ENCODE_MS).
    Signal positions, roles and the red quadrant live in the JS SIGNALS array.
    Image path is the JS ATTN_IMG constant. Keep visible copy free of long dashes. */
 .el-attn{ position:absolute; inset:0; z-index:0; overflow:hidden;
@@ -1604,7 +1604,7 @@ body{ background:#eef2ee; }
     ];
     var RED_Q='br';
     /* timings in ms */
-    var ENCODE_MS=3000, REVEAL_MS=3000;
+    var ENCODE_MS=3000;
     /* minimal floating labels for the life lesson */
     var LIFE_LABELS=[
       {t:'problems',cls:'lbl-blue',x:20,y:16},{t:'stress',cls:'lbl-blue',x:26,y:70},{t:"what's wrong",cls:'lbl-blue',x:76,y:14},
@@ -1654,15 +1654,29 @@ body{ background:#eef2ee; }
         drawPaths();
         if(correct){ textEl.textContent='You caught it.'; subEl.textContent='Most attention misses what it was not trained to value.'; }
         else { textEl.textContent='You saw it.'; subEl.textContent='But your attention was not asked to keep it.'; }
-        timers.push(setTimeout(function(){ subEl.textContent='Where focus goes, energy flows.'; }, 1500));
-        timers.push(setTimeout(function(){ setPhase('lifeIntegration'); }, REVEAL_MS));
+        addBtn('Next', showFocusFlow, 'attn-next');
       } else if(p==='lifeIntegration'){
         buildLabels();
         textEl.textContent='When we train the mind to count problems, problems become the map.';
         subEl.textContent='The solutions, support, beauty, and reasons to be grateful may still be there, but they stop being encoded. Healing begins when attention learns to search for safety again.';
-        timers.push(setTimeout(function(){ subEl.textContent='Matthew helps redirect attention through breath, touch, warmth, movement, and presence, creating space for the body to soften and listen.'; }, 2500));
-        addBtn('Next', function(){ setPhase('finalPhoto'); }, 'attn-next');
+        addBtn('Next', showLifeIntegration2, 'attn-next');
       }
+    }
+
+    function showFocusFlow(){
+      if(attnEl.getAttribute('data-phase')!=='revealRed') return;
+      ctrlEl.innerHTML='';
+      textEl.textContent='Where focus goes, energy flows.';
+      subEl.textContent='What you are asked to search for becomes what your mind is most ready to keep.';
+      addBtn('Next', function(){ setPhase('lifeIntegration'); }, 'attn-next');
+    }
+
+    function showLifeIntegration2(){
+      if(attnEl.getAttribute('data-phase')!=='lifeIntegration') return;
+      ctrlEl.innerHTML='';
+      textEl.textContent='Matthew helps redirect attention through breath, touch, warmth, movement, and presence.';
+      subEl.textContent='That creates space for the body to soften, listen, and find a safer signal to follow.';
+      addBtn('Next', function(){ setPhase('finalPhoto'); }, 'attn-next');
     }
 
     function start(){ clearT(); picks=[]; clearPicks(); setPhase('encodeBlue'); }
