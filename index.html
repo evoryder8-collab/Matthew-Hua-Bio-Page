@@ -236,73 +236,134 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 /* generative canvas atmospheres — one bespoke field per element, rendered in JS */
 .el-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; display:block; }
 
-/* ===== Mindset 01 — interactive Attention Field (selective attention) ===== */
-/* Tune: dot colours below, timings in the JS createAttention (BLUE_MS / CLOSE_MS / RED_MS),
-   image path in the JS ATTN_IMG constant, copy in attnMarkup(). */
-.el-attn{ position:absolute; inset:0; z-index:0; overflow:hidden; }
-.attn-field{ position:absolute; inset:0; }
-.attn-field .dot{ position:absolute; width:7px; height:7px; margin:-3.5px 0 0 -3.5px; border-radius:50%; transition:opacity .7s var(--ease), box-shadow .7s var(--ease), transform .7s var(--ease); }
-.dot-muted{ background:#f3eef5; opacity:.14; width:5px; height:5px; margin:-2.5px 0 0 -2.5px; }
-.dot-blue{ background:#8fb7d6; opacity:.32; }
-.dot-amber{ background:#e0a06a; opacity:.30; }
-.dot-gold{ background:var(--gold); opacity:.26; }
-.el-attn[data-phase="intro"] .dot{ animation:attnTwinkle 4.5s ease-in-out infinite; }
-@keyframes attnTwinkle{ 0%,100%{ opacity:.34 } 50%{ opacity:.72 } }
-/* focus on blue */
-.el-attn[data-phase="blue"] .dot{ opacity:.05; }
-.el-attn[data-phase="blue"] .dot-blue{ opacity:1; box-shadow:0 0 8px 1px rgba(143,183,214,.95), 0 0 20px 4px rgba(143,183,214,.45); animation:attnPulse 1.5s var(--ease) infinite; }
-/* reveal the amber / red signals you missed */
-.el-attn[data-phase="red"] .dot{ opacity:.06; }
-.el-attn[data-phase="red"] .dot-amber{ opacity:1; box-shadow:0 0 8px 1px rgba(224,160,106,.95), 0 0 20px 4px rgba(224,160,106,.4); animation:attnPulse 1.5s var(--ease) infinite; }
-@keyframes attnPulse{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.7) } }
-.el-attn[data-phase="final"] .attn-field{ opacity:0; transition:opacity .9s var(--ease); }
+/* ===== Mindset 01 — Attention Field (spatial memory experiment) =====
+   Tune signal colors, size and glow in the .el-attn variables below.
+   Timings live in the JS createAttention (ENCODE_MS, REVEAL_MS, LIFE_MS).
+   Signal positions, roles and the red quadrant live in the JS SIGNALS array.
+   Image path is the JS ATTN_IMG constant. Keep visible copy free of long dashes. */
+.el-attn{ position:absolute; inset:0; z-index:0; overflow:hidden;
+  --sig-blue:#7fb3ec; --sig-amber:#f0a24e; --sig-gold:#ffd27a; --sig-neutral:#b9aec6; --sig-grey:#8a8494;
+  --sig-size:clamp(26px,4vw,38px); --glow:1; }
+.attn-stage{ position:absolute; inset:0; z-index:1; }
+.attn-field,.attn-paths,.attn-labels{ position:absolute; inset:0; transition:transform .25s var(--ease); }
 
-/* close-eyes: eyelid wipe + soft veil + blur */
-.attn-veil{ position:absolute; inset:0; z-index:2; background:rgba(8,6,14,0); -webkit-backdrop-filter:blur(0); backdrop-filter:blur(0); transition:background .5s var(--ease), backdrop-filter .5s var(--ease); pointer-events:none; }
-.attn-lid{ position:absolute; left:0; right:0; height:52%; z-index:2; pointer-events:none; transform:scaleY(0); transition:transform .5s var(--ease); }
-.attn-lid-top{ top:0; transform-origin:top; background:linear-gradient(180deg,#07060c,rgba(7,6,12,.85)); }
-.attn-lid-bot{ bottom:0; transform-origin:bottom; background:linear-gradient(0deg,#07060c,rgba(7,6,12,.85)); }
-.el-attn[data-phase="close"] .attn-lid{ transform:scaleY(1); }
-.el-attn[data-phase="close"] .attn-veil{ background:rgba(8,6,14,.5); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px); }
-.el-attn[data-phase="close"] .attn-field{ filter:blur(5px); opacity:.55; transition:filter .5s var(--ease), opacity .5s var(--ease); }
+/* premium signal: soft aura, translucent ring, bright core, orbital speck */
+.sig{ position:absolute; left:var(--x); top:var(--y); width:var(--sig-size); height:var(--sig-size); margin:0; padding:0; border:0; background:none; transform:translate(-50%,-50%); cursor:default; opacity:.5; --sc:var(--sig-neutral); animation:sigBreath 5.5s ease-in-out infinite; transition:opacity .7s var(--ease), filter .7s var(--ease); will-change:transform; }
+.sig>span,.sig>.s-orbit{ position:absolute; border-radius:50%; pointer-events:none; }
+.s-aura{ inset:-12%; background:radial-gradient(circle, color-mix(in srgb, var(--sc) 42%, transparent), transparent 64%); opacity:.55; }
+.s-ring{ inset:24%; border:1px solid color-mix(in srgb, var(--sc) 55%, transparent); }
+.s-core{ inset:38%; background:var(--sc); box-shadow:0 0 calc(7px * var(--glow)) 1px color-mix(in srgb, var(--sc) 85%, transparent); }
+.s-orbit{ inset:6%; border:1px dashed color-mix(in srgb, var(--sc) 26%, transparent); animation:sigOrbit 12s linear infinite; }
+.s-orbit i{ position:absolute; top:-1.5px; left:50%; width:3px; height:3px; margin-left:-1.5px; border-radius:50%; background:var(--sc); box-shadow:0 0 5px var(--sc); }
+.sig-blue{ --sc:var(--sig-blue); } .sig-amber{ --sc:var(--sig-amber); } .sig-gold{ --sc:var(--sig-gold); } .sig-neutral{ --sc:var(--sig-neutral); }
+@keyframes sigBreath{ 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-50%) scale(1.08); } }
+@keyframes sigOrbit{ to{ transform:rotate(360deg); } }
+@keyframes sigHalo{ 0%,100%{ transform:scale(1); opacity:.5; } 50%{ transform:scale(1.4); opacity:.95; } }
 
-/* final editorial reveal: transparent figure + quote + healing copy */
-.attn-final{ position:absolute; inset:0; z-index:3; display:grid; grid-template-columns:1fr; align-items:center; opacity:0; visibility:hidden; transition:opacity .9s var(--ease), visibility .9s var(--ease); overflow:auto; }
-.el-attn[data-phase="final"] .attn-final{ opacity:1; visibility:visible; }
+/* intro: calm constellation, all colors present */
+.el-attn[data-phase="intro"] .sig{ opacity:.44; }
+
+/* encodeBlue: blue called forward, amber visible but quiet, the rest recede */
+.el-attn[data-phase="encodeBlue"] .sig{ opacity:.22; }
+.el-attn[data-phase="encodeBlue"] .sig-amber{ opacity:.58; }
+.el-attn[data-phase="encodeBlue"] .sig-blue{ opacity:1; --glow:2.4; animation:sigBreath 2.6s ease-in-out infinite; }
+.el-attn[data-phase="encodeBlue"] .sig-blue .s-aura{ animation:sigHalo 2.6s var(--ease) infinite; }
+
+/* recallBlue: every signal grey, same positions, clickable */
+.el-attn[data-phase="recallBlue"] .sig{ --sc:var(--sig-grey); opacity:.78; cursor:pointer; animation:none; }
+.el-attn[data-phase="recallBlue"] .sig::after{ content:""; position:absolute; inset:-45%; border-radius:50%; }
+.el-attn[data-phase="recallBlue"] .sig:hover{ opacity:1; }
+.el-attn[data-phase="recallBlue"] .sig.picked{ --sc:var(--sig-blue); opacity:1; }
+
+/* askRedLocation: the recalled picks read blue, the rest stay grey */
+.el-attn[data-phase="askRedLocation"] .sig{ --sc:var(--sig-grey); opacity:.46; animation:none; }
+.el-attn[data-phase="askRedLocation"] .sig.picked{ --sc:var(--sig-blue); opacity:1; }
+
+/* revealRed: the overlooked signal blooms, picks become secondary */
+.el-attn[data-phase="revealRed"] .sig{ --sc:var(--sig-grey); opacity:.2; animation:none; }
+.el-attn[data-phase="revealRed"] .sig.picked{ --sc:var(--sig-blue); opacity:.6; }
+.el-attn[data-phase="revealRed"] .sig-amber{ --sc:var(--sig-amber); opacity:1; --glow:2.8; transform:translate(-50%,-50%) scale(1.55); animation:sigReveal 1.1s var(--ease); }
+.el-attn[data-phase="revealRed"] .sig-amber .s-aura{ animation:sigHalo 3s var(--ease) infinite; }
+.el-attn[data-phase="revealRed"] .sig-amber .s-ring{ animation:sigRing 1.6s var(--ease) infinite; }
+@keyframes sigReveal{ 0%{ transform:translate(-50%,-50%) scale(.6); opacity:.2; } 100%{ transform:translate(-50%,-50%) scale(1.55); opacity:1; } }
+@keyframes sigRing{ 0%{ transform:scale(1); opacity:.8; } 100%{ transform:scale(2.4); opacity:0; } }
+
+/* lifeIntegration: signals harmonize toward gold */
+.el-attn[data-phase="lifeIntegration"] .sig{ --sc:var(--sig-gold); opacity:.72; animation:sigBreath 6.5s ease-in-out infinite; transition:opacity 1.2s var(--ease); }
+.el-attn[data-phase="lifeIntegration"] .sig-blue{ --sc:color-mix(in srgb, var(--sig-blue) 46%, var(--sig-gold)); }
+.el-attn[data-phase="lifeIntegration"] .sig-amber{ --sc:var(--sig-gold); opacity:1; }
+
+/* finalPhoto: field settles out */
+.el-attn[data-phase="finalPhoto"] .attn-stage{ opacity:0; transition:opacity 1s var(--ease); }
+
+/* faint attention paths drawn from the recalled picks */
+.attn-paths{ z-index:2; pointer-events:none; opacity:0; transition:opacity 1s var(--ease); }
+.el-attn[data-phase="revealRed"] .attn-paths,.el-attn[data-phase="lifeIntegration"] .attn-paths{ opacity:.85; }
+.attn-paths path{ fill:none; stroke:rgba(127,179,236,.5); stroke-width:1; stroke-dasharray:3 4; }
+
+/* quadrant click targets, only live during askRedLocation */
+.attn-quads{ position:absolute; inset:0; z-index:3; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; opacity:0; pointer-events:none; }
+.el-attn[data-phase="askRedLocation"] .attn-quads{ opacity:1; pointer-events:auto; }
+.attn-quad{ border:1px solid transparent; background:transparent; transition:background .3s, border-color .3s; cursor:pointer; }
+.attn-quad:hover{ background:rgba(255,255,255,.045); border-color:rgba(255,255,255,.14); }
+
+/* countdown ring during encodeBlue */
+.attn-ring{ position:absolute; top:clamp(14px,2.4vw,22px); right:clamp(14px,2.4vw,22px); width:42px; height:42px; z-index:4; opacity:0; transition:opacity .4s; }
+.el-attn[data-phase="encodeBlue"] .attn-ring{ opacity:1; }
+.attn-ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
+.attn-ring .ring-bg{ fill:none; stroke:rgba(255,255,255,.16); stroke-width:3; }
+.attn-ring .ring-fg{ fill:none; stroke:var(--sig-blue); stroke-width:3; stroke-linecap:round; stroke-dasharray:113; stroke-dashoffset:0; }
+.el-attn[data-phase="encodeBlue"] .attn-ring .ring-fg{ animation:attnCount 3s linear forwards; }
+@keyframes attnCount{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:113; } }
+
+/* minimal floating labels for the life lesson */
+.attn-labels{ z-index:3; pointer-events:none; }
+.attn-label{ position:absolute; transform:translate(-50%,-50%); font-family:var(--font-sans); font-weight:500; font-size:11px; letter-spacing:.05em; padding:4px 10px; border-radius:999px; white-space:nowrap; opacity:0; transition:opacity 1s var(--ease); background:rgba(10,8,16,.5); border:1px solid rgba(255,255,255,.1); }
+.el-attn[data-phase="lifeIntegration"] .attn-label{ opacity:1; }
+.attn-label.lbl-blue{ color:#bcd6f4; border-color:rgba(127,179,236,.4); }
+.attn-label.lbl-good{ color:#ffe2ab; border-color:rgba(255,210,122,.42); }
+
+/* HUD: kicker, copy, progress, controls over the scrim. Empty areas let signal taps through. */
+.el-attn .el-scrim{ z-index:2; background:linear-gradient(180deg, transparent 54%, rgba(10,7,16,.86)); }
+.attn-hud{ position:absolute; left:0; right:0; bottom:0; z-index:4; padding:clamp(22px,3vw,42px); display:flex; flex-direction:column; align-items:flex-start; pointer-events:none; }
+.attn-hud .attn-btn,.attn-hud .attn-controls{ pointer-events:auto; }
+.attn-title{ font-size:clamp(1.5rem,3vw,2.4rem); margin:10px 0 0; letter-spacing:-.02em; }
+.el-attn:not([data-phase="intro"]) .attn-title{ display:none; }
+.attn-text{ color:var(--text); font-size:clamp(1rem,1.6vw,1.2rem); margin:12px 0 0; max-width:44ch; line-height:1.4; min-height:1.4em; }
+.attn-sub{ color:var(--text-2); font-size:clamp(.88rem,1.2vw,1rem); margin:8px 0 0; max-width:50ch; line-height:1.5; min-height:1em; }
+.attn-progress{ margin-top:10px; font-family:var(--font-sans); font-weight:600; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--sig-blue); min-height:1em; }
+.attn-controls{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.attn-btn{ font-family:var(--font-sans); font-weight:600; font-size:13px; letter-spacing:.04em; color:#16121c; background:#ffd27a; border:1px solid #ffd27a; border-radius:999px; padding:11px 20px; min-height:44px; cursor:pointer; transition:transform .3s var(--ease), background .3s, box-shadow .3s; box-shadow:0 12px 26px -14px rgba(255,210,122,.6); }
+.attn-btn:hover{ transform:translateY(-2px); background:#ffdc93; }
+.attn-opt{ background:rgba(255,255,255,.045); color:var(--text); border:1px solid var(--line-2); box-shadow:none; }
+.attn-opt:hover{ background:rgba(255,255,255,.1); border-color:var(--sig-blue); transform:translateY(-2px); }
+
+/* final reveal: transparent figure, quote, caption */
+.attn-final{ position:absolute; inset:0; z-index:5; opacity:0; visibility:hidden; transition:opacity .9s var(--ease), visibility .9s; display:grid; grid-template-columns:1fr; align-items:end; overflow:auto; }
+.el-attn[data-phase="finalPhoto"] .attn-final{ opacity:1; visibility:visible; }
 .attn-final-img{ position:absolute; inset:0; z-index:1; pointer-events:none; }
-.attn-final-img::before{ content:""; position:absolute; right:4%; bottom:0; width:60%; height:90%; background:radial-gradient(58% 58% at 68% 60%, rgba(239,132,190,.22), transparent 70%); }
-.attn-final-img img{ position:absolute; right:0; bottom:0; height:96%; max-width:62%; object-fit:contain; object-position:bottom right; filter:drop-shadow(0 26px 52px rgba(0,0,0,.6)); -webkit-mask-image:linear-gradient(180deg,#000 86%,transparent); mask-image:linear-gradient(180deg,#000 86%,transparent); }
-.attn-final-img.no-img::after{ content:""; position:absolute; right:16%; bottom:16%; width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, rgba(239,132,190,.32), transparent 70%); filter:blur(8px); }
-.attn-final-copy{ position:relative; z-index:2; padding:clamp(22px,3.4vw,46px); max-width:62ch; background:linear-gradient(180deg, rgba(14,11,20,.92), rgba(14,11,20,.55) 70%, transparent); }
-.attn-eyebrow{ font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.26em; text-transform:uppercase; color:var(--gold); }
-.attn-quote{ font-family:var(--font-serif); font-style:italic; font-weight:300; font-size:clamp(1.4rem,2.6vw,2.15rem); line-height:1.22; color:var(--text); margin:14px 0 0; max-width:24ch; }
-.attn-heal{ color:var(--text-2); font-size:clamp(.92rem,1.2vw,1rem); line-height:1.6; margin:16px 0 0; max-width:48ch; }
-
-/* controls */
-.attn-controls{ margin-top:16px; }
-.attn-btn{ font-family:var(--font-sans); font-weight:600; font-size:13px; letter-spacing:.04em; color:#2a0a1c; background:var(--gold); border-radius:999px; padding:11px 22px; min-height:44px; transition:transform .3s var(--ease), background .3s, box-shadow .3s; box-shadow:0 12px 26px -14px rgba(239,132,190,.7); }
-.attn-btn:hover{ transform:translateY(-2px); background:var(--gold-bright); }
-.attn-again{ margin-top:22px; }
-.attn-prompt{ min-height:1.5em; }
-
-/* mindset meta rides above the close-eyes overlay; hidden in the final reveal */
-.el-attn-panel .el-meta{ z-index:4; }
-.el-attn-panel.attn-final-on .el-meta{ opacity:0; visibility:hidden; pointer-events:none; transition:opacity .5s var(--ease), visibility .5s; }
+.attn-final-img::before{ content:""; position:absolute; right:4%; bottom:0; width:62%; height:92%; background:radial-gradient(56% 56% at 68% 58%, rgba(255,206,106,.26), transparent 70%); }
+.attn-final-img img{ position:absolute; right:0; bottom:0; height:96%; max-width:62%; object-fit:contain; object-position:bottom right; filter:drop-shadow(0 26px 52px rgba(0,0,0,.6)) drop-shadow(0 0 28px rgba(255,206,106,.34)); -webkit-mask-image:linear-gradient(180deg,#000 86%,transparent); mask-image:linear-gradient(180deg,#000 86%,transparent); }
+.attn-final-img.no-img::after{ content:""; position:absolute; right:16%; bottom:16%; width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, rgba(255,206,106,.34), transparent 70%); filter:blur(8px); }
+.attn-final-copy{ position:relative; z-index:2; padding:clamp(22px,3.4vw,44px); background:linear-gradient(180deg, rgba(12,9,16,.92), rgba(12,9,16,.55) 64%, transparent); }
+.attn-eyebrow{ font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.26em; text-transform:uppercase; color:var(--sig-gold); }
+.attn-quote{ font-family:var(--font-serif); font-style:italic; font-weight:300; font-size:clamp(1.4rem,2.6vw,2.1rem); line-height:1.22; color:var(--text); margin:14px 0 0; max-width:26ch; }
+.attn-caption{ color:var(--text-2); font-size:clamp(.9rem,1.2vw,1rem); line-height:1.55; margin:14px 0 0; max-width:48ch; }
+.attn-replay{ margin-top:20px; }
+.el-attn-panel.attn-final-on .attn-hud{ opacity:0; visibility:hidden; pointer-events:none; transition:opacity .5s var(--ease), visibility .5s; }
 
 @media (min-width:900px){
-  .attn-final{ grid-template-columns:1.02fr .98fr; }
-  .attn-final-copy{ background:linear-gradient(90deg, rgba(14,11,20,.97) 0%, rgba(14,11,20,.74) 44%, rgba(14,11,20,.12) 72%, transparent); max-width:none; height:100%; display:flex; flex-direction:column; justify-content:center; }
+  .attn-final{ grid-template-columns:1.02fr .98fr; align-items:center; }
+  .attn-final-copy{ background:linear-gradient(90deg, rgba(12,9,16,.96) 0%, rgba(12,9,16,.72) 44%, rgba(12,9,16,.1) 72%, transparent); height:100%; display:flex; flex-direction:column; justify-content:center; }
   .attn-final-img img{ height:104%; max-width:52%; }
   .attn-final-img::before{ right:1%; width:52%; height:98%; }
 }
 
+@media (max-width:760px){ .s-orbit{ animation-duration:18s; } }
+
 @media (prefers-reduced-motion:reduce){
-  .el-attn .dot{ animation:none !important; }
-  .el-attn[data-phase="blue"] .dot-blue, .el-attn[data-phase="red"] .dot-amber{ animation:none !important; }
-  .attn-lid{ top:0; height:100%; transform:scaleY(1); opacity:0; transition:opacity .45s var(--ease); background:rgba(7,6,12,.72); }
-  .attn-lid-bot{ display:none; }
-  .el-attn[data-phase="close"] .attn-lid{ opacity:1; }
-  .el-attn[data-phase="close"] .attn-field{ filter:none; }
+  .sig,.sig .s-aura,.sig .s-ring,.s-orbit{ animation:none !important; }
+  .el-attn[data-phase="encodeBlue"] .attn-ring .ring-fg{ animation:none; stroke-dashoffset:113; }
 }
 
 .el-foot{ margin-top:clamp(26px,3vw,40px); }
@@ -576,6 +637,87 @@ body.has-cursor, body.has-cursor a, body.has-cursor button, body.has-cursor .car
   transform:scaleX(0); transform-origin:0 50%; transition:transform 1s var(--ease) .25s; }
 .section-head.is-in h2::after{ transform:scaleX(1); }
 
+/* ============================================================
+   GLOBAL BRIGHT FIELD
+   One fixed breathing pink/green aurora behind the whole site.
+   Every section goes transparent so the field is continuous across
+   scroll (not a separate gradient per block). Section level copy flips
+   to dark ink for contrast; the dark content cards stay as glass panels
+   on top. Tune the field in .bg-aurora (base) and .bg-aurora .blob.
+   ============================================================ */
+body{ background:#eef2ee; }
+.bg-aurora{ position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden;
+  background:radial-gradient(118% 92% at 50% 4%, #ffe7f2 0%, #f4ecf6 30%, #e8f7ef 62%, #d9f1e3 100%); }
+.bg-aurora .blob{ position:absolute; width:50vw; height:50vw; border-radius:50%; opacity:.82; will-change:transform; filter:blur(62px) saturate(120%); }
+.bg-aurora .g1{ background:radial-gradient(circle,#4fe6a0 0%,transparent 66%); left:-10%; top:-6%; animation:auroraDrift 19s ease-in-out infinite; }
+.bg-aurora .p1{ background:radial-gradient(circle,#ff8fc6 0%,transparent 66%); right:-10%; top:2%; animation:auroraDrift2 23s ease-in-out infinite reverse; }
+.bg-aurora .g2{ background:radial-gradient(circle,#66f0b4 0%,transparent 66%); right:-6%; bottom:-12%; animation:auroraDrift2 27s ease-in-out infinite; }
+.bg-aurora .p2{ background:radial-gradient(circle,#ffa3d2 0%,transparent 66%); left:-8%; bottom:-14%; animation:auroraDrift 25s ease-in-out infinite reverse; }
+.bg-aurora .g3{ background:radial-gradient(circle,#5cf0aa 0%,transparent 64%); left:32%; top:34%; width:44vw; height:44vw; animation:auroraDrift 31s ease-in-out infinite; }
+.bg-aurora .p3{ background:radial-gradient(circle,#ff97c9 0%,transparent 64%); left:40%; top:-4%; width:42vw; height:42vw; animation:auroraDrift2 29s ease-in-out infinite reverse; }
+
+/* hero now rides on the shared field */
+.hero{ background:transparent; }
+
+/* sections become transparent so the field shows through continuously */
+.recognition,.journey,.elements,.technology,.archive,.philosophy,.studio,.footer{ background:transparent; }
+.recognition{ border-block-color:rgba(28,16,24,.12); }
+.section::before{ background:linear-gradient(90deg,transparent,rgba(28,16,24,.16),transparent); }
+
+/* section level copy flips to dark ink for readability on the bright field */
+.eyebrow{ color:#5b3f54; } .eyebrow .num{ color:#c81d77; }
+.section-head h2{ color:#1c1018; }
+.section-head .lead{ color:#4c3a48; }
+.journey-lede{ color:#231421; } .journey-lede em{ color:#c81d77; }
+.journey-body p{ color:#4c3a48; } .journey-body p:first-child::first-letter{ color:#c81d77; }
+.pullquote{ color:#231421; border-top-color:rgba(28,16,24,.16); } .pullquote span{ color:#c81d77; }
+.note{ color:#5b4a55; }
+.tech-close p{ color:#231421; } .tech-close p span{ color:#c81d77; }
+.phil-quote{ color:#1c1018; } .phil-quote em{ color:#c81d77; }
+.studio h2{ color:#1c1018; } .studio .sub{ color:#4c3a48; } .studio-meta{ color:#5b4a55; }
+.archive-foot{ color:#5b4a55; } .archive-foot .k{ color:#3a2a36; border-color:rgba(28,16,24,.2); }
+.marquee .item{ color:#4c3a48; } .marquee .item b{ color:#1c1018; } .marquee .star{ color:#c81d77; } .marquee .sep{ background:#c81d77; }
+.footer{ border-top-color:rgba(28,16,24,.14); }
+.footer .container{ color:#5b4a55; } .footer a{ color:#3a2a36; } .footer a:hover{ color:#c81d77; } .footer .f-brand{ color:#1c1018; }
+
+/* element rail tabs + archive chips read on the bright field (stage card stays dark) */
+.el-tab{ color:#3a2a36; background:rgba(20,12,22,.035); border-color:rgba(28,16,24,.14); }
+.el-tab .et-n{ color:#7a5f72; } .el-tab .et-name{ color:#241420; }
+.el-tab:hover{ color:#16121c; border-color:rgba(28,16,24,.28); }
+.el-tab[aria-selected="true"]{ color:#16121c; }
+.el-tab[aria-selected="true"] .et-name{ color:#16121c; }
+.chip{ color:#3a2a36; border-color:rgba(28,16,24,.18); }
+.chip:hover{ color:#16121c; border-color:rgba(28,16,24,.34); }
+
+/* CTAs: dark on bright (matches the hero) */
+.btn-primary{ background:#16121c; color:#fff5fb; border-color:#16121c; }
+.btn-primary:hover{ background:#241a2e; border-color:#241a2e; }
+.btn-ghost{ border-color:rgba(28,16,24,.3); color:#1c1018; }
+.btn-ghost:hover{ border-color:#16121c; color:#16121c; }
+
+/* nav: light frosted, dark ink across the whole site */
+.nav::before{ background:rgba(255,255,255,.55); border-bottom-color:rgba(28,16,24,.1); }
+.brand{ color:#16121c; } .brand .dot{ background:#c81d77; box-shadow:0 0 14px rgba(200,29,119,.5); }
+.nav-links a{ color:#3a2a36; } .nav-links a:hover{ color:#16121c; } .nav-links a.active{ color:#16121c; }
+.nav-cta{ border-color:rgba(28,16,24,.3); color:#16121c!important; }
+.nav-cta:hover{ background:#16121c; border-color:#16121c; color:#fff!important; }
+.burger span{ background:#16121c; }
+.nav .burger[aria-expanded="true"] span{ background:#16121c; }
+@media (max-width:920px){ .nav-links{ background:rgba(248,244,248,.97); } .nav-links a{ color:#241420; } }
+
+/* v5 section rail + chapter HUD read on the bright field */
+.section-rail::before{ background:rgba(28,16,24,.14); }
+.rail-node .rail-label{ color:#5b4a55; } .rail-node:hover .rail-label{ color:#16121c; }
+.rail-node .rail-dot{ border-color:rgba(28,16,24,.3); }
+.chapter .chapter-index i{ color:#7a5f72; } .chapter .chapter-name{ color:#4c3a48; }
+
+/* mobile: lighter blur and fewer animated layers for performance */
+@media (max-width:760px){
+  .bg-aurora .blob{ filter:blur(46px) saturate(116%); width:66vw; height:66vw; }
+  .bg-aurora .g3,.bg-aurora .p3{ display:none; }
+}
+@media (prefers-reduced-motion:reduce){ .bg-aurora .blob{ animation:none; } }
+
 /* ===================== reduced motion ===================== */
 @media (prefers-reduced-motion:reduce){
   html{ scroll-behavior:auto; }
@@ -586,6 +728,11 @@ body.has-cursor, body.has-cursor a, body.has-cursor button, body.has-cursor .car
 
 <body class="no-js">
 <a class="skip" href="#journey">Skip to content</a>
+<!-- one fixed breathing pink/green field behind the whole site -->
+<div class="bg-aurora" aria-hidden="true">
+  <span class="blob g1"></span><span class="blob p1"></span><span class="blob g2"></span>
+  <span class="blob p2"></span><span class="blob g3"></span><span class="blob p3"></span>
+</div>
 <div class="grain" aria-hidden="true"></div>
 
 <!-- ============================ NAV ============================ -->
@@ -606,10 +753,6 @@ body.has-cursor, body.has-cursor a, body.has-cursor button, body.has-cursor .car
 
 <!-- =========================== HERO =========================== -->
 <section class="hero" aria-label="Introduction">
-  <div class="hero-aurora" aria-hidden="true">
-    <span class="blob g1"></span><span class="blob p1"></span><span class="blob g2"></span>
-    <span class="blob p2"></span><span class="blob g3"></span><span class="blob p3"></span>
-  </div>
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="container hero-inner" id="heroInner">
     <figure class="hero-figure" aria-hidden="true"><img class="hero-portrait" src="assets/v2-mat-x-tony.webp" alt="" loading="eager" decoding="async" onerror="this.closest('.hero-figure').classList.add('no-img')" /></figure>
@@ -1213,68 +1356,170 @@ body.has-cursor, body.has-cursor a, body.has-cursor button, body.has-cursor .car
     requestAnimationFrame(tick);
   })();
 
-  /* =================== MINDSET 01 — Attention Field (selective attention) =================== */
-  /* Copy lives here. Keep visible text free of em dashes. */
+  /* =================== MINDSET 01 — Attention Field (spatial memory experiment) ===================
+     A small experiment: memorize blue, recall the blue positions, then answer where the red was.
+     It proves that attention keeps what it is told to search for and loses the rest.
+     Tune SIGNALS (positions, roles, red quadrant), the ms timings, and the copy below.
+     Keep visible copy free of long dashes. */
   function attnMarkup(e,img){
     return ''
       +'<div class="el-attn" data-phase="intro">'
-      +  '<div class="attn-field" aria-hidden="true"></div>'
-      +  '<div class="attn-veil" aria-hidden="true"></div>'
-      +  '<div class="attn-lid attn-lid-top" aria-hidden="true"></div>'
-      +  '<div class="attn-lid attn-lid-bot" aria-hidden="true"></div>'
+      +  '<div class="attn-stage">'
+      +    '<div class="attn-field"></div>'
+      +    '<svg class="attn-paths" preserveAspectRatio="none" aria-hidden="true"></svg>'
+      +    '<div class="attn-labels" aria-hidden="true"></div>'
+      +    '<div class="attn-quads">'
+      +      '<button class="attn-quad" data-q="tl" type="button" aria-label="Top left"></button>'
+      +      '<button class="attn-quad" data-q="tr" type="button" aria-label="Top right"></button>'
+      +      '<button class="attn-quad" data-q="bl" type="button" aria-label="Bottom left"></button>'
+      +      '<button class="attn-quad" data-q="br" type="button" aria-label="Bottom right"></button>'
+      +    '</div>'
+      +    '<div class="attn-ring" aria-hidden="true"><svg viewBox="0 0 42 42"><circle class="ring-bg" cx="21" cy="21" r="18"/><circle class="ring-fg" cx="21" cy="21" r="18"/></svg></div>'
+      +  '</div>'
       +  '<div class="attn-final">'
-      +    '<div class="attn-final-img"><img src="'+img+'" alt="Matthew Hua" loading="lazy" decoding="async" onerror="this.closest(\'.attn-final-img\').classList.add(\'no-img\'); this.remove();" /></div>'
+      +    '<div class="attn-final-img"><img class="attn-photo" src="'+img+'" alt="Matthew Hua" loading="lazy" decoding="async" /></div>'
       +    '<div class="attn-final-copy">'
       +      '<span class="attn-eyebrow">Element 01 · Mindset</span>'
       +      '<p class="attn-quote">As Tony Robbins said, where focus goes, energy flows.</p>'
-      +      '<p class="attn-heal">In healing, attention is not abstract. Where the mind feels safe enough to focus, the body begins to listen. Breath, touch, heat, cold, movement, and community become signals that guide the nervous system back toward trust.</p>'
-      +      '<button class="attn-btn attn-again" type="button">Again</button>'
+      +      '<p class="attn-caption">For Matthew, this becomes practical: guide attention toward safety, gratitude, and possibility, and the body has a clearer signal to follow.</p>'
+      +      '<button class="attn-btn attn-replay" type="button">Again</button>'
       +    '</div>'
       +  '</div>'
-      +'</div>'
-      +'<div class="el-scrim"></div>'
-      +'<div class="el-meta">'
-      +  '<span class="el-kicker">Element '+e.n+'</span><h3>'+e.name+'</h3>'
-      +  '<p class="attn-prompt" aria-live="polite">Mindset is the filter.</p>'
-      +  '<div class="attn-controls"><button class="attn-btn attn-begin" type="button">Begin</button></div>'
+      +  '<div class="el-scrim"></div>'
+      +  '<div class="attn-hud">'
+      +    '<span class="el-kicker">Element '+e.n+' · '+e.name+'</span>'
+      +    '<h3 class="attn-title">Attention Test</h3>'
+      +    '<p class="attn-text" aria-live="polite"></p>'
+      +    '<p class="attn-sub" aria-live="polite"></p>'
+      +    '<div class="attn-progress"></div>'
+      +    '<div class="attn-controls"></div>'
+      +  '</div>'
       +'</div>';
   }
   function createAttention(panel){
     var attnEl=panel.querySelector('.el-attn'),
         field=panel.querySelector('.attn-field'),
-        promptEl=panel.querySelector('.attn-prompt'),
-        beginBtn=panel.querySelector('.attn-begin'),
-        againBtn=panel.querySelector('.attn-again'),
+        paths=panel.querySelector('.attn-paths'),
+        labelsWrap=panel.querySelector('.attn-labels'),
+        titleEl=panel.querySelector('.attn-title'),
+        textEl=panel.querySelector('.attn-text'),
+        subEl=panel.querySelector('.attn-sub'),
+        progEl=panel.querySelector('.attn-progress'),
+        ctrlEl=panel.querySelector('.attn-controls'),
+        replayBtn=panel.querySelector('.attn-replay'),
+        photo=panel.querySelector('.attn-photo'),
         timers=[];
-    function clearT(){ for(var i=0;i<timers.length;i++) clearTimeout(timers[i]); timers=[]; }
-    /* signal field: muted majority plus blue and amber signal groups and a few accent dots */
-    var plan=[]; function add(cat,n){ for(var i=0;i<n;i++) plan.push(cat); }
-    add('muted',26); add('blue',9); add('amber',9); add('gold',6);
-    for(var i=plan.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=plan[i]; plan[i]=plan[j]; plan[j]=t; }
-    plan.forEach(function(cat){
-      var d=document.createElement('i'); d.className='dot dot-'+cat;
-      d.style.left=(5+Math.random()*90).toFixed(1)+'%';
-      d.style.top=(8+Math.random()*84).toFixed(1)+'%';
-      d.style.animationDelay=(Math.random()*4.5).toFixed(2)+'s';
-      field.appendChild(d);
+
+    /* fixed signal data: stable ids, percent positions, roles, quadrant. Red lives in br. */
+    var SIGNALS=[
+      {id:'b1',role:'blue',x:20,y:24,q:'tl'},
+      {id:'b2',role:'blue',x:76,y:22,q:'tr'},
+      {id:'b3',role:'blue',x:26,y:60,q:'bl'},
+      {id:'a1',role:'amber',x:78,y:62,q:'br'},
+      {id:'g1',role:'gold',x:50,y:16,q:'tr'},
+      {id:'g2',role:'gold',x:62,y:48,q:'br'},
+      {id:'g3',role:'gold',x:14,y:46,q:'bl'},
+      {id:'n1',role:'neutral',x:44,y:32,q:'tl'},
+      {id:'n2',role:'neutral',x:88,y:44,q:'tr'},
+      {id:'n3',role:'neutral',x:36,y:52,q:'bl'},
+      {id:'n4',role:'neutral',x:58,y:68,q:'br'},
+      {id:'n5',role:'neutral',x:30,y:40,q:'tl'}
+    ];
+    var RED_Q='br';
+    /* timings in ms */
+    var ENCODE_MS=3000, REVEAL_MS=3000, LIFE_MS=4600;
+    /* minimal floating labels for the life lesson */
+    var LIFE_LABELS=[
+      {t:'problems',cls:'lbl-blue',x:20,y:16},{t:'stress',cls:'lbl-blue',x:26,y:70},{t:"what's wrong",cls:'lbl-blue',x:76,y:14},
+      {t:'breath',cls:'lbl-good',x:80,y:54},{t:'gratitude',cls:'lbl-good',x:50,y:8},{t:'support',cls:'lbl-good',x:13,y:38},{t:'small wins',cls:'lbl-good',x:62,y:40}
+    ];
+
+    var sigEls={}, picks=[], answer=null, correct=false;
+    SIGNALS.forEach(function(sg){
+      var b=document.createElement('button'); b.type='button'; b.className='sig sig-'+sg.role;
+      b.dataset.id=sg.id; b.dataset.role=sg.role; b.dataset.q=sg.q; b.tabIndex=-1; b.setAttribute('aria-hidden','true');
+      b.style.setProperty('--x',sg.x+'%'); b.style.setProperty('--y',sg.y+'%'); b.style.animationDelay=(((sg.x+sg.y)%5)/1.3).toFixed(2)+'s';
+      b.innerHTML='<span class="s-aura"></span><span class="s-ring"></span><span class="s-core"></span><span class="s-orbit"><i></i></span>';
+      b.addEventListener('click', function(){ onSignalClick(sg,b); });
+      field.appendChild(b); sigEls[sg.id]=b;
     });
-    /* timing in ms. Tune the sequence here. */
-    var BLUE_MS=3000, CLOSE_MS=900, RED_MS=3200;
-    var PROMPT={ intro:'Mindset is the filter.', blue:'For three seconds, look only for the blue signals.', red:'Now, what red signals did you notice?' };
-    function setPhase(p){
-      attnEl.setAttribute('data-phase',p);
-      if(PROMPT[p]) promptEl.textContent=PROMPT[p];
-      panel.classList.toggle('attn-final-on', p==='final');
-      beginBtn.hidden = (p!=='intro');
+
+    function clearT(){ for(var i=0;i<timers.length;i++) clearTimeout(timers[i]); timers=[]; }
+    function addBtn(label,fn){ var b=document.createElement('button'); b.type='button'; b.className='attn-btn'; b.textContent=label; b.addEventListener('click',fn); ctrlEl.appendChild(b); }
+    function addOpt(label,fn){ var b=document.createElement('button'); b.type='button'; b.className='attn-btn attn-opt'; b.textContent=label; b.addEventListener('click',fn); ctrlEl.appendChild(b); }
+
+    function setPhase(p){ attnEl.setAttribute('data-phase',p); panel.classList.toggle('attn-final-on', p==='finalPhoto'); render(p); }
+
+    function render(p){
+      progEl.textContent=''; ctrlEl.innerHTML='';
+      if(p==='intro'){
+        textEl.textContent='Your mind is about to be given one instruction.';
+        subEl.textContent='What it focuses on, it stores. What it ignores, it loses.';
+        addBtn('Begin', start);
+      } else if(p==='encodeBlue'){
+        textEl.textContent='Memorize the blue signal positions.';
+        subEl.textContent='Ignore everything else.';
+        timers.push(setTimeout(function(){ setPhase('recallBlue'); }, ENCODE_MS));
+      } else if(p==='recallBlue'){
+        textEl.textContent='Now click the 3 places where the blue signals were.';
+        subEl.textContent='Trust your memory.';
+        progEl.textContent='0 of 3';
+      } else if(p==='askRedLocation'){
+        textEl.textContent='Where was the red signal?';
+        subEl.textContent='Tap a quadrant, or choose below.';
+        addOpt('Top left', function(){ answerRed('tl'); });
+        addOpt('Top right', function(){ answerRed('tr'); });
+        addOpt('Bottom left', function(){ answerRed('bl'); });
+        addOpt('Bottom right', function(){ answerRed('br'); });
+        addOpt("I don't know", function(){ answerRed('idk'); });
+      } else if(p==='revealRed'){
+        drawPaths();
+        if(correct){ textEl.textContent='You caught it.'; subEl.textContent='Most attention misses what it was not trained to value.'; }
+        else { textEl.textContent='You saw it.'; subEl.textContent='But your attention was not asked to keep it.'; }
+        timers.push(setTimeout(function(){ subEl.textContent='Where focus goes, energy flows.'; }, 1500));
+        timers.push(setTimeout(function(){ setPhase('lifeIntegration'); }, REVEAL_MS));
+      } else if(p==='lifeIntegration'){
+        buildLabels();
+        textEl.textContent='When we train the mind to count problems, problems become the map.';
+        subEl.textContent='The solutions, support, beauty, and reasons to be grateful may still be there, but they stop being encoded. Healing begins when attention learns to search for safety again.';
+        timers.push(setTimeout(function(){ subEl.textContent='Matthew helps redirect attention through breath, touch, warmth, movement, and presence, creating space for the body to soften and listen.'; }, 2500));
+        timers.push(setTimeout(function(){ setPhase('finalPhoto'); }, LIFE_MS));
+      }
     }
-    function run(){ clearT(); setPhase('blue');
-      timers.push(setTimeout(function(){ setPhase('close'); }, BLUE_MS));
-      timers.push(setTimeout(function(){ setPhase('red'); }, BLUE_MS+CLOSE_MS));
-      timers.push(setTimeout(function(){ setPhase('final'); }, BLUE_MS+CLOSE_MS+RED_MS));
+
+    function start(){ clearT(); picks=[]; clearPicks(); setPhase('encodeBlue'); }
+    function onSignalClick(sg,b){
+      if(attnEl.getAttribute('data-phase')!=='recallBlue') return;
+      if(b.classList.contains('picked') || picks.length>=3) return;
+      b.classList.add('picked'); picks.push(sg); progEl.textContent=picks.length+' of 3';
+      if(picks.length===3) timers.push(setTimeout(function(){ setPhase('askRedLocation'); }, 520));
     }
-    function reset(){ clearT(); setPhase('intro'); }
-    beginBtn.addEventListener('click', run);
-    againBtn.addEventListener('click', reset);
+    function answerRed(q){ if(attnEl.getAttribute('data-phase')!=='askRedLocation') return; answer=q; correct=(q===RED_Q); setPhase('revealRed'); }
+    var quads=panel.querySelectorAll('.attn-quad');
+    quads.forEach(function(q){ q.addEventListener('click', function(){ answerRed(q.dataset.q); }); });
+
+    function drawPaths(){
+      if(picks.length<2){ paths.innerHTML=''; return; }
+      var w=field.clientWidth||600, h=field.clientHeight||400;
+      paths.setAttribute('viewBox','0 0 '+w+' '+h);
+      var d=''; for(var i=0;i<picks.length;i++){ d+=(i?'L':'M')+(picks[i].x/100*w).toFixed(0)+' '+(picks[i].y/100*h).toFixed(0)+' '; }
+      paths.innerHTML='<path d="'+d+'"/>';
+    }
+    function buildLabels(){ labelsWrap.innerHTML=''; LIFE_LABELS.forEach(function(l){ var d=document.createElement('span'); d.className='attn-label '+l.cls; d.textContent=l.t; d.style.left=l.x+'%'; d.style.top=l.y+'%'; labelsWrap.appendChild(d); }); }
+    function clearPicks(){ for(var k in sigEls) sigEls[k].classList.remove('picked'); paths.innerHTML=''; labelsWrap.innerHTML=''; }
+    function reset(){ clearT(); picks=[]; answer=null; correct=false; clearPicks(); field.style.transform=paths.style.transform=labelsWrap.style.transform=''; setPhase('intro'); }
+
+    replayBtn.addEventListener('click', reset);
+    if(photo) photo.addEventListener('error', function(){ var w=photo.closest('.attn-final-img'); if(w) w.classList.add('no-img'); photo.remove(); });
+
+    /* subtle pointer parallax on the constellation (desktop, performant) */
+    if(matchMedia('(hover:hover) and (pointer:fine)').matches){
+      var stage=panel.querySelector('.attn-stage');
+      stage.addEventListener('mousemove', function(ev){ var r=stage.getBoundingClientRect(); var dx=((ev.clientX-r.left)/r.width-.5), dy=((ev.clientY-r.top)/r.height-.5); var t='translate('+(dx*9).toFixed(1)+'px,'+(dy*7).toFixed(1)+'px)'; field.style.transform=t; paths.style.transform=t; labelsWrap.style.transform=t; });
+      stage.addEventListener('mouseleave', function(){ field.style.transform=paths.style.transform=labelsWrap.style.transform=''; });
+    }
+    addEventListener('resize', function(){ var ph=attnEl.getAttribute('data-phase'); if(ph==='revealRed'||ph==='lifeIntegration') drawPaths(); });
+
     reset();
     return { setActive:function(on){ if(on){ reset(); } else { clearT(); } }, reset:reset };
   }
