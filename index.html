@@ -133,7 +133,7 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .swiss-flag{ position:relative; width:16px; height:16px; flex:0 0 16px; border-radius:2px; background:#e31b23; box-shadow:0 0 0 1px rgba(255,255,255,.72), 0 3px 8px rgba(28,16,24,.16); }
 .swiss-flag::before,.swiss-flag::after{ content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; border-radius:1px; }
 .swiss-flag::before{ width:10px; height:3px; } .swiss-flag::after{ width:3px; height:10px; }
-@media (max-width:760px){ .hero-ribbon{ top:76px; left:20px; max-width:calc(100vw - 40px); transform:rotate(-6deg); padding:9px 13px; font-size:8.8px; letter-spacing:.07em; } .swiss-flag{ width:14px; height:14px; flex-basis:14px; } }
+@media (max-width:760px){ .hero-ribbon{ top:76px; left:20px; max-width:calc(100vw - 40px); transform:rotate(-6deg) scale(.78); padding:7px 10px; gap:5px; font-size:7.4px; letter-spacing:.055em; } .swiss-flag{ width:11px; height:11px; flex-basis:11px; } .swiss-flag::before{ width:7px; height:2px; } .swiss-flag::after{ width:2px; height:7px; } }
 
 /* bright breathing aurora: equal parts bright green + bright muted pink */
 .hero-aurora{ position:absolute; inset:-12%; z-index:0; pointer-events:none; filter:blur(58px) saturate(120%); }
