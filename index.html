@@ -464,8 +464,8 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .compare ul{ list-style:none; margin:18px 0 0; padding:0; display:flex; flex:1; flex-direction:column; gap:11px; }
 .compare li{ color:#ddd2e0; font-size:14.5px; padding-left:20px; position:relative; }
 .compare li::before{ content:""; position:absolute; left:0; top:.62em; width:7px; height:1px; background:currentColor; opacity:.6; }
-.compare .sig{ margin-top:24px; align-self:flex-start; max-width:100%; white-space:normal; overflow-wrap:anywhere; line-height:1.35; padding:9px 12px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.055); font-family:var(--font-sans); font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
-.compare .rc .sig{ color:#ffc0dc; border-color:rgba(255,192,220,.22); } .compare .zs .sig{ color:#d6f7e0; border-color:rgba(214,247,224,.22); }
+.compare .compare-sign{ margin-top:24px; align-self:flex-start; max-width:100%; white-space:normal; overflow-wrap:anywhere; line-height:1.35; padding:9px 12px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.055); font-family:var(--font-sans); font-size:12px; letter-spacing:.14em; text-transform:uppercase; position:static; transform:none; }
+.compare .rc .compare-sign{ color:#ffc0dc; border-color:rgba(255,192,220,.22); } .compare .zs .compare-sign{ color:#d6f7e0; border-color:rgba(214,247,224,.22); }
 .tech-close{ margin-top:clamp(44px,6vw,84px); max-width:760px; }
 .tech-close p{ font-family:var(--font-serif); font-style:italic; font-weight:300; font-size:clamp(1.5rem,3.4vw,2.3rem); line-height:1.26; }
 .tech-close p span{ color:var(--gold-bright); }
@@ -561,7 +561,7 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:600; letter-spacing:-.02e
 .brand{ font-weight:700; letter-spacing:.14em; }
 .eyebrow,.m-tag,.el-kicker,.lbl,.card .role,.studio-meta,.archive-foot{ font-weight:500; }
 .nav-links a,.el-tab .et-name{ font-weight:500; }
-.btn,.chip,.el-tab .et-name,.m-sign,.compare .sig{ font-weight:600; }
+.btn,.chip,.el-tab .et-name,.m-sign,.compare .compare-sign{ font-weight:600; }
 .journey-lede,.pullquote,.phil-quote,.m-hero,.tech-close p,.compare h4,.hero-tag{ font-family:var(--font-serif); } /* serif accents stay elegant */
 
 /* scroll progress rail */
@@ -1038,7 +1038,7 @@ body{ background:#eef2ee; }
           <li>Longer integrated sessions</li>
           <li>The therapist is fully involved throughout</li>
         </ul>
-        <p class="sig">Touch becomes the technology.</p>
+        <p class="compare-sign">Touch becomes the technology.</p>
       </div>
       <div class="col zs">
         <h4>Instruments that verify.</h4>
@@ -1048,7 +1048,7 @@ body{ background:#eef2ee; }
           <li>Shorter focused sessions</li>
           <li>Set, supervise, and document the dose</li>
         </ul>
-        <p class="sig">Precision you can prove.</p>
+        <p class="compare-sign">Precision you can prove.</p>
       </div>
     </div>
 
@@ -1094,7 +1094,7 @@ body{ background:#eef2ee; }
     <p class="sub reveal">healwell is where the method, the instruments, and the hands meet. Quiet, deliberate, and unhurried. For professional enquiries and collaborations, the door is open by conversation.</p>
     <div class="studio-actions reveal">
       <!-- refined, non-salesy actions. No booking funnel. -->
-      <a class="btn btn-primary" href="mailto:hello@healwell.ch">Private Inquiry <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn-primary" href="mailto:info@healwell.ch">Private Inquiry <span class="arrow" aria-hidden="true">→</span></a>
       <a class="btn btn-ghost" href="#technology">Professional Profile</a>
       <a class="btn btn-ghost" href="#top">Visit healwell</a>
     </div>
@@ -1102,7 +1102,7 @@ body{ background:#eef2ee; }
       <span class="place"><span class="pin" aria-hidden="true"></span> Rüdigerstrasse 7/Ground Floor, 8045 Zürich</span>
       <span><a href="https://wa.me/41765067488">WhatsApp 076 506 74 88</a></span>
       <span>Health Insurance recognised</span>
-      <span>hello@healwell.ch</span>
+      <span>info@healwell.ch</span>
     </div>
   </div>
 </section>
