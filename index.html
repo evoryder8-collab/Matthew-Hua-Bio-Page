@@ -270,8 +270,10 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .el-attn[data-phase="encodeBlue"] .sig-blue .s-aura{ animation:sigHalo 2.6s var(--ease) infinite; }
 
 /* recallBlue: every signal grey, same positions, clickable */
-.el-attn[data-phase="recallBlue"] .sig{ --sc:var(--sig-grey); opacity:.78; cursor:pointer; animation:none; }
-.el-attn[data-phase="recallBlue"] .sig::after{ content:""; position:absolute; inset:-45%; border-radius:50%; }
+.el-attn[data-phase="recallBlue"] .sig{ --sc:var(--sig-grey); opacity:.78; cursor:pointer; animation:none; touch-action:manipulation; }
+.el-attn[data-phase="recallBlue"] .sig::after{ content:""; position:absolute; inset:-60%; min-width:44px; min-height:44px; border-radius:50%; }
+.el-attn[data-phase="recallBlue"] .sig.picked{ animation:sigPick .5s var(--ease); }
+@keyframes sigPick{ 0%{ transform:translate(-50%,-50%) scale(1); } 40%{ transform:translate(-50%,-50%) scale(1.4); } 100%{ transform:translate(-50%,-50%) scale(1); } }
 .el-attn[data-phase="recallBlue"] .sig:hover{ opacity:1; }
 .el-attn[data-phase="recallBlue"] .sig.picked{ --sc:var(--sig-blue); opacity:1; }
 
@@ -307,14 +309,15 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .attn-quad{ border:1px solid transparent; background:transparent; transition:background .3s, border-color .3s; cursor:pointer; }
 .attn-quad:hover{ background:rgba(255,255,255,.045); border-color:rgba(255,255,255,.14); }
 
-/* countdown ring during encodeBlue */
-.attn-ring{ position:absolute; top:clamp(14px,2.4vw,22px); right:clamp(14px,2.4vw,22px); width:42px; height:42px; z-index:4; opacity:0; transition:opacity .4s; }
-.el-attn[data-phase="encodeBlue"] .attn-ring{ opacity:1; }
-.attn-ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
-.attn-ring .ring-bg{ fill:none; stroke:rgba(255,255,255,.16); stroke-width:3; }
-.attn-ring .ring-fg{ fill:none; stroke:var(--sig-blue); stroke-width:3; stroke-linecap:round; stroke-dasharray:113; stroke-dashoffset:0; }
+/* countdown ring during encodeBlue (sits above the scrim) */
+.attn-ring{ position:absolute; top:clamp(16px,2.6vw,26px); right:clamp(16px,2.6vw,26px); width:clamp(52px,7vw,62px); height:clamp(52px,7vw,62px); z-index:6; display:grid; place-items:center; opacity:0; transform:scale(.85); transition:opacity .4s var(--ease), transform .4s var(--ease); pointer-events:none; }
+.el-attn[data-phase="encodeBlue"] .attn-ring{ opacity:1; transform:scale(1); }
+.attn-ring svg{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); }
+.attn-ring .ring-bg{ fill:none; stroke:rgba(255,255,255,.14); stroke-width:2.6; }
+.attn-ring .ring-fg{ fill:none; stroke:var(--sig-blue); stroke-width:2.6; stroke-linecap:round; stroke-dasharray:126; stroke-dashoffset:0; filter:drop-shadow(0 0 4px color-mix(in srgb,var(--sig-blue) 80%,transparent)); }
 .el-attn[data-phase="encodeBlue"] .attn-ring .ring-fg{ animation:attnCount 3s linear forwards; }
-@keyframes attnCount{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:113; } }
+@keyframes attnCount{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:126; } }
+.ring-num{ font-family:var(--font-sans); font-weight:600; font-size:clamp(18px,2.4vw,22px); color:var(--text); font-variant-numeric:tabular-nums; }
 
 /* minimal floating labels for the life lesson */
 .attn-labels{ z-index:3; pointer-events:none; }
@@ -324,7 +327,7 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .attn-label.lbl-good{ color:#ffe2ab; border-color:rgba(255,210,122,.42); }
 
 /* HUD: kicker, copy, progress, controls over the scrim. Empty areas let signal taps through. */
-.el-attn .el-scrim{ z-index:2; background:linear-gradient(180deg, transparent 54%, rgba(10,7,16,.86)); }
+.el-attn .el-scrim{ z-index:2; pointer-events:none; background:linear-gradient(180deg, transparent 54%, rgba(10,7,16,.86)); }
 .attn-hud{ position:absolute; left:0; right:0; bottom:0; z-index:4; padding:clamp(22px,3vw,42px); display:flex; flex-direction:column; align-items:flex-start; pointer-events:none; }
 .attn-hud .attn-btn,.attn-hud .attn-controls{ pointer-events:auto; }
 .attn-title{ font-size:clamp(1.5rem,3vw,2.4rem); margin:10px 0 0; letter-spacing:-.02em; }
@@ -389,6 +392,12 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .m-make{ font-family:var(--font-sans); font-size:12.5px; color:var(--text-2); letter-spacing:.04em; }
 .m-snap{ color:var(--text-2); margin:16px 0 0; max-width:46ch; }
 .m-hero{ font-family:var(--font-serif); font-style:italic; font-weight:300; font-size:clamp(1.2rem,1.9vw,1.5rem); margin:18px 0 0; color:var(--text); }
+/* transparent device photo, integrated directly above each machine animation */
+.m-photo{ position:relative; margin:18px 0 4px; display:flex; align-items:flex-end; justify-content:center; height:clamp(150px,19vw,224px); pointer-events:none; }
+.m-photo::before{ content:""; position:absolute; left:50%; bottom:4%; transform:translateX(-50%); width:72%; height:80%; border-radius:50%; filter:blur(36px); z-index:0; }
+.m-rc .m-photo::before{ background:radial-gradient(circle, rgba(247,168,212,.42), transparent 66%); }
+.m-zs .m-photo::before{ background:radial-gradient(circle, rgba(143,227,176,.4), transparent 66%); }
+.m-photo img{ position:relative; z-index:1; max-height:100%; max-width:82%; width:auto; object-fit:contain; filter:drop-shadow(0 18px 30px rgba(0,0,0,.5)); -webkit-mask-image:linear-gradient(180deg,#000 88%,transparent); mask-image:linear-gradient(180deg,#000 88%,transparent); }
 .m-viz{ position:relative; height:150px; margin:22px 0 18px; border-radius:12px; overflow:hidden; border:1px solid var(--line); background:#0b0912; }
 .m-sign{ font-family:var(--font-sans); font-size:12px; letter-spacing:.14em; text-transform:uppercase; margin-top:auto; padding-top:14px; }
 .m-rc .m-sign{ color:#f29bc0; } .m-zs .m-sign{ color:#a9e8c2; }
@@ -718,6 +727,59 @@ body{ background:#eef2ee; }
 }
 @media (prefers-reduced-motion:reduce){ .bg-aurora .blob{ animation:none; } }
 
+/* ============================================================
+   BLOCK COHESION
+   Soften the dark blocks into glass panels that sit naturally on the
+   breathing field: rounder corners, tinted borders, layered shadows,
+   a light frost. Text stays light on dark glass. Tune radius, border
+   and background alpha here.
+   ============================================================ */
+.card,.machine,.el-stage,.compare,.lb-inner,.phil-list .pq{
+  border-radius:20px; border-color:rgba(255,255,255,.085);
+  box-shadow:0 26px 56px -30px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06); }
+.compare{ overflow:hidden; } .compare .col{ border-radius:0; }
+
+/* archive cards: rounder corners and a tinted hover */
+.card{ border-radius:18px; }
+.card:hover{ border-color:rgba(247,168,212,.5); box-shadow:0 40px 82px -34px rgba(0,0,0,.8), 0 0 0 1px rgba(247,168,212,.14), inset 0 1px 0 rgba(255,255,255,.08); }
+
+/* the Six Elements stage stays dark for the constellation, with a soft frost edge */
+.el-stage{ background:rgba(12,9,18,.9); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+
+/* machines: dark glass so the field glows faintly through */
+.machine{ -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+.machine::before{ opacity:.84; }
+.m-rc:hover{ border-color:rgba(247,168,212,.5); } .m-zs:hover{ border-color:rgba(143,227,176,.5); }
+
+/* Philosophy quote blocks become floating glass cards instead of hard rectangles */
+.phil-list{ background:transparent; border:0; gap:clamp(14px,2vw,22px); margin-top:clamp(40px,6vw,76px); }
+.phil-list .pq{ background:linear-gradient(180deg, rgba(24,17,30,.62), rgba(16,11,22,.72)); border:1px solid rgba(255,255,255,.1); border-radius:20px; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); box-shadow:0 24px 50px -28px rgba(0,0,0,.66), inset 0 1px 0 rgba(255,255,255,.06); }
+.phil-list .pq .lbl{ color:#b6a6c0; }
+
+/* lightbox frame */
+.lb-inner{ background:rgba(20,14,26,.94); }
+
+/* gallery: vertical video + image items. Tune aspect ratios and spans here. */
+.gallery-grid{ align-items:start; }
+.card.r916 .media{ aspect-ratio:9/16; } .card.r23 .media{ aspect-ratio:2/3; }
+.card.r32 .media{ aspect-ratio:3/2; } .card.r54 .media{ aspect-ratio:5/4; }
+.card .gimg{ position:absolute; inset:0; z-index:1; width:100%; height:100%; object-fit:cover; transition:transform 1.1s var(--ease); }
+.card:hover .gimg{ transform:scale(1.05); }
+.card.is-vid .media{ background:#0b0912; }
+@media (max-width:679px){ .card.r916{ grid-column:span 6; } }
+/* lightbox adapts to vertical video and any image aspect */
+.lb-media{ aspect-ratio:auto; display:flex; align-items:center; justify-content:center; min-height:240px; max-height:78svh; }
+.lb-media video,.lb-media img{ max-width:100%; max-height:78svh; width:auto; height:auto; object-fit:contain; background:#000; }
+.lb-media.is-img video{ display:none; } .lb-media.is-vid img{ display:none; }
+.lb-poster{ z-index:0; }
+
+/* mobile: drop backdrop blur for performance, lean on opacity */
+@media (max-width:760px){
+  .machine,.phil-list .pq{ -webkit-backdrop-filter:none; backdrop-filter:none; }
+  .el-stage{ -webkit-backdrop-filter:none; backdrop-filter:none; background:rgba(12,9,18,.94); }
+  .phil-list .pq{ background:linear-gradient(180deg, rgba(22,16,28,.88), rgba(15,10,20,.92)); }
+}
+
 /* ===================== reduced motion ===================== */
 @media (prefers-reduced-motion:reduce){
   html{ scroll-behavior:auto; }
@@ -836,6 +898,7 @@ body{ background:#eef2ee; }
         <span class="m-tag">Pro Labo Japan · ECMS bio-conductive myofascial system</span>
         <h3>Release Cutter</h3>
         <p class="m-make">The therapist's hand, turned into a living electrode.</p>
+        <figure class="m-photo" aria-hidden="true"><img src="assets/release%20cutter.webp" alt="" loading="lazy" decoding="async" onerror="this.closest('.m-photo').remove()" /></figure>
         <div class="m-viz viz-rc" aria-hidden="true">
           <svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice">
             <path class="hand" d="M250 30 q40 10 50 45 q8 30 -20 45" />
@@ -888,6 +951,7 @@ body{ background:#eef2ee; }
         <span class="m-tag">Zimmer MedizinSysteme, Germany · multi-vector precision platform</span>
         <h3>Zimmer Soleo Series</h3>
         <p class="m-make">Many energies, one applicator, timed to the percent.</p>
+        <figure class="m-photo" aria-hidden="true"><img src="assets/zimmer%20soleo%20.webp" alt="" loading="lazy" decoding="async" onerror="this.closest('.m-photo').remove()" /></figure>
         <div class="m-viz viz-zs" aria-hidden="true">
           <div class="grid"></div>
           <span class="wave"></span><span class="wave"></span><span class="wave"></span>
@@ -1032,9 +1096,10 @@ body{ background:#eef2ee; }
     <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
     <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous moment">←</button>
     <button class="lb-nav lb-next" id="lbNext" aria-label="Next moment">→</button>
-    <div class="lb-media">
+    <div class="lb-media" id="lbMedia">
       <div class="lb-poster" id="lbPoster" aria-hidden="true"></div>
       <video id="lbVideo" controls muted playsinline preload="none"></video>
+      <img id="lbImg" alt="" decoding="async" />
     </div>
     <div class="lb-body">
       <div><div class="yr" id="lbYear"></div><h3 id="lbTitle"></h3><p class="desc" id="lbDesc"></p></div>
@@ -1107,31 +1172,24 @@ body{ background:#eef2ee; }
 
   /* =================== ARCHIVE DATA =================== */
   var items=[
-    {id:"european-2024",title:"European Massage Championship",year:"2024",location:"Europe · Asian Inspired Massage",role:"winner",group:"wins",award:"Gold",
-      description:"Gold in Asian Inspired Massage. Deep tissue precision choreographed with breath and pressure. The win that put the method on the European map.",
-      preview:{webm:"videos/awards/european-championship-2024-preview.webm",mp4:"videos/awards/european-championship-2024-preview.mp4"},
-      full:{webm:"videos/awards/european-championship-2024.webm",mp4:"videos/awards/european-championship-2024.mp4"},poster:"",ratio:"r45",span:"w5",mood:"triumph",tags:["Gold","Asian Fusion","Championship"]},
-    {id:"champ-2023",title:"Champ of the Champs",year:"2023",location:"Germany · September",role:"winner",group:"wins",award:"Champion",
-      description:"Champ of the Champs in Germany. Measured against winners, and still first. Command under the highest pressure.",
-      preview:{webm:"videos/awards/champ-of-the-champs-2023-preview.webm",mp4:"videos/awards/champ-of-the-champs-2023-preview.mp4"},
-      full:{webm:"videos/awards/champ-of-the-champs-2023.webm",mp4:"videos/awards/champ-of-the-champs-2023.mp4"},poster:"",ratio:"r169",span:"w7",mood:"mastery",tags:["Champion","Germany","Elite"]},
-    {id:"swiss-2023",title:"Swiss Massage Championship",year:"2023",location:"Switzerland · April",role:"winner",group:"wins",award:"Gold",
-      description:"Gold at the Swiss Championship. Swiss precision rewarded on home ground. The foundation year of an international run.",
-      preview:{webm:"videos/awards/swiss-championship-2023-preview.webm",mp4:"videos/awards/swiss-championship-2023-preview.mp4"},
-      full:{webm:"videos/awards/swiss-championship-2023.webm",mp4:"videos/awards/swiss-championship-2023.mp4"},poster:"",ratio:"r11",span:"w4",mood:"precision",tags:["Gold","Switzerland"]},
-    {id:"judging",title:"On the judging panel",year:"Archive",location:"Championship circuit",role:"judge",group:"stage",award:"",
-      description:"From competitor to authority. Reading technique, intention, and presence from the outside in.",
-      preview:{webm:"videos/stage/judging-moment-preview.webm",mp4:"videos/stage/judging-moment-preview.mp4"},
-      full:{webm:"videos/stage/judging-moment.webm",mp4:"videos/stage/judging-moment.mp4"},poster:"",ratio:"r169",span:"w4",mood:"discernment",tags:["Judge","Authority"]},
-    {id:"awarding",title:"Awarding on stage",year:"Archive",location:"On stage",role:"awarding",group:"stage",award:"",
-      description:"Handing recognition to the next generation. The full arc, from competitor and champion to the one who now elevates others.",
-      preview:{webm:"videos/stage/awarding-on-stage-preview.webm",mp4:"videos/stage/awarding-on-stage-preview.mp4"},
-      full:{webm:"videos/stage/awarding-on-stage.webm",mp4:"videos/stage/awarding-on-stage.mp4"},poster:"",ratio:"r45",span:"w4",mood:"legacy",tags:["Stage","Legacy"]},
-    {id:"practice",title:"The work itself",year:"Archive",location:"Studio · Zurich",role:"practice",group:"practice",award:"",
-      description:"Behind the awards, the quiet precision of bodywork. Where transformation actually happens, one read and one release at a time.",
-      preview:{webm:"videos/practice/bodywork-detail-preview.webm",mp4:"videos/practice/bodywork-detail-preview.mp4"},
-      full:{webm:"videos/practice/bodywork-detail.webm",mp4:"videos/practice/bodywork-detail.mp4"},poster:"",ratio:"r169",span:"w4",mood:"intimacy",tags:["Bodywork","Detail","Studio"]}
+    {id:"emc-2024",title:"Reel 9, European Championship",year:"2024",location:"Europe · Asian Inspired",role:"winner",group:"wins",award:"Gold",kind:"video",src:"Reel 9 Awarded in EMC 2024.mp4",ratio:"r916",span:"w4",mood:"triumph",
+      description:"Gold in Asian Inspired Massage at the European Championship. The reel that put the method on the European map.",tags:["Gold","Asian Fusion","Championship"]},
+    {id:"champ-champs",title:"Winning Champ of the Champs",year:"2023",location:"Germany · September",role:"winner",group:"wins",award:"Champion",kind:"video",src:"winning champ of the champs.mp4",ratio:"r916",span:"w4",mood:"mastery",
+      description:"Champ of the Champs in Germany. Measured against winners, and still first. Command under the highest pressure.",tags:["Champion","Germany","Elite"]},
+    {id:"judge-advice",title:"Advice as a judge",year:"Archive",location:"Championship circuit",role:"judge",group:"stage",award:"",kind:"video",src:"advice for other therapists as a judge.mp4",ratio:"r916",span:"w4",mood:"discernment",
+      description:"From competitor to authority. Advice for other therapists, given from the judging side of the table.",tags:["Judge","Authority"]},
+    {id:"inner-fire",title:"Reignite Your Inner Fire",year:"Film",location:"Promo short film",role:"practice",group:"practice",award:"",kind:"video",src:"reignite your inner fire promo short film.mp4",ratio:"r916",span:"w4",mood:"intimacy",
+      description:"A short film on the work and the philosophy behind it. People find comfort through momentary discomfort.",tags:["Film","Philosophy"]},
+    {id:"swiss-retouched",title:"Swiss Nuad Thai Championship",year:"2023",location:"Switzerland · Asian Inspired",role:"winner",group:"wins",award:"Gold",kind:"image",src:"matthew winner asian inspired category in swiss nuad thai championship-retouched.webp",ratio:"r23",span:"w4",mood:"precision",
+      description:"Gold in the Asian Inspired category at the Swiss Nuad Thai Championship.",tags:["Gold","Switzerland"]},
+    {id:"mat-tony",title:"With Tony Robbins",year:"Archive",location:"Mindset and mastery",role:"awarding",group:"practice",award:"",kind:"image",src:"v2-mat-x-tony.webp",ratio:"r54",span:"w4",mood:"legacy",
+      description:"Where focus goes, energy flows. A meeting of mindset and mastery.",tags:["Mindset","Mastery"]},
+    {id:"swiss",title:"On the podium, Switzerland",year:"2023",location:"Swiss Nuad Thai Championship",role:"winner",group:"wins",award:"Gold",kind:"image",src:"matthew winner in asian inspired swiss nuad thai championship.webp",ratio:"r32",span:"w6",mood:"precision",
+      description:"On the podium at the Swiss Nuad Thai Championship, Asian Inspired category.",tags:["Gold","Switzerland","Podium"]},
+    {id:"champ-group",title:"Champ of the Champs",year:"2023",location:"Germany · with the field",role:"awarding",group:"stage",award:"",kind:"image",src:"group photo champ of the champs.webp",ratio:"r32",span:"w6",mood:"legacy",
+      description:"The full field at Champ of the Champs. Competitor, champion, and now among the names that set the standard.",tags:["Stage","Legacy"]}
   ];
+  function asset(n){ return 'assets/'+encodeURIComponent(n); }
   var moodGrad={triumph:"radial-gradient(120% 120% at 30% 18%, #2a1226, #0e0b14 60%), linear-gradient(135deg, rgba(255,194,228,.30), rgba(143,227,176,.10), transparent)",
     mastery:"radial-gradient(120% 120% at 70% 14%, #241a2a, #0e0b14 60%), linear-gradient(135deg, rgba(239,132,190,.24), transparent)",
     precision:"radial-gradient(120% 120% at 50% 0%, #16241f, #0e0b14 62%), linear-gradient(135deg, rgba(143,227,176,.22), transparent)",
@@ -1139,20 +1197,23 @@ body{ background:#eef2ee; }
     legacy:"radial-gradient(120% 120% at 75% 22%, #2a1626, #0e0b14 60%), linear-gradient(135deg, rgba(255,194,228,.24), transparent)",
     intimacy:"radial-gradient(120% 120% at 40% 28%, #2a1422, #0e0b14 62%), linear-gradient(135deg, rgba(247,168,212,.24), rgba(143,227,176,.08), transparent)"};
   function poster(it){ return it.poster?("center/cover no-repeat url('"+it.poster+"')"):(moodGrad[it.mood]||moodGrad.mastery); }
-  function srcTags(s){ return '<source src="'+s.webm+'" type="video/webm"><source src="'+s.mp4+'" type="video/mp4">'; }
+  function mediaInner(it){
+    if(it.kind==='image') return '<img class="gimg" src="'+asset(it.src)+'" alt="'+it.title+'" loading="lazy" decoding="async" />';
+    return '<div class="poster" style="background:'+poster(it)+'"></div><video muted loop playsinline preload="none">'+'<source src="'+asset(it.src)+'" type="video/mp4">'+'</video>';
+  }
   var grid=document.getElementById('galleryGrid');
   items.forEach(function(it,i){
     var card=document.createElement('article');
-    card.className='card '+it.span+' '+it.ratio+' reveal'; card.setAttribute('role','listitem'); card.tabIndex=0;
+    card.className='card '+it.span+' '+it.ratio+' '+(it.kind==='image'?'is-img':'is-vid')+' reveal'; card.setAttribute('role','listitem'); card.tabIndex=0;
     card.dataset.index=i; card.dataset.group=it.group;
     card.setAttribute('aria-label','Open '+it.title+(it.award?(' '+it.award):'')+'. '+it.location);
-    card.innerHTML='<div class="media"><div class="poster" style="background:'+poster(it)+'"></div><div class="ghost" aria-hidden="true">0'+(i+1)+'</div>'+
-      '<video muted loop playsinline preload="none" poster="'+(it.poster||'')+'">'+srcTags(it.preview)+'</video>'+
-      '<span class="role '+it.role+'">'+it.role+'</span><span class="open-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>'+
+    var icon=(it.kind==='image')?'<path d="M4 5h16v14H4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 13l3-3 3 3 2-2 2 2" fill="none" stroke="currentColor" stroke-width="2"/>':'<path d="M8 5v14l11-7z"/>';
+    card.innerHTML='<div class="media">'+mediaInner(it)+'<div class="ghost" aria-hidden="true">0'+(i+1)+'</div>'+
+      '<span class="role '+it.role+'">'+it.role+'</span><span class="open-hint" aria-hidden="true"><svg viewBox="0 0 24 24">'+icon+'</svg></span>'+
       '<div class="info"><div class="yr">'+(it.award?(it.award+' · '):'')+it.year+'</div><h3>'+it.title+'</h3><div class="loc">'+it.location+'</div></div></div>';
     grid.appendChild(card);
     var v=card.querySelector('video');
-    if(HOVER&&!REDUCED){ card.addEventListener('mouseenter',function(){ var p=v.play(); if(p&&p.then)p.then(function(){card.classList.add('playing');}).catch(function(){}); });
+    if(v&&HOVER&&!REDUCED){ card.addEventListener('mouseenter',function(){ var p=v.play(); if(p&&p.then)p.then(function(){card.classList.add('playing');}).catch(function(){}); });
       card.addEventListener('mouseleave',function(){ v.pause(); card.classList.remove('playing'); }); }
     card.addEventListener('click',function(){ openLB(i); });
     card.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openLB(i); } });
@@ -1171,7 +1232,19 @@ body{ background:#eef2ee; }
   /* lightbox */
   var lb=document.getElementById('lightbox'),lbV=document.getElementById('lbVideo'),lbP=document.getElementById('lbPoster'),
       lbT=document.getElementById('lbTitle'),lbY=document.getElementById('lbYear'),lbD=document.getElementById('lbDesc'),lbTg=document.getElementById('lbTags'),lbC=document.getElementById('lbCount'),cur=0,lastF=null;
-  function rl(i){ var it=items[i]; cur=i; lbP.style.background=poster(it); lbT.textContent=it.title; lbY.textContent=(it.award?(it.award+' · '):'')+it.location; lbD.textContent=it.description; lbC.textContent=(i+1)+' / '+items.length; lbTg.innerHTML=it.tags.map(function(t){return '<span>'+t+'</span>';}).join(''); lbV.pause(); lbV.innerHTML=srcTags(it.full); lbV.load(); var p=lbV.play(); if(p&&p.then)p.catch(function(){}); }
+  function rl(i){ var it=items[i]; cur=i;
+    lbT.textContent=it.title; lbY.textContent=(it.award?(it.award+' · '):'')+it.location; lbD.textContent=it.description; lbC.textContent=(i+1)+' / '+items.length;
+    lbTg.innerHTML=it.tags.map(function(t){return '<span>'+t+'</span>';}).join('');
+    var media=document.getElementById('lbMedia'), img=document.getElementById('lbImg');
+    if(it.kind==='image'){
+      lbV.pause(); lbV.removeAttribute('src'); lbV.innerHTML=''; media.className='lb-media is-img';
+      lbP.style.background='#0c0a12'; img.src=asset(it.src); img.alt=it.title;
+    } else {
+      img.removeAttribute('src'); media.className='lb-media is-vid'; lbP.style.background=poster(it);
+      lbV.pause(); lbV.innerHTML='<source src="'+asset(it.src)+'" type="video/mp4">'; lbV.load();
+      var p=lbV.play(); if(p&&p.then)p.catch(function(){});
+    }
+  }
   function openLB(i){ lastF=document.activeElement; rl(i); lb.classList.add('open'); document.body.style.overflow='hidden'; if(window.__lenis)__lenis.stop(); document.getElementById('lbClose').focus(); }
   function closeLB(){ lb.classList.remove('open'); lbV.pause(); document.body.style.overflow=''; if(window.__lenis)__lenis.start(); if(lastF)lastF.focus(); }
   function stp(d){ rl((cur+d+items.length)%items.length); }
@@ -1224,9 +1297,11 @@ body{ background:#eef2ee; }
         /* card depth is handled by pointer-reactive 3D tilt (v4), not scroll parallax */
         /* machines rise via the 3D reveal and gain depth from pointer tilt (v4) */
       }
-      /* philosophy: discomfort -> comfort (tight, blurred, dim -> open, clear, bright) */
+      /* philosophy: discomfort -> comfort (blurred, dim -> clear, bright).
+         Only blur + opacity are scrubbed; letter-spacing is left fixed so the
+         headline never reflows and the pink italic stays locked to the phrase. */
       var pq=document.getElementById('philQuote');
-      if(pq){ gsap.fromTo(pq,{filter:'blur(9px)',letterSpacing:'0.18em',opacity:.35},{filter:'blur(0px)',letterSpacing:'-0.02em',opacity:1,ease:'none',scrollTrigger:{trigger:pq,start:'top 85%',end:'top 40%',scrub:.6}}); }
+      if(pq){ gsap.fromTo(pq,{filter:'blur(9px)',opacity:.4},{filter:'blur(0px)',opacity:1,ease:'none',scrollTrigger:{trigger:pq,start:'top 88%',end:'top 52%',scrub:.6}}); }
     } else { document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('is-in'); }); }
     setTimeout(function(){ document.querySelectorAll('.reveal:not(.is-in)').forEach(function(el){ if(el.getBoundingClientRect().top < innerHeight*1.1) el.classList.add('is-in'); }); }, 1400);
   });
@@ -1374,7 +1449,7 @@ body{ background:#eef2ee; }
       +      '<button class="attn-quad" data-q="bl" type="button" aria-label="Bottom left"></button>'
       +      '<button class="attn-quad" data-q="br" type="button" aria-label="Bottom right"></button>'
       +    '</div>'
-      +    '<div class="attn-ring" aria-hidden="true"><svg viewBox="0 0 42 42"><circle class="ring-bg" cx="21" cy="21" r="18"/><circle class="ring-fg" cx="21" cy="21" r="18"/></svg></div>'
+      +    '<div class="attn-ring" aria-hidden="true"><svg viewBox="0 0 44 44"><circle class="ring-bg" cx="22" cy="22" r="20"/><circle class="ring-fg" cx="22" cy="22" r="20"/></svg><span class="ring-num">3</span></div>'
       +  '</div>'
       +  '<div class="attn-final">'
       +    '<div class="attn-final-img"><img class="attn-photo" src="'+img+'" alt="Matthew Hua" loading="lazy" decoding="async" /></div>'
@@ -1408,6 +1483,7 @@ body{ background:#eef2ee; }
         ctrlEl=panel.querySelector('.attn-controls'),
         replayBtn=panel.querySelector('.attn-replay'),
         photo=panel.querySelector('.attn-photo'),
+        ringNum=panel.querySelector('.ring-num'),
         timers=[];
 
     /* fixed signal data: stable ids, percent positions, roles, quadrant. Red lives in br. */
@@ -1459,6 +1535,7 @@ body{ background:#eef2ee; }
       } else if(p==='encodeBlue'){
         textEl.textContent='Memorize the blue signal positions.';
         subEl.textContent='Ignore everything else.';
+        if(ringNum){ var n=Math.round(ENCODE_MS/1000); ringNum.textContent=n; timers.push(setInterval(function(){ n-=1; if(ringNum) ringNum.textContent=(n>0?n:0); }, 1000)); }
         timers.push(setTimeout(function(){ setPhase('recallBlue'); }, ENCODE_MS));
       } else if(p==='recallBlue'){
         textEl.textContent='Now click the 3 places where the blue signals were.';
