@@ -140,11 +140,11 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .hero-scrim{ position:absolute; inset:0; z-index:1; pointer-events:none; background:radial-gradient(130% 92% at 50% 24%, transparent 48%, rgba(255,255,255,.16) 100%); }
 
 /* Matthew x Tony portrait with layered aura, top of the centered hero column */
-.hero-figure{ position:relative; z-index:1; width:min(440px,64vw); margin:0 auto clamp(6px,1.4vh,18px); display:flex; justify-content:center; pointer-events:none; }
+.hero-figure{ position:relative; z-index:1; width:min(560px,74vw); margin:0 auto clamp(6px,1.4vh,18px); display:flex; justify-content:center; pointer-events:none; }
 .hero-figure::before{ content:""; position:absolute; left:50%; top:48%; transform:translate(-50%,-50%); width:128%; height:122%; z-index:-2; border-radius:50%; background:radial-gradient(circle at 36% 42%, rgba(79,230,160,.82), transparent 60%), radial-gradient(circle at 68% 56%, rgba(255,143,198,.88), transparent 62%); filter:blur(46px); opacity:.92; animation:auraPulse 7s var(--ease) infinite; }
 .hero-figure::after{ content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:82%; height:94%; z-index:-1; border-radius:48% 52% 50% 50%; background:radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 62%); filter:blur(18px); }
 @keyframes auraPulse{ 0%,100%{ transform:translate(-50%,-50%) scale(1); opacity:.82; } 50%{ transform:translate(-50%,-50%) scale(1.08); opacity:1; } }
-.hero-portrait{ display:block; width:auto; height:auto; max-width:100%; max-height:clamp(168px,28vh,300px); filter:drop-shadow(0 20px 40px rgba(40,10,30,.42)) drop-shadow(0 0 24px rgba(255,143,198,.5)) drop-shadow(0 0 30px rgba(79,230,160,.4)); -webkit-mask-image:linear-gradient(180deg,#000 91%,transparent); mask-image:linear-gradient(180deg,#000 91%,transparent); }
+.hero-portrait{ display:block; width:auto; height:auto; max-width:100%; max-height:clamp(200px,36vh,400px); object-position:center; filter:drop-shadow(0 20px 40px rgba(40,10,30,.42)) drop-shadow(0 0 24px rgba(255,143,198,.5)) drop-shadow(0 0 30px rgba(79,230,160,.4)); -webkit-mask-image:linear-gradient(180deg,#000 91%,transparent); mask-image:linear-gradient(180deg,#000 91%,transparent); }
 .hero-figure.no-img{ display:none; }
 
 /* hero text and chrome read dark on the bright field */
@@ -392,12 +392,16 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .m-make{ font-family:var(--font-sans); font-size:12.5px; color:var(--text-2); letter-spacing:.04em; }
 .m-snap{ color:var(--text-2); margin:16px 0 0; max-width:46ch; }
 .m-hero{ font-family:var(--font-serif); font-style:italic; font-weight:300; font-size:clamp(1.2rem,1.9vw,1.5rem); margin:18px 0 0; color:var(--text); }
-/* transparent device photo, integrated directly above each machine animation */
-.m-photo{ position:relative; margin:18px 0 4px; display:flex; align-items:flex-end; justify-content:center; height:clamp(150px,19vw,224px); pointer-events:none; }
-.m-photo::before{ content:""; position:absolute; left:50%; bottom:4%; transform:translateX(-50%); width:72%; height:80%; border-radius:50%; filter:blur(36px); z-index:0; }
-.m-rc .m-photo::before{ background:radial-gradient(circle, rgba(247,168,212,.42), transparent 66%); }
-.m-zs .m-photo::before{ background:radial-gradient(circle, rgba(143,227,176,.4), transparent 66%); }
-.m-photo img{ position:relative; z-index:1; max-height:100%; max-width:82%; width:auto; object-fit:contain; filter:drop-shadow(0 18px 30px rgba(0,0,0,.5)); -webkit-mask-image:linear-gradient(180deg,#000 88%,transparent); mask-image:linear-gradient(180deg,#000 88%,transparent); }
+/* transparent device photo above each machine animation. The new assets have a large
+   transparent canvas, so the image is scaled up and centered to bring the visible device
+   back to its intended size; the glow now fades inside the file. Tune width per machine. */
+.m-photo{ position:relative; margin:10px 0 0; display:flex; align-items:center; justify-content:center; height:clamp(168px,22vw,250px); overflow:visible; pointer-events:none; }
+.m-photo::before{ content:""; position:absolute; left:50%; top:48%; transform:translate(-50%,-50%); width:62%; height:74%; border-radius:50%; filter:blur(34px); z-index:0; }
+.m-rc .m-photo::before{ background:radial-gradient(circle, rgba(247,168,212,.32), transparent 66%); }
+.m-zs .m-photo::before{ background:radial-gradient(circle, rgba(143,227,176,.3), transparent 66%); }
+.m-photo img{ position:relative; z-index:1; height:auto; max-height:none; object-fit:contain; filter:drop-shadow(0 16px 26px rgba(0,0,0,.45)); }
+.m-rc .m-photo img{ width:clamp(360px,48vw,560px); }
+.m-zs .m-photo img{ width:clamp(430px,56vw,660px); }
 .m-viz{ position:relative; height:150px; margin:22px 0 18px; border-radius:12px; overflow:hidden; border:1px solid var(--line); background:#0b0912; }
 .m-sign{ font-family:var(--font-sans); font-size:12px; letter-spacing:.14em; text-transform:uppercase; margin-top:auto; padding-top:14px; }
 .m-rc .m-sign{ color:#f29bc0; } .m-zs .m-sign{ color:#a9e8c2; }
@@ -457,11 +461,11 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
 .chip[aria-pressed="true"]{ background:var(--gold); border-color:var(--gold); color:#2a0a1c; }
 .chip .c{ font-variant-numeric:tabular-nums; opacity:.6; }
 .gallery-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:clamp(14px,1.6vw,24px); transition:opacity .25s var(--ease); }
-.card{ position:relative; grid-column:span 12; border-radius:14px; overflow:hidden; background:var(--surface); border:1px solid var(--line); cursor:pointer; isolation:isolate; transition:border-color .5s var(--ease); }
+.card{ position:relative; grid-column:span 12; border-radius:14px; overflow:hidden; background:#2b2926; border:1px solid var(--line); cursor:pointer; isolation:isolate; transition:border-color .5s var(--ease); }
 @media (min-width:680px){ .card.w6{ grid-column:span 6 } .card.w5{ grid-column:span 5 } .card.w7{ grid-column:span 7 } .card.w4{ grid-column:span 4 } .card.w8{ grid-column:span 8 } }
 .card[hidden]{ display:none; }
 .card:hover{ border-color:var(--gold); }
-.card .media{ position:relative; width:100%; aspect-ratio:16/10; overflow:hidden; background:#0c0a12; }
+.card .media{ position:relative; width:100%; aspect-ratio:16/10; overflow:hidden; background:#2b2926; }
 .card.r45 .media{ aspect-ratio:4/5 } .card.r169 .media{ aspect-ratio:16/9 } .card.r11 .media{ aspect-ratio:1/1 }
 .card .poster{ position:absolute; inset:0; z-index:1; transition:transform 1.1s var(--ease); }
 .card:hover .poster{ transform:scale(1.05); }
@@ -737,7 +741,7 @@ body{ background:#eef2ee; }
 .card,.machine,.el-stage,.compare,.lb-inner,.phil-list .pq{
   border-radius:20px; border-color:rgba(255,255,255,.085);
   box-shadow:0 26px 56px -30px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06); }
-.compare{ overflow:hidden; } .compare .col{ border-radius:0; }
+.compare{ overflow:hidden; background:linear-gradient(180deg, rgba(20,15,26,.72), rgba(13,9,19,.8)); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); } .compare .col{ border-radius:0; } .compare .col li{ color:#cabfce; }
 
 /* archive cards: rounder corners and a tinted hover */
 .card{ border-radius:18px; }
@@ -765,11 +769,11 @@ body{ background:#eef2ee; }
 .card.r32 .media{ aspect-ratio:3/2; } .card.r54 .media{ aspect-ratio:5/4; }
 .card .gimg{ position:absolute; inset:0; z-index:1; width:100%; height:100%; object-fit:cover; transition:transform 1.1s var(--ease); }
 .card:hover .gimg{ transform:scale(1.05); }
-.card.is-vid .media{ background:#0b0912; }
+.card.is-vid .media{ background:#2b2926; }
 @media (max-width:679px){ .card.r916{ grid-column:span 6; } }
 /* lightbox adapts to vertical video and any image aspect */
 .lb-media{ aspect-ratio:auto; display:flex; align-items:center; justify-content:center; min-height:240px; max-height:78svh; }
-.lb-media video,.lb-media img{ max-width:100%; max-height:78svh; width:auto; height:auto; object-fit:contain; background:#000; }
+.lb-media video,.lb-media img{ position:relative; z-index:2; max-width:100%; max-height:78svh; width:auto; height:auto; object-fit:contain; background:#000; }
 .lb-media.is-img video{ display:none; } .lb-media.is-vid img{ display:none; }
 .lb-poster{ z-index:0; }
 
@@ -817,7 +821,7 @@ body{ background:#eef2ee; }
 <section class="hero" aria-label="Introduction">
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="container hero-inner" id="heroInner">
-    <figure class="hero-figure" aria-hidden="true"><img class="hero-portrait" src="assets/v2-mat-x-tony.webp" alt="" loading="eager" decoding="async" onerror="this.closest('.hero-figure').classList.add('no-img')" /></figure>
+    <figure class="hero-figure" aria-hidden="true"><img class="hero-portrait" src="assets/v3%20mat%20x%20tonyPHOTO-2026-03-16-21-22-09-2.webp" alt="" loading="eager" decoding="async" onerror="this.closest('.hero-figure').classList.add('no-img')" /></figure>
     <span class="eyebrow">Zurich · Transformational Therapy · healwell</span>
     <h1 aria-label="Matthew Hua">
       <span class="ln"><span>Matthew</span></span>
@@ -951,7 +955,7 @@ body{ background:#eef2ee; }
         <span class="m-tag">Zimmer MedizinSysteme, Germany · multi-vector precision platform</span>
         <h3>Zimmer Soleo Series</h3>
         <p class="m-make">Many energies, one applicator, timed to the percent.</p>
-        <figure class="m-photo" aria-hidden="true"><img src="assets/zimmer%20soleo%20.webp" alt="" loading="lazy" decoding="async" onerror="this.closest('.m-photo').remove()" /></figure>
+        <figure class="m-photo" aria-hidden="true"><img src="assets/zimmer%20soleo.webp" alt="" loading="lazy" decoding="async" onerror="this.closest('.m-photo').remove()" /></figure>
         <div class="m-viz viz-zs" aria-hidden="true">
           <div class="grid"></div>
           <span class="wave"></span><span class="wave"></span><span class="wave"></span>
@@ -1133,7 +1137,7 @@ body{ background:#eef2ee; }
   var rail=document.getElementById('elRail'), stage=document.getElementById('elStage'), elPanels=[];
   var elFX=createElementFX();
   /* image asset for the Mindset final reveal. Place the transparent WebP here (see assets/README.md). */
-  var attn=null, ATTN_IMG='assets/v2-mat-x-tony.webp';
+  var attn=null, ATTN_IMG='assets/v3%20mat%20x%20tonyPHOTO-2026-03-16-21-22-09-2.webp';
   ELEMENTS.forEach(function(e,i){
     var tab=document.createElement('button');
     tab.className='el-tab'; tab.type='button'; tab.id='eltab-'+e.key; tab.setAttribute('role','tab');
@@ -1182,8 +1186,6 @@ body{ background:#eef2ee; }
       description:"A short film on the work and the philosophy behind it. People find comfort through momentary discomfort.",tags:["Film","Philosophy"]},
     {id:"swiss-retouched",title:"Swiss Nuad Thai Championship",year:"2023",location:"Switzerland · Asian Inspired",role:"winner",group:"wins",award:"Gold",kind:"image",src:"matthew winner asian inspired category in swiss nuad thai championship-retouched.webp",ratio:"r23",span:"w4",mood:"precision",
       description:"Gold in the Asian Inspired category at the Swiss Nuad Thai Championship.",tags:["Gold","Switzerland"]},
-    {id:"mat-tony",title:"With Tony Robbins",year:"Archive",location:"Mindset and mastery",role:"awarding",group:"practice",award:"",kind:"image",src:"v2-mat-x-tony.webp",ratio:"r54",span:"w4",mood:"legacy",
-      description:"Where focus goes, energy flows. A meeting of mindset and mastery.",tags:["Mindset","Mastery"]},
     {id:"swiss",title:"On the podium, Switzerland",year:"2023",location:"Swiss Nuad Thai Championship",role:"winner",group:"wins",award:"Gold",kind:"image",src:"matthew winner in asian inspired swiss nuad thai championship.webp",ratio:"r32",span:"w6",mood:"precision",
       description:"On the podium at the Swiss Nuad Thai Championship, Asian Inspired category.",tags:["Gold","Switzerland","Podium"]},
     {id:"champ-group",title:"Champ of the Champs",year:"2023",location:"Germany · with the field",role:"awarding",group:"stage",award:"",kind:"image",src:"group photo champ of the champs.webp",ratio:"r32",span:"w6",mood:"legacy",
@@ -1196,7 +1198,7 @@ body{ background:#eef2ee; }
     discernment:"radial-gradient(120% 120% at 25% 25%, #182a24, #0e0b14 60%), linear-gradient(135deg, rgba(143,227,176,.22), rgba(255,194,228,.08), transparent)",
     legacy:"radial-gradient(120% 120% at 75% 22%, #2a1626, #0e0b14 60%), linear-gradient(135deg, rgba(255,194,228,.24), transparent)",
     intimacy:"radial-gradient(120% 120% at 40% 28%, #2a1422, #0e0b14 62%), linear-gradient(135deg, rgba(247,168,212,.24), rgba(143,227,176,.08), transparent)"};
-  function poster(it){ return it.poster?("center/cover no-repeat url('"+it.poster+"')"):(moodGrad[it.mood]||moodGrad.mastery); }
+  function poster(it){ return it.poster?("center/cover no-repeat url('"+it.poster+"')"):"radial-gradient(120% 120% at 50% -8%, #38352f 0%, #2b2926 58%, #221f1d 100%)"; }
   function mediaInner(it){
     if(it.kind==='image') return '<img class="gimg" src="'+asset(it.src)+'" alt="'+it.title+'" loading="lazy" decoding="async" />';
     return '<div class="poster" style="background:'+poster(it)+'"></div><video muted loop playsinline preload="none">'+'<source src="'+asset(it.src)+'" type="video/mp4">'+'</video>';
@@ -1335,8 +1337,8 @@ body{ background:#eef2ee; }
         if(!raf) raf=requestAnimationFrame(function(){ el.style.transform='perspective(1100px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) scale(1.03)'; raf=null; }); });
       el.addEventListener('mouseleave',function(){ el.classList.remove('tilting'); el.style.transform='perspective(1100px) rotateX(0deg) rotateY(0deg)'; });
     }
-    document.querySelectorAll('.card').forEach(function(c){ tilt(c,9); });
-    document.querySelectorAll('.machine, .el-stage, .compare .col').forEach(function(c){ tilt(c,4.5); });
+    document.querySelectorAll('.card').forEach(function(c){ tilt(c,2.7); });
+    document.querySelectorAll('.machine, .el-stage').forEach(function(c){ tilt(c,4.5); });
 
     /* magnetic depth buttons */
     document.querySelectorAll('.btn, .nav-cta').forEach(function(b){
