@@ -342,7 +342,16 @@ h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:500; line-height:1.03; ma
    Tune the split with the field height below. */
 .el-attn .el-scrim{ display:none; }
 .el-attn .attn-field, .el-attn .attn-paths, .el-attn .attn-labels, .el-attn .attn-quads{ bottom:auto; height:62%; }
-.attn-hud{ position:absolute; left:0; right:0; bottom:0; top:62%; z-index:4; padding:clamp(20px,2.6vw,38px); display:flex; flex-direction:column; align-items:flex-start; justify-content:center; overflow:auto; pointer-events:none; isolation:isolate; }
+.attn-hud{ position:absolute; left:0; right:0; bottom:0; z-index:4; padding:clamp(18px,2.4vw,34px); display:flex; flex-direction:column; align-items:flex-start; pointer-events:none; isolation:isolate; }
+.attn-hud>*{ flex:0 0 auto; }
+/* the long life-lesson copy moves to a band BELOW the card on every width so it never
+   crowds the signals or overlaps itself. Tune the reserved space with margin-bottom. */
+.el-stage.attn-life-stage{ overflow:visible; margin-bottom:clamp(150px,22vh,250px); }
+.el-stage.attn-life-stage .el-panel, .el-stage.attn-life-stage .el-attn{ overflow:visible; }
+.el-stage.attn-life-stage .attn-hud{ top:calc(100% + 20px); bottom:auto; left:0; right:0; padding:0 2px; color:#231421; }
+.el-stage.attn-life-stage .attn-hud .el-kicker{ color:#c81d77; }
+.el-stage.attn-life-stage .attn-text{ color:#231421; min-height:0; max-width:62ch; }
+.el-stage.attn-life-stage .attn-sub{ color:#4c3a48; min-height:0; max-width:66ch; }
 .attn-hud .attn-btn,.attn-hud .attn-controls{ pointer-events:auto; }
 .attn-title{ font-size:clamp(1.5rem,3vw,2.4rem); margin:10px 0 0; letter-spacing:-.02em; }
 .el-attn:not([data-phase="intro"]) .attn-title{ display:none; }
