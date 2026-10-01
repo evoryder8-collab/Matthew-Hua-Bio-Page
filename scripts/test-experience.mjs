@@ -89,6 +89,34 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
     check(true,`${name}: history navigation works`);
     console.log(`${name}: archive, reduced motion, history and repository-prefix checks passed`);
     await context.close();
+    const navigationContext=await browser.newContext({viewport:{width:1440,height:1000}});
+    const navigationPage=await navigationContext.newPage();
+    await navigationPage.addInitScript(()=>{sessionStorage.setItem('matthew-entered','1');localStorage.setItem('matthew-language','en');});
+    await navigationPage.goto(base);
+    await navigationPage.locator('#mindset-host button').first().waitFor();
+    await navigationPage.evaluate(async()=>{
+      const {createEffects}=await import(new URL('static/effects.js',location.href));
+      const effect=createEffects({transitionCanvas:document.querySelector('#transition-canvas'),cursorCanvas:document.querySelector('#sparkler-canvas')});
+      const transition=effect.transition;
+      window.navigationSparks={count:0,durations:[]};
+      effect.transition=(...args)=>{const start=performance.now();window.navigationSparks.count++;return transition(...args).then(result=>{window.navigationSparks.durations.push(performance.now()-start);return result;});};
+    });
+    await navigationPage.locator('.desktop-nav [data-route=method]').click();
+    await navigationPage.waitForFunction(()=>window.navigationSparks.durations.length===1);
+    const duration=await navigationPage.evaluate(()=>window.navigationSparks.durations[0]);
+    check(duration>=1950&&duration<3000,`${name}: menu sparkle lasts two seconds (${Math.round(duration)}ms)`);
+    await navigationPage.locator('.desktop-nav [data-route=method]').click();
+    await navigationPage.goBack();
+    await navigationPage.waitForFunction(()=>document.body.dataset.route==='home');
+    await navigationPage.goForward();
+    await navigationPage.waitForFunction(()=>document.body.dataset.route==='method');
+    check(await navigationPage.evaluate(()=>window.navigationSparks.count)===1,`${name}: same page and browser history do not replay sparks`);
+    await navigationPage.locator('.wordmark').click();
+    await navigationPage.waitForFunction(()=>document.body.dataset.route==='home');
+    check(await navigationPage.evaluate(()=>window.navigationSparks.count)===1,`${name}: non-menu navigation does not replay sparks`);
+    check(await navigationPage.locator('#transition-canvas').evaluate(canvas=>{const data=canvas.getContext('2d').getImageData(0,0,1,1).data;return data[3]===0;}),`${name}: no black transition layer remains`);
+    console.log(`${name}: two-second menu transition and direct Back/Forward passed`);
+    await navigationContext.close();
   }finally{await browser.close();}
 }
 console.log(`PASS: ${checks} experience assertions across Chromium and WebKit.`);

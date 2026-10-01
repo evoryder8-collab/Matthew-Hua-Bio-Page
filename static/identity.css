@@ -77,18 +77,25 @@ dialog{border-radius:20px;background:#f8f0f6}dialog::backdrop{background:#0e0b14
 .split-flag img:first-child{clip-path:polygon(0 0,100% 0,0 100%);object-position:25% 50%}
 .split-flag img:last-child{clip-path:polygon(100% 0,100% 100%,0 100%)}
 .split-flag:after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom right,transparent 49%,#fff9 49.5%,#fff9 50.5%,transparent 51%)}
-.portal-ambient,.portal-frost{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
-.portal-ambient{z-index:2}
-.portal-frost{z-index:3;background:#efeaf32e;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.portal-focus{position:absolute;inset:0;z-index:4;min-height:100svh;display:grid;place-items:center;padding:100px 25px 55px;text-align:center}
+.portal-shade,.portal-ambient,.portal-frost{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.portal-shade{z-index:2;background:rgba(2,2,2,.96)}
+.portal-ambient{z-index:3}
+.portal-frost{z-index:4;background:#00000008;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.portal-focus{position:absolute;inset:0;z-index:5;min-height:100svh;display:grid;place-items:center;padding:100px 25px 55px;text-align:center;color:#fff3e5}
 .portal-focus-content{width:min(650px,100%);min-width:0;margin:auto}
-.portal-focus .portal-title{margin:0 auto 28px;text-wrap:balance;text-shadow:0 2px 20px #fff8}
-.portal-focus .portal-sub{max-width:380px;margin:0 auto 30px}
-.portal-focus .portal-back{position:static;display:inline-flex;justify-content:center;align-items:center;gap:12px;margin:24px auto 0;min-height:44px}
-.portal-focus .sound-symbol{margin:0 auto 22px}
+.portal-focus .portal-title{margin:0 auto 28px;text-wrap:balance;color:#fff3e5;text-shadow:0 2px 24px #000}
+.portal-focus .portal-sub{max-width:380px;margin:0 auto 30px;color:#d3c7c4}
+.portal-focus .portal-back{position:static;display:inline-flex;justify-content:center;align-items:center;gap:12px;margin:24px auto 0;min-height:44px;color:#d3c7c4}
+.portal-focus .sound-symbol{margin:0 auto 22px;color:#f3cf9a}
 .portal-focus .sound-choices{width:min(310px,100%);margin:auto;min-width:0}
+.portal-focus .sound-yes{border-color:#f3cf9a66;box-shadow:0 12px 38px -18px #edbe8059}
+.portal-focus .sound-yes small{color:#f3cf9a}
+.portal-focus .sound-no{color:#eee0d6;border-color:#eee0d642}
+.portal-focus .sound-no:hover{color:#ffdbb0;border-color:#f3cf9a}
 .german-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;max-width:340px;margin:36px auto 0}
-.german-options .language-option{min-height:130px;gap:14px;background:#fff9;box-shadow:0 15px 38px -23px #6e355969}
+.german-options .language-option{min-height:130px;gap:14px;background:#ffffff0d;border-color:#f3dfce3b;color:#fff3e5;box-shadow:0 15px 38px -23px #000}
+.german-options .language-option:hover{background:#ffffff16;border-color:#f3cf9a88}
+.german-options .language-option[aria-pressed=true]{background:#fff2f913;border-color:#edb3ce;box-shadow:inset 0 0 0 1px #edb3ce24,0 8px 24px -14px #edb3ce59}
 .german-options .language-option img{width:76px;max-width:76px;height:50px;object-fit:contain;box-shadow:none}
 .german-options .language-option span{font-size:12px}
 .portal-choice-error{font-size:12px;line-height:1.7;margin:18px auto 0;max-width:340px}

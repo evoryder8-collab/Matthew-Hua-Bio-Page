@@ -12,8 +12,8 @@ export const SPARK_TUNING = {
 
 const instances = new WeakMap();
 const ambientInstances = new WeakMap();
-const CURTAIN = '#0a0810';
-const DURATION = 1500;
+const CURTAIN = '#030303';
+const DURATION = 2000;
 const TAU = Math.PI * 2;
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const smooth = (value) => { const t = clamp(value); return t * t * (3 - 2 * t); };
@@ -24,7 +24,7 @@ const setting = (key, fallback, min, max) => {
 
 /**
  * Transitions are serialized; simultaneous opening() calls share one Promise.
- * Both transition modes take about 1500ms, plus any async swap time; long remains
+ * Both transition modes take about 2000ms, plus any async swap time; long remains
  * accepted for compatibility. Reduced motion uses a brief, particle-free fade.
  * Keep both canvases mounted through swap. A caller may reparent the transition
  * canvas into its active dialog before calling transition(), then move it back.
@@ -178,7 +178,8 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
     const streakScale = macroScale * 1.6;
     const tip = burningTip(time);
     const size = setting('sparkSize', 0.95, 0, 3);
-    const envelope = smooth(time / 0.12) * (1 - smooth((time - 1.04) / 0.46));
+    const progress = time / (DURATION / 1000);
+    const envelope = smooth(progress / 0.08) * (1 - smooth((progress - 0.8) / 0.2));
     const opacity = setting('opacity', 0.94, 0, 1) * alpha * envelope;
     if (opacity < 0.005 || size === 0) return;
     const gravity = setting('gravity', 360, -800, 1200);
@@ -191,21 +192,21 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
     const wireLength = Math.max(height * 0.7, 450 * macroScale);
     const wire = curtain.createLinearGradient(tip.x - 90 * macroScale, tip.y + wireLength, tip.x, tip.y);
     wire.addColorStop(0, 'rgba(108,79,60,0)');
-    wire.addColorStop(0.65, 'rgba(145,103,70,0.45)');
+    wire.addColorStop(0.65, 'rgba(145,103,70,0.14)');
     wire.addColorStop(1, '#f2b971');
     curtain.strokeStyle = wire;
-    curtain.lineWidth = 3 * macroScale;
+    curtain.lineWidth = 1.3 * macroScale;
     curtain.globalAlpha = opacity;
     curtain.beginPath();
     curtain.moveTo(tip.x - 90 * macroScale, tip.y + wireLength);
     curtain.lineTo(tip.x, tip.y);
     curtain.stroke();
-    const glowRadius = 270 * macroScale * size;
+    const glowRadius = 105 * macroScale * size;
     const halo = curtain.createRadialGradient(tip.x, tip.y - 20 * macroScale, 0, tip.x, tip.y - 20 * macroScale, glowRadius);
     halo.addColorStop(0, 'rgba(255,251,232,1)');
-    halo.addColorStop(0.22, 'rgba(255,233,181,0.85)');
-    halo.addColorStop(0.5, 'rgba(255,190,100,0.23)');
-    halo.addColorStop(0.8, 'rgba(255,160,64,0.055)');
+    halo.addColorStop(0.12, 'rgba(255,233,181,0.55)');
+    halo.addColorStop(0.35, 'rgba(255,190,100,0.12)');
+    halo.addColorStop(0.7, 'rgba(255,160,64,0.02)');
     halo.addColorStop(1, 'rgba(255,178,80,0)');
     curtain.globalCompositeOperation = 'lighter';
     curtain.fillStyle = halo;
@@ -220,22 +221,22 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
       const birth = time - age;
       if (birth < 0 || age >= life) continue;
       const origin = burningTip(birth);
-      origin.x += Math.cos(seed.angle) * 38 * macroScale * size;
-      origin.y += Math.sin(seed.angle) * 55 * macroScale * size - 15 * macroScale;
+      origin.x += Math.cos(seed.angle) * 7 * macroScale * size;
+      origin.y += Math.sin(seed.angle) * 10 * macroScale * size - 12 * macroScale;
       const drag = Math.exp(-seed.drag * age);
       const vx = Math.cos(seed.angle) * seed.speed * sprayScale * drag;
       const vy = Math.sin(seed.angle) * seed.speed * sprayScale * drag + gravity * sprayScale * (1 - drag) / seed.drag;
-      const fragment = (seed.color > 0.94 ? 48 + seed.size * 28 : 5 + seed.size * 19) * macroScale * exposure;
-      const tailAge = Math.max(0, age - Math.min(0.09, fragment / Math.max(80, Math.hypot(vx, vy))));
+      const fragment = (seed.color > 0.94 ? 55 + seed.size * 70 : 14 + seed.size * 55) * macroScale * exposure;
+      const tailAge = age < life * 0.22 ? 0 : Math.max(0, age - Math.min(0.12, fragment / Math.max(80, Math.hypot(vx, vy))));
       const tail = flight(origin, seed, tailAge, sprayScale, gravity);
       const middle = flight(origin, seed, (tailAge + age) / 2, sprayScale, gravity);
       const head = flight(origin, seed, age, sprayScale, gravity);
       const brightness = opacity * smooth(age / 0.018) * Math.pow(1 - age / life, 0.55);
-      const weight = (0.55 + seed.size * 0.8) * size * streakScale;
+      const weight = (0.2 + seed.size * 0.36) * size * streakScale;
       curtain.beginPath();
       curtain.moveTo(tail.x, tail.y);
       curtain.quadraticCurveTo(2 * middle.x - (tail.x + head.x) / 2, 2 * middle.y - (tail.y + head.y) / 2, head.x, head.y);
-      const warm = palette(seed.color > 0.93 ? 0.97 : seed.color * 0.55);
+      const warm = palette(seed.color);
       curtain.strokeStyle = warm;
       curtain.lineWidth = weight * 3;
       curtain.globalAlpha = brightness * 0.12;
@@ -268,41 +269,45 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
       }
     }
 
-    // Overlapping feathered light lobes bloom into an overexposed burning head.
-    // No filled silhouette or fixed radial spokes: every edge falls off softly.
-    for (let layer = 0; layer < 5; layer++) {
-      const angle = layer * 2.4;
-      const spread = layer === 0 ? 0 : 25;
-      const x = tip.x + (Math.cos(angle) * spread + Math.sin(time * 9 + layer) * 4) * macroScale;
-      const y = tip.y + (Math.sin(angle) * spread * 1.35 - 12) * macroScale;
-      const radius = (layer === 0 ? 78 : 62) * macroScale * size;
-      curtain.save();
-      curtain.translate(x, y);
-      curtain.rotate(Math.sin(time * 5 + layer) * 0.12);
-      curtain.scale(1, 1.22);
-      const burn = curtain.createRadialGradient(0, 0, 0, 0, 0, radius);
-      burn.addColorStop(0, 'rgba(255,255,250,1)');
-      burn.addColorStop(0.34, 'rgba(255,253,241,0.98)');
-      burn.addColorStop(0.64, 'rgba(255,241,210,0.62)');
-      burn.addColorStop(0.84, 'rgba(255,210,148,0.16)');
-      burn.addColorStop(1, 'rgba(255,190,116,0)');
-      curtain.fillStyle = burn;
-      curtain.globalAlpha = opacity * (0.92 + Math.sin(time * 8 + layer) * 0.05);
-      curtain.fillRect(-radius, -radius, radius * 2, radius * 2);
-      curtain.restore();
+    // An uneven burning edge keeps the white-hot head alive instead of forming
+    // a fixed oval. The neighbouring light trails pick up its champagne bloom.
+    const edge = Array.from({ length: 24 }, (_, index) => {
+      const angle = index / 24 * TAU;
+      const radius = (16 + Math.sin(index * 2.7 + time * 14) * 4 + Math.cos(index * 1.4 - time * 9) * 3) * macroScale * size;
+      return { x: tip.x + Math.cos(angle) * radius, y: tip.y - 12 * macroScale + Math.sin(angle) * radius * 1.3 };
+    });
+    curtain.shadowColor = '#ffdda0';
+    curtain.shadowBlur = 9 * macroScale;
+    curtain.fillStyle = '#fffdf5';
+    curtain.globalAlpha = opacity;
+    curtain.beginPath();
+    curtain.moveTo((edge[0].x + edge.at(-1).x) / 2, (edge[0].y + edge.at(-1).y) / 2);
+    for (let index = 0; index < edge.length; index++) {
+      const point = edge[index], next = edge[(index + 1) % edge.length];
+      curtain.quadraticCurveTo(point.x, point.y, (point.x + next.x) / 2, (point.y + next.y) / 2);
     }
+    curtain.closePath();
+    curtain.fill();
     curtain.restore();
   }
 
   function drawOpening(job) {
     clear(curtain);
+    const alpha = smooth(job.elapsed / 120) * (1 - smooth((job.elapsed - (DURATION - 250)) / 250));
+    curtain.globalAlpha = alpha;
+    curtain.fillStyle = CURTAIN;
+    curtain.fillRect(0, 0, width, height);
+    curtain.globalAlpha = 1;
     drawSparkler(job, job.elapsed / 1000);
   }
 
   function drawTransition(job) {
     const covered = job.phase === 'covered' || job.phase === 'waiting';
     const progress = covered ? 1 : clamp(job.elapsed / job.halfDuration);
-    const alpha = covered ? 1 : job.phase === 'cover' ? smooth(progress) : 1 - smooth(progress);
+    const alpha = covered ? 1 : reduced
+      ? job.phase === 'cover' ? smooth(progress) : 1 - smooth(progress)
+      : job.phase === 'cover' ? smooth(job.elapsed / 120)
+        : 1 - smooth((job.elapsed - (job.halfDuration - 250)) / 250);
     // The CSS backing also guards the opaque hold if a swap resizes/reparents us.
     transitionCanvas.style.backgroundColor = covered ? CURTAIN : 'transparent';
     clear(curtain);
@@ -688,19 +693,18 @@ export function mountAmbientSparks(canvas) {
         context.beginPath();
         context.moveTo(tail.x, tail.y);
         context.lineTo(head.x, head.y);
-        // Broad amber edges survive the caller's 10px frost on a pale backdrop.
-        context.lineWidth = particle.size * 2.2;
-        context.strokeStyle = '#9f521b';
-        context.globalAlpha = alpha * 0.92;
+        context.lineWidth = particle.size * 4;
+        context.strokeStyle = '#f0b45c';
+        context.globalAlpha = alpha * 0.2;
         context.stroke();
-        context.lineWidth = particle.size * 0.7;
-        context.strokeStyle = '#ffd68c';
+        context.lineWidth = particle.size;
+        context.strokeStyle = '#ffe2a8';
         context.globalAlpha = alpha;
         context.stroke();
         context.fillStyle = '#fff4d5';
         context.globalAlpha = alpha * 0.95;
         context.beginPath();
-        context.arc(head.x, head.y, particle.size * 0.5, 0, TAU);
+        context.arc(head.x, head.y, particle.size * 0.8, 0, TAU);
         context.fill();
       }
     }
@@ -740,8 +744,8 @@ export function mountAmbientSparks(canvas) {
           life: 2.4 + Math.random() * 1.6,
           vx: side === 0 ? 35 + Math.random() * 65 : side === 1 ? -35 - Math.random() * 65 : (Math.random() - 0.5) * 70,
           vy: side === 2 ? -60 - Math.random() * 45 : -25 - Math.random() * 65,
-          size: 5 + Math.random() * 3,
-          exposure: 0.2 + Math.random() * 0.2,
+          size: 2 + Math.random() * 1.5,
+          exposure: 0.1 + Math.random() * 0.16,
         };
       });
     }

@@ -37,6 +37,8 @@ The first visit in a tab runs the portal. A valid URL language takes precedence,
 
 Sound is never assumed or persisted. The European Championship arrival film starts after the transition. Its upper field uses 70% of the viewport; tapping the actual darkened homepage below dismisses it. Tap the film to reveal controls. Escape and keyboard navigation also work. Autoplay-blocking browsers retain a play control.
 
+The signature sparkler runs for two seconds against black, with a compact white-hot core and fine warm trails. Beyond the entrance, it runs only when selecting a different page from the navigation menu. Back/Forward, same-page selections, changing language and closing the arrival film do not replay it. Both portal prompts use a very dark blurred background, with the sparks above the darkening layer.
+
 Only memory encoding is timed. Active game choices are never blurred or obscured. Reflection appears above the blurred completed game and requires Next. Reduced-motion users receive a short fade instead of moving particles. Touch devices have no custom cursor.
 
 ## Browser Checks
