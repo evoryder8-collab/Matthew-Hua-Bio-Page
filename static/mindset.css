@@ -1,0 +1,443 @@
+/* Original Attention Field visual language; interactions remain in their own band. */
+.mindset-game {
+  --mindset-blue: #7fb3ec;
+  --mindset-red: #f05259;
+  --mindset-gold: #ffd27a;
+  --mindset-neutral: #b9aec6;
+  --mindset-ease: cubic-bezier(.22, 1, .36, 1);
+  container-type: inline-size;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  min-height: 500px;
+  margin: 0;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(240, 232, 244, .16);
+  border-radius: 18px;
+  background: #0c0a12;
+  color: #f3eef5;
+  box-shadow: 0 24px 64px -36px #0806108c, inset 0 1px 0 #ffffff09;
+  font-family: var(--font-sans, "Comfortaa", ui-rounded, sans-serif);
+  font-size: 1rem;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+.mindset-game *, .mindset-game *::before, .mindset-game *::after {
+  box-sizing: border-box;
+  letter-spacing: 0;
+}
+.mindset-game [hidden] { display: none !important; }
+
+.mindset-field {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: clamp(370px, 46svh, 500px);
+  overflow: hidden;
+  background: #0c0a12;
+  background-image: linear-gradient(145deg, #20172766, transparent 52%, #17172333);
+  transition: filter .65s var(--mindset-ease), opacity .65s var(--mindset-ease);
+}
+
+.mindset-signal {
+  --mindset-sc: #aaa2b5;
+  --mindset-glow: 1;
+  position: absolute;
+  left: var(--mindset-x);
+  top: var(--mindset-y);
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  appearance: none;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--mindset-sc);
+  opacity: .6;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.mindset-signal > span {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.mindset-signal-aura {
+  inset: -12%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--mindset-sc) 42%, transparent), transparent 64%);
+  opacity: .55;
+  animation: mindset-breathe 5.5s ease-in-out infinite;
+  animation-delay: var(--mindset-delay);
+}
+.mindset-signal-ring {
+  inset: 24%;
+  border: 1px solid color-mix(in srgb, var(--mindset-sc) 55%, transparent);
+}
+.mindset-signal-core {
+  inset: 38%;
+  background: var(--mindset-sc);
+  box-shadow: 0 0 calc(7px * var(--mindset-glow)) 1px color-mix(in srgb, var(--mindset-sc) 85%, transparent);
+}
+.mindset-signal-orbit {
+  inset: 6%;
+  border: 1px dashed color-mix(in srgb, var(--mindset-sc) 26%, transparent);
+  animation: mindset-orbit 12s linear infinite;
+  animation-delay: var(--mindset-delay);
+}
+.mindset-signal-point {
+  position: absolute;
+  top: -1.5px;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  border-radius: 50%;
+  background: var(--mindset-sc);
+  box-shadow: 0 0 5px var(--mindset-sc);
+}
+.mindset-signal .mindset-signal-stem {
+  top: 68%;
+  left: calc(50% - .5px);
+  width: 1px;
+  height: 13px;
+  border-radius: 0;
+  background: linear-gradient(var(--mindset-sc), transparent);
+  opacity: .4;
+}
+.mindset-signal-blue { --mindset-sc: var(--mindset-blue); }
+.mindset-signal-red { --mindset-sc: var(--mindset-red); }
+.mindset-signal-gold { --mindset-sc: var(--mindset-gold); }
+.mindset-signal-neutral { --mindset-sc: var(--mindset-neutral); }
+.mindset-game[data-phase="intro"] .mindset-signal { opacity: .55; }
+.mindset-game[data-phase="memorize3seconds"] .mindset-signal { opacity: .38; }
+.mindset-game[data-phase="memorize3seconds"] .mindset-signal-blue {
+  opacity: 1;
+  --mindset-glow: 2.4;
+}
+.mindset-game[data-phase="memorize3seconds"] .mindset-signal-blue .mindset-signal-aura {
+  animation: mindset-halo 2.6s var(--mindset-ease) infinite;
+}
+.mindset-game[data-phase="memorize3seconds"] .mindset-signal-red { opacity: .95; --mindset-glow: 1.4; }
+button.mindset-signal { opacity: .88; cursor: pointer; touch-action: manipulation; }
+button.mindset-signal .mindset-signal-orbit,
+button.mindset-signal .mindset-signal-aura { animation: none; }
+.mindset-signal-picked { opacity: 1; }
+.mindset-signal-picked::after {
+  position: absolute;
+  inset: 2px;
+  border: 1px solid #9acaff;
+  border-radius: 50%;
+  box-shadow: 0 0 14px #7fb3ec30;
+  content: "";
+  pointer-events: none;
+}
+.mindset-signal-picked .mindset-signal-orbit { border-color: #7fb3ec77; }
+.mindset-game[data-phase="red"] .mindset-field::before,
+.mindset-game[data-phase="red"] .mindset-field::after {
+  position: absolute;
+  z-index: -1;
+  background: #b9aec626;
+  content: "";
+  pointer-events: none;
+}
+.mindset-game[data-phase="red"] .mindset-field::before { inset: 0 auto 0 50%; width: 1px; }
+.mindset-game[data-phase="red"] .mindset-field::after { inset: 50% 0 auto; height: 1px; }
+
+.mindset-content {
+  position: relative;
+  padding: 0 32px 32px;
+  z-index: 2;
+}
+.mindset-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.mindset-eyebrow {
+  min-width: 0;
+  margin: 0;
+  color: #f7a8d4;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.mindset-progress {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 2px;
+  appearance: none;
+  overflow: hidden;
+  border: 0;
+  background: #f0e8f41a;
+  color: #ffd27a;
+  accent-color: #ffd27a;
+}
+.mindset-progress::-webkit-progress-bar { background: #f0e8f41a; }
+.mindset-progress::-webkit-progress-value { background: #ffd27a; }
+.mindset-progress::-moz-progress-bar { background: #ffd27a; }
+.mindset-title {
+  margin: 0;
+  color: #f3eef5;
+  font-family: var(--font-sans, "Comfortaa", ui-rounded, sans-serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.mindset-copy, .mindset-lead, .mindset-instruction, .mindset-score {
+  max-width: 50ch;
+  margin: 12px 0 0;
+  color: #c6bacb;
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.mindset-lead { color: #f3eef5; }
+.mindset-instruction { color: #bcd6f4; font-size: 12px; }
+.mindset-score { color: #ffe2ab; font-weight: 600; }
+.mindset-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+  margin-top: 14px;
+}
+.mindset-status {
+  margin: 0;
+  color: #bcd6f4;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.mindset-countdown {
+  position: relative;
+  display: grid;
+  flex: 0 0 52px;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  font-size: 19px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.mindset-countdown svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.mindset-countdown circle { fill: none; stroke-width: 2.6; }
+.mindset-clock-background { stroke: #ffffff24; }
+.mindset-clock-remaining {
+  stroke: #7fb3ec;
+  stroke-linecap: round;
+  stroke-dasharray: 126;
+  stroke-dashoffset: var(--mindset-clock-offset, 0);
+}
+.mindset-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.mindset-controls:empty { display: none; }
+.mindset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 96px;
+  min-height: 46px;
+  max-width: 100%;
+  margin: 0;
+  padding: 12px 22px;
+  appearance: none;
+  border: 1px solid #ffd27a;
+  border-radius: 999px;
+  background: #ffd27a;
+  color: #261521;
+  box-shadow: 0 12px 26px -14px #ffd27a99;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background .3s, box-shadow .3s;
+}
+.mindset-button:disabled { color: #a89bae; background: #302835; border-color: #514457; box-shadow: none; cursor: not-allowed; }
+.mindset-next {
+  padding-inline: 26px;
+  border-color: #fff7dfcc;
+  background: linear-gradient(135deg, #fff7df, #ffd778 42%, #f7a8d4);
+  box-shadow: 0 18px 38px -22px #ffd27ac7, inset 0 1px 0 #ffffffc2;
+}
+.mindset-next::after { content: "\2192"; font-size: 18px; line-height: 1; }
+.mindset-controls-quarters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mindset-quarter, .mindset-unknown {
+  min-width: 0;
+  color: #f3eef5;
+  background: #ffffff0b;
+  border-color: #f0e8f433;
+  box-shadow: none;
+}
+.mindset-unknown { grid-column: 1 / -1; }
+.mindset-button:focus-visible, .mindset-title:focus-visible, .mindset-field:focus-visible {
+  outline: 2px solid #ffc2e4;
+  outline-offset: 5px;
+}
+button.mindset-signal:focus-visible { outline: 2px solid #d6f7e0; outline-offset: 1px; }
+
+/* The meaning layer is deliberately absent until both answers are committed. */
+.mindset-meaning { display: grid; }
+.mindset-meaning .mindset-field,
+.mindset-meaning .mindset-content { grid-area: 1 / 1; }
+.mindset-meaning .mindset-field {
+  height: 100%;
+  min-height: 500px;
+  aspect-ratio: auto;
+  filter: blur(5px);
+  opacity: .72;
+  pointer-events: none;
+}
+.mindset-meaning .mindset-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px;
+  background: linear-gradient(125deg, #0c0910b8, #120d1b73 55%, #17111e99);
+  animation: mindset-meaning-in .65s var(--mindset-ease) both;
+}
+.mindset-meaning .mindset-title {
+  max-width: 20ch;
+  font-family: var(--font-serif, "Fraunces", Georgia, serif);
+  font-size: 38px;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.2;
+}
+.mindset-meaning .mindset-copy { max-width: 42ch; margin-top: 20px; font-size: 15px; line-height: 1.75; }
+.mindset-meaning .mindset-controls { margin-top: 28px; }
+.mindset-meaning .mindset-signal-red { opacity: 1; --mindset-glow: 2.8; }
+.mindset-game[data-phase="integrationTitle"] .mindset-signal { --mindset-sc: #ffd27a; }
+.mindset-life { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+.mindset-life-label {
+  position: absolute;
+  max-width: 34%;
+  margin: 0;
+  padding: 4px 10px;
+  transform: translate(-50%, -50%);
+  border: 1px solid #ffd27a66;
+  border-radius: 999px;
+  background: #0a081080;
+  color: #ffe2ab;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.mindset-life-concern { color: #bcd6f4; border-color: #7fb3ec66; }
+
+/* Keep the original transparent portrait intact, with its large margins zoomed away. */
+.mindset-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+.mindset-photo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  transform-origin: 50% 47.5%;
+  transform: translate(-50%, -47.5%) scale(1.9);
+  filter: drop-shadow(0 26px 32px #00000066) drop-shadow(0 0 22px #ffce6a26);
+}
+.mindset-game[data-phase="finalPhoto"] .mindset-title {
+  color: #f3eef5;
+  font-family: var(--font-serif, "Fraunces", Georgia, serif);
+  font-size: 30px;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.22;
+}
+.mindset-game[data-phase="finalPhoto"] .mindset-eyebrow { color: #ffd27a; }
+.mindset-game[data-phase="finalPhoto"] .mindset-content { background: linear-gradient(#0c0910cc, #0c091000); }
+
+.mindset-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+@container (min-width: 36rem) {
+  .mindset-game[data-phase="finalPhoto"] .mindset-field { grid-area: 1 / 1; height: 100%; min-height: 540px; aspect-ratio: auto; }
+  .mindset-game[data-phase="finalPhoto"] .mindset-photo-frame { inset: 0 0 0 38%; }
+  .mindset-game[data-phase="finalPhoto"] .mindset-photo { width: auto; height: 105%; }
+  .mindset-game[data-phase="finalPhoto"] .mindset-content {
+    grid-area: 1 / 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 48%;
+    min-height: 540px;
+    padding: 30px;
+    background: linear-gradient(90deg, #0c0910f5, #0c0910b8 70%, transparent);
+  }
+}
+.mindset-game[data-phase="finalPhoto"] { position: relative; display: grid; }
+
+@container (min-width: 48rem) {
+  .mindset-title { font-size: 28px; }
+  .mindset-copy, .mindset-lead { font-size: 15px; }
+  .mindset-meaning .mindset-title { font-size: 42px; }
+  .mindset-meaning .mindset-copy { font-size: 16px; }
+}
+
+@container (max-width: 30rem) {
+  .mindset-field { height: auto; aspect-ratio: 1; min-height: 320px; }
+  .mindset-signal { left: var(--mindset-mobile-x); }
+  .mindset-content { padding: 0 22px 26px; }
+  .mindset-title { font-size: 20px; }
+  .mindset-copy, .mindset-lead { font-size: 13px; }
+  .mindset-meaning .mindset-field { min-height: 400px; }
+  .mindset-meaning .mindset-content { padding: 30px 24px; }
+  .mindset-meaning .mindset-title { font-size: 29px; }
+  .mindset-meaning .mindset-copy { font-size: 13px; line-height: 1.75; }
+  .mindset-game[data-phase="finalPhoto"] .mindset-title { font-size: 25px; }
+}
+@media (max-width: 600px) { .mindset-game { min-height: 0; } }
+@media (hover: hover) {
+  button.mindset-signal:hover { opacity: 1; background: #ffffff05; }
+  .mindset-button:hover:not(:disabled) { box-shadow: 0 12px 28px -10px #ffd27a88; }
+  .mindset-button.mindset-quarter:hover, .mindset-button.mindset-unknown:hover { background: #ffffff18; border-color: #7fb3ec; }
+}
+@keyframes mindset-orbit { to { transform: rotate(360deg); } }
+@keyframes mindset-breathe { 50% { opacity: .8; transform: scale(1.08); } }
+@keyframes mindset-halo { 0%, 100% { transform: scale(1); opacity: .5; } 50% { transform: scale(1.4); opacity: .95; } }
+@keyframes mindset-meaning-in { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+.mindset-reduced-motion *, .mindset-reduced-motion *::before, .mindset-reduced-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mindset-game *, .mindset-game *::before, .mindset-game *::after { animation: none !important; transition: none !important; }
+}
+@media (forced-colors: active) {
+  .mindset-signal-core { forced-color-adjust: none; }
+  .mindset-signal-picked::after { border-color: Highlight; }
+  button.mindset-signal:focus-visible { outline-color: Highlight; }
+}

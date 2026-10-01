@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://matthewhua.ch/sitemap.xml

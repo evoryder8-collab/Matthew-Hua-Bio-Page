@@ -1,0 +1,411 @@
+{
+  "languageError": "Die Sprache konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+  "locale": "de",
+  "nativeName": "Deutsch",
+  "portal": {
+    "welcome": "Ein Moment für Sie.",
+    "choose": "Wählen Sie Ihre Sprache",
+    "hint": "Fühlen Sie sich willkommen.",
+    "auto": "Weiter auf {language} in {seconds}s",
+    "detected": "Ihre Sprache",
+    "pause": "Lassen Sie sich Zeit",
+    "continue": "Weiter",
+    "sound": "Ton einschalten?",
+    "soundCopy": "Etwas Atmosphäre. Etwas mehr Nähe.",
+    "yes": "Ja, gerne",
+    "recommended": "Empfohlen",
+    "no": "Lieber ohne Ton",
+    "enter": "Willkommen",
+    "change": "Sprache ändern"
+  },
+  "nav": {
+    "home": "Startseite",
+    "method": "Die Methode",
+    "practice": "Privatpraxis",
+    "about": "Über Matthew",
+    "archive": "Das Archiv",
+    "contact": "Kontakt",
+    "inquiry": "Persönliche Anfrage",
+    "menu": "Menü öffnen",
+    "closeMenu": "Menü schliessen",
+    "language": "Sprache",
+    "soundOn": "Ton ausschalten",
+    "soundOff": "Ton einschalten",
+    "skip": "Zum Inhalt springen"
+  },
+  "common": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "close": "Schliessen",
+    "play": "Film abspielen",
+    "pause": "Film pausieren",
+    "replay": "Noch einmal ansehen",
+    "discover": "Entdecken",
+    "viewAll": "Zum Archiv",
+    "inquire": "Ins Gespräch kommen",
+    "book": "Eine Sitzung vereinbaren",
+    "readStory": "Seine Geschichte",
+    "watchFilm": "Entfachen Sie Ihr inneres Feuer neu",
+    "minutes": "Ein Kurzfilm",
+    "scroll": "Erkunden",
+    "loading": "Wird geladen",
+    "mediaError": "Der Film braucht einen Moment. Sie können ihn auch direkt öffnen.",
+    "openFilm": "Film öffnen",
+    "imageAlt": "Matthew Hua mit Tony Robbins",
+    "photoCredit": "Fotografien aus dem redaktionellen Porträt von Matthew",
+    "contactLink": "Sprechen wir miteinander",
+    "homeLink": "Zurück zur Startseite"
+  },
+  "home": {
+    "eyebrow": "Transformationstherapeut · Zurich",
+    "title": "Matthew Hua",
+    "headline": "Ein persönlicher Rückzugsort für Menschen mit einem anspruchsvollen Alltag.",
+    "intro": "Individuelle Körperarbeit, Atemarbeit und Präzisionstechnologie für Menschen in der Öffentlichkeit, Unternehmerinnen, Unternehmer und Berufstätige.",
+    "signature": "Veränderung beginnt im Körper.",
+    "filmLabel": "Was die Praxis ausmacht",
+    "filmTitle": "Entfachen Sie Ihr inneres Feuer neu.",
+    "filmCopy": "Ein Einblick in Matthews Welt: Präsenz, Bewegung und die Möglichkeit, sich anders zu fühlen.",
+    "methodLabel": "Die Methode",
+    "methodTitle": "Ein Mensch. Ein ganz persönlicher Ansatz.",
+    "methodCopy": "Berührung, Atem, Temperatur, Aufmerksamkeit und Bewegung werden auf Sie abgestimmt. Ausgangspunkt ist, wie Sie sich fühlen. Daraus entwickelt sich die Sitzung.",
+    "practiceLabel": "Privatpraxis",
+    "practiceTitle": "Ihre Zeit. Ihr Raum.",
+    "practiceCopy": "Eine Begegnung ohne Eile in Zurich. Im Mittelpunkt steht der Mensch hinter all den Verpflichtungen.",
+    "aboutLabel": "Der Mensch hinter der Praxis",
+    "aboutTitle": "Ein Leben über Grenzen hinweg. Eine Praxis ohne festes Drehbuch.",
+    "aboutCopy": "Von Vietnam über Australien nach Zurich: Matthews Weg verbindet gemeindenahe Gesundheitsarbeit, praktisches Handwerk, Lehre und internationale Wettbewerbe.",
+    "awardsLabel": "Ausgezeichnete Praxis",
+    "awardRome": "EM-Gold in seiner Kategorie",
+    "awardGermany": "Gold in Eastern Freestyle",
+    "awardSwiss": "Schweizer Freestyle-Meister",
+    "awardJury": "Internationaler Juror und Dozent",
+    "closing": "Schaffen Sie Raum für sich."
+  },
+  "method": {
+    "eyebrow": "Die Methode der Transformationstherapie",
+    "title": "Sechs Elemente. Eine Praxis.",
+    "intro": "Ein Ansatz, der Ihr Empfinden, Ihre Bewegung und Ihren Umgang mit dem Moment verbindet. Jedes Element hat seinen Platz. In Ihrer Sitzung kommt zusammen, was für Sie relevant ist.",
+    "elements": [
+      {
+        "name": "Innere Haltung",
+        "line": "Was wir wahrnehmen, prägt unser Erleben.",
+        "copy": "Eine Einladung, Aufmerksamkeit, Perspektive und eigene Reaktionen zu erkunden. Beginnen Sie mit einem kleinen Experiment."
+      },
+      {
+        "name": "Wärme / Kälte",
+        "line": "Dem Moment mit Ruhe begegnen.",
+        "copy": "Begleitete Wärme- und Kälteerfahrungen lenken die Aufmerksamkeit in die Gegenwart. Vorbereitung, persönliche Eignung und eine ruhige Begleitung bilden den Rahmen."
+      },
+      {
+        "name": "Atemarbeit",
+        "line": "Zurück zum eigenen Atem.",
+        "copy": "Eine begleitete Erkundung von Atmung und Wahrnehmung, gestützt auf Matthews Ausbildungen zum Instruktor der Wim Hof Method und von Oxygen Advantage."
+      },
+      {
+        "name": "Körper",
+        "line": "Ein Gespräch durch Berührung.",
+        "copy": "Einflüsse aus klassischer, thailändischer, chinesischer, balinesischer und Sportmassage sowie Shiatsu verbinden sich zu einer dynamischen, persönlichen Körperarbeit. Berührung und Bewegung richten sich nach dem Menschen auf der Liege."
+      },
+      {
+        "name": "Bewegung",
+        "line": "Eine lebendige Beziehung zum eigenen Körper.",
+        "copy": "Begleitete Bewegung, Mobilität und Neugier auf körperliche Erfahrungen im Alltag. Erkunden Sie, wie Sie sich bewegen und wo mehr Leichtigkeit möglich ist."
+      },
+      {
+        "name": "Gemeinschaft",
+        "line": "Gemeinsam üben, gemeinsam lernen.",
+        "copy": "Workshops und gemeinsame Erfahrungen schaffen Raum, mit anderen zu lernen. Matthews Hintergrund in gemeindenaher Gesundheitsarbeit prägt seinen Unterricht und seine Begegnungen."
+      }
+    ],
+    "technologyLabel": "Hände und Instrumente",
+    "technologyTitle": "Präzision mit menschlichem Gespür.",
+    "technologyIntro": "Technologie erweitert die Möglichkeiten. Matthew bleibt präsent, wählt die passenden Anwendungen und begleitet die Arbeit im Austausch mit Ihnen.",
+    "releaseLabel": "Pro Labo · Japan",
+    "releaseTitle": "Release Cutter",
+    "releaseLine": "Die Hände bleiben im Mittelpunkt.",
+    "releaseCopy": "Elektrische Stimulation wird über spezielle Kopplungshandschuhe übertragen, die der Therapeut trägt. Bei diesem gerätegestützten Ansatz bleiben Berührung und die Aufmerksamkeit des Therapeuten Teil der Sitzung.",
+    "zimmerLabel": "Zimmer · Deutschland",
+    "zimmerTitle": "Soleo SonoStim",
+    "zimmerLine": "Instrumente, gezielt eingesetzt.",
+    "zimmerCopy": "Die Soleo-Produktfamilie ergänzt eine fachlich begleitete Sitzung um Ultraschall und Elektrotherapie. Anwendung und Einstellungen richten sich nach der Gerätekonfiguration und der jeweiligen Person.",
+    "handsTitle": "Hände, die wahrnehmen.",
+    "handsItems": [
+      "Aufmerksame Berührung, die auf Sie eingeht",
+      "Ein persönlicher Rhythmus aus Berührung und Bewegung",
+      "Der Therapeut begleitet die gesamte Sitzung"
+    ],
+    "instrumentsTitle": "Instrumente, die unterstützen.",
+    "instrumentsItems": [
+      "Ein breiteres Anwendungsspektrum",
+      "Individuell gewählte Einstellungen",
+      "Technologie unter therapeutischer Begleitung"
+    ],
+    "techNote": "Ansatz und Geräteeinsatz werden vor der Sitzung individuell besprochen.",
+    "nextPage": "Die Privatpraxis kennenlernen"
+  },
+  "game": {
+    "eyebrow": "01 / Innere Haltung",
+    "title": "Ein Experiment zur Aufmerksamkeit.",
+    "intro": "Wonach Sie suchen, prägt, woran Sie sich erinnern.",
+    "introSub": "Ein kurzes Gedächtnisexperiment. Danach ein Moment zum Nachdenken.",
+    "begin": "Beginnen",
+    "memorize": "Merken Sie sich die Positionen der blauen Signale.",
+    "memorizeSub": "Anschliessend suchen Sie sie aus dem Gedächtnis.",
+    "recall": "Wo waren die drei blauen Signale?",
+    "recallSub": "Wählen Sie drei Positionen. Lassen Sie sich Zeit.",
+    "position": "Position {number}",
+    "selected": "{count} von 3 ausgewählt",
+    "confirm": "Weiter",
+    "red": "Und wo war das rote Signal?",
+    "redSub": "Wählen Sie ein Viertel des Feldes oder geben Sie an, dass Sie unsicher sind.",
+    "tl": "Oben links",
+    "tr": "Oben rechts",
+    "bl": "Unten links",
+    "br": "Unten rechts",
+    "unknown": "Ich bin unsicher",
+    "caught": "Sie haben es bemerkt.",
+    "missed": "Es war auch da.",
+    "revealCopy": "Die blauen Signale haben Ihre Aufmerksamkeit gebunden. Das rote Signal war im unteren rechten Viertel.",
+    "score": "Sie haben sich an {count} der 3 blauen Positionen erinnert.",
+    "focusTitle": "Wohin die Aufmerksamkeit geht, fliesst die Energie.",
+    "focusCopy": "Was wir suchen, nehmen wir leichter wahr. Dies ist eine Einladung zum Nachdenken, kein Test Ihrer Fähigkeiten.",
+    "lessonTitle": "Was bestimmt Ihren Blick?",
+    "lessonCopy": "Wenn wir immer wieder Probleme zählen, können sie das ganze Bild ausfüllen. Unterstützung, kleine Erfolge und Gründe zur Dankbarkeit sind vielleicht weiterhin da und warten darauf, wahrgenommen zu werden.",
+    "integrationTitle": "Geben Sie einem anderen Signal Raum.",
+    "integrationCopy": "Durch Atem, Berührung, Wärme, Bewegung und Präsenz lädt Matthew dazu ein, dem Körper eine andere Art von Aufmerksamkeit zu schenken.",
+    "finalTitle": "Worauf Sie sich konzentrieren, dorthin fliesst Ihre Energie.",
+    "finalCopy": "Tony Robbins prägt seit Langem Matthews Interesse an persönlicher Entwicklung. Ihre Begegnung ist Teil eines viel längeren Weges des Lernens und Praktizierens.",
+    "replay": "Noch einmal versuchen",
+    "next": "Weiter",
+    "labels": [
+      "Probleme",
+      "Stress",
+      "was nicht stimmt",
+      "Atem",
+      "Dankbarkeit",
+      "Unterstützung",
+      "kleine Erfolge"
+    ],
+    "paused": "Während Ihrer Abwesenheit pausiert.",
+    "fieldLabel": "Aufmerksamkeitsexperiment: zwölf Signalpositionen",
+    "progressLabel": "Fortschritt des Experiments"
+  },
+  "practice": {
+    "eyebrow": "Privatpraxis · Zurich",
+    "title": "Raum für den Menschen hinter all dem.",
+    "intro": "Ihre Arbeit, Ihre Verantwortung, Ihr Lebenstempo. Hier richtet sich die Aufmerksamkeit wieder auf Sie.",
+    "principles": [
+      {
+        "title": "Persönliche Aufmerksamkeit",
+        "copy": "Am Anfang steht ein Gespräch darüber, wie Sie sich fühlen und was Sie hierherführt. Aus dieser Begegnung entwickelt sich die Sitzung."
+      },
+      {
+        "title": "Diskretion",
+        "copy": "Ein sorgfältig gestalteter, privater Rahmen für Menschen in der Öffentlichkeit, Unternehmerinnen, Unternehmer und Berufstätige, die einen persönlichen Ansatz schätzen."
+      },
+      {
+        "title": "Ein integrierter Ansatz",
+        "copy": "Körperarbeit, Atem, innere Haltung, Bewegung und ausgewählte Technologie können in einer durchdachten Sitzung zusammenkommen."
+      }
+    ],
+    "processLabel": "Ihr erster Besuch",
+    "processTitle": "Ein Gespräch. Eine Sitzung. Raum zum Nachspüren.",
+    "steps": [
+      {
+        "title": "Kontakt aufnehmen",
+        "copy": "Besprechen Sie Ihre Interessen, mögliche Termine und offene Fragen direkt mit Matthew, bevor Sie buchen."
+      },
+      {
+        "title": "Ankommen",
+        "copy": "Nehmen Sie sich im Studio nahe Sihlcity einen Moment zum Ankommen. Besprechen Sie den Schwerpunkt und stimmen Sie den Ansatz gemeinsam ab."
+      },
+      {
+        "title": "Erleben",
+        "copy": "Ihre Rückmeldungen gestalten die Sitzung mit. Berührung, Tempo und Intensität werden im laufenden Austausch abgestimmt."
+      },
+      {
+        "title": "Weitergehen",
+        "copy": "Spüren Sie nach, wie Sie sich fühlen, und besprechen Sie, ob weitere Sitzungen oder ein Workshop für Sie sinnvoll wären."
+      }
+    ],
+    "faqTitle": "Vor unserer Begegnung",
+    "faqs": [
+      {
+        "q": "Wie vereinbare ich eine Sitzung?",
+        "a": "Schreiben Sie an info@healwell.ch oder kontaktieren Sie Matthew per WhatsApp unter +41 76 506 74 88. Verfügbarkeit, Sitzungsdauer und Honorar vereinbaren Sie direkt."
+      },
+      {
+        "q": "Ist eine Anerkennung durch die Krankenkasse möglich?",
+        "a": "Matthew ist für fünf Methoden beim EMR registriert. Eine Rückerstattung hängt von Ihrer Zusatzversicherung, der Methode und Ihrer Police ab. Klären Sie die Kostenübernahme vor der Buchung mit Ihrer Versicherung."
+      },
+      {
+        "q": "Wo findet die Sitzung statt?",
+        "a": "Das Healwell-Studio befindet sich an der Rüdigerstrasse 7, im Erdgeschoss, 8045 Zürich, nahe Sihlcity. Hinweise zur Anreise finden Sie auf der Kontaktseite."
+      },
+      {
+        "q": "In welcher Sprache kann die Sitzung stattfinden?",
+        "a": "Die Arbeitssprachen sind Englisch und Deutsch; Matthew spricht auch etwas Mandarin. Die Website ist in zehn Sprachen verfügbar. Bitte besprechen Sie Ihre bevorzugte Sitzungssprache bei der Anfrage."
+      }
+    ],
+    "closing": "Beginnen Sie mit einem Gespräch."
+  },
+  "about": {
+    "eyebrow": "Über Matthew",
+    "title": "Ein Leben in Bewegung.",
+    "intro": "In Vietnam geboren. In Australien aufgewachsen. In Zurich tätig. Ein Leben des Lernens, des Engagements für andere und des praktischen Handwerks.",
+    "quote": "Ich übe mich im Loslassen.",
+    "quoteBy": "Matthew Hua",
+    "chapters": [
+      {
+        "label": "01 / Zwischen den Ufern",
+        "title": "Ein weiter Blick.",
+        "copy": "Matthew verliess Vietnam mit seiner Familie auf einem Boot und kam als Kind nach Australien. Als Jugendlicher in Sydney fand er zur Meditation. Es folgten gemeindenahe Gesundheitsarbeit und ein Studium der Sozialwissenschaften und Internationalen Studien an der University of Technology Sydney."
+      },
+      {
+        "label": "02 / Die Sprache der Berührung",
+        "title": "Mit den Händen lernen.",
+        "copy": "Seine Massageausbildung begann 1997 in Sydney und führte ihn später nach Guangzhou und Zurich. Klassische, chinesische, balinesische, thailändische und sportliche Einflüsse sowie Shiatsu wurden Teil eines dynamischen, persönlichen Stils. Mit Healwell fand diese Praxis ein Zuhause in Zurich."
+      },
+      {
+        "label": "03 / Über das Vertraute hinaus",
+        "title": "Wer lehrt, übt weiter.",
+        "copy": "Als fortgeschrittener Instruktor der Wim Hof Method und Ateminstruktor für Oxygen Advantage vertieft Matthew laufend die Praktiken, die er vermittelt. Zu seinen Erfahrungen zählen eine Winterwanderung mit Wim Hof, die Assistenz bei Workshops in Schweden und ein barfuss gelaufener Marathon in Zurich."
+      },
+      {
+        "label": "04 / Wissen weitergeben",
+        "title": "Von der Liege auf die internationale Bühne.",
+        "copy": "Wettbewerbe brachten Schweizer Freestyle-Gold, Gold in Eastern Freestyle in Deutschland und europäisches Gold in Asian Inspired / Nuad Thai in Rome. Bis 2026 umfasste seine internationale Tätigkeit auch die European Feedback Jury nahe Paris und eine Berufung als Juror in Tokyo."
+      }
+    ],
+    "timelineTitle": "Eine Praxis nimmt Gestalt an.",
+    "timeline": [
+      {
+        "year": "1997",
+        "text": "Beginn der Massageausbildung in Sydney."
+      },
+      {
+        "year": "2017",
+        "text": "Healwell wird in Zurich gegründet; die öffentliche Markengeschichte beginnt 2018."
+      },
+      {
+        "year": "2021",
+        "text": "EMR-Registrierung für fünf anerkannte Methoden."
+      },
+      {
+        "year": "2022",
+        "text": "Zertifizierung als Instruktor der Wim Hof Method."
+      },
+      {
+        "year": "2023",
+        "text": "Schweizer Freestyle-Gold; Gold und Silber bei der Universal Massage Championship in Deutschland."
+      },
+      {
+        "year": "2024",
+        "text": "EM-Gold in seiner Kategorie in Rome; Mitarbeit im Studio VAULT in Zurich."
+      },
+      {
+        "year": "2026",
+        "text": "Internationale Juryarbeit, Rückmeldungen und Mentoring für Fachkolleginnen und Fachkollegen."
+      }
+    ],
+    "foundationTitle": "Ein Handwerk mit solider Grundlage.",
+    "foundationCopy": "Seine EMR-anerkannten Methoden sind Therapeutische Massage, Klassische Massage, Fussreflexzonenmassage, Manuelle Lymphdrainage und Autogenes Training. Fortlaufende Weiterbildung und internationaler Austausch ergänzen diese Grundlage.",
+    "tonyTitle": "Einfluss und Begegnung.",
+    "tonyCopy": "Seit mehr als 35 Jahren prägt Tony Robbins Matthews Interesse an persönlicher Entwicklung. Ihre Begegnung gehört zu einer fortwährenden Auseinandersetzung mit Aufmerksamkeit, Eigenverantwortung und unserem Umgang mit Erfahrungen.",
+    "todayTitle": "In Zurich verwurzelt. Offen für die Welt.",
+    "todayCopy": "Neben Healwell ist Matthew auch mit VAULT in Zurich verbunden. Unterricht, gemeinsame Praxis und internationaler Austausch bringen immer wieder neue Perspektiven ins Studio."
+  },
+  "archive": {
+    "eyebrow": "Das Archiv",
+    "title": "Eine Praxis in Bewegung.",
+    "intro": "Momente an der Liege, auf der Bühne und aus einem Leben, in dem das Lernen weitergeht.",
+    "all": "Alle Momente",
+    "films": "Filme",
+    "recognition": "Auszeichnungen",
+    "practice": "Die Praxis",
+    "items": [
+      {
+        "title": "Europameisterschaft",
+        "caption": "Rome, 2024 · Gold, Asian Inspired / Nuad Thai"
+      },
+      {
+        "title": "Champ of the Champs",
+        "caption": "Penzberg, 2023 · Auf internationaler Bühne"
+      },
+      {
+        "title": "Rat aus der Jury",
+        "caption": "Beobachtung, Rückmeldung und die nächste Generation"
+      },
+      {
+        "title": "Entfachen Sie Ihr inneres Feuer neu",
+        "caption": "Ein Kurzfilm über Praxis und Möglichkeiten"
+      },
+      {
+        "title": "Anerkennung in der Schweiz",
+        "caption": "Ein Moment aus Matthews Wettbewerbsweg"
+      },
+      {
+        "title": "Champ of the Champs",
+        "caption": "Gemeinsamer Erfolg bei Champ of the Champs"
+      },
+      {
+        "title": "Auf dem Podest in der Schweiz",
+        "caption": "Schweizer Massagemeisterschaft · Fribourg, 2023."
+      }
+    ],
+    "previous": "Vorheriger Moment",
+    "next": "Nächster Moment"
+  },
+  "contact": {
+    "eyebrow": "Kontakt · Zurich",
+    "title": "Hier beginnt Ihre Zeit.",
+    "intro": "Eine Frage, eine erste Sitzung, eine neue Möglichkeit. Sprechen Sie direkt mit Matthew.",
+    "email": "Matthew eine E-Mail schreiben",
+    "whatsapp": "WhatsApp",
+    "phone": "Telefon",
+    "addressLabel": "Das Studio",
+    "address": "Rüdigerstrasse 7",
+    "floor": "Erdgeschoss",
+    "city": "8045 Zürich, Switzerland",
+    "near": "Nahe Sihlcity · Nach Vereinbarung",
+    "drive": "Anfahrt mit dem Auto",
+    "chooseMap": "Ihr Weg hierher.",
+    "chooseMapCopy": "Wählen Sie Ihren bevorzugten Kartendienst für die Anfahrt zum Studio.",
+    "google": "Google Maps",
+    "apple": "Apple Maps",
+    "googleHint": "Anfahrt in Google Maps",
+    "appleHint": "Anfahrt in Apple Maps",
+    "mapLabel": "Healwell-Studio, Rüdigerstrasse 7, Zurich",
+    "route": "Von Zürich HB zum Studio",
+    "mapFallback": "Standort auf der Karte ansehen",
+    "insurance": "Krankenkassenanerkannt",
+    "insuranceCopy": "EMR-anerkannte Methoden. Bitte klären Sie die Rückerstattung mit Ihrer Zusatzversicherung.",
+    "copyAddress": "Adresse kopieren",
+    "copied": "Adresse kopiert",
+    "direct": "Ein direktes Gespräch. Eine persönliche Antwort."
+  },
+  "emotion": {
+    "eyebrow": "Raum, Sie selbst zu sein",
+    "title": "Sie müssen Ihre Tränen nicht wegwischen.",
+    "copy": "Tränen sind hier willkommen. Sie müssen nichts zurückhalten, Ihre Gefühle nicht erklären und sich nicht beeilen, wieder gefasst zu sein. Manchmal beginnt Stärke damit, dass wir uns erlauben zu fühlen.",
+    "note": "Ihr Tempo. Ihr Wohlbefinden. Ihre Entscheidung."
+  },
+  "footer": {
+    "line": "Veränderung beginnt im Körper.",
+    "location": "Zurich, Schweiz",
+    "rights": "Matthew Hua",
+    "privacy": "Datenschutz",
+    "privacyText": "Ihre Sprachwahl wird in Ihrem Browser gespeichert. Ton wird nur mit Ihrer Zustimmung eingeschaltet. Die Karte auf der Kontaktseite lädt Kartenkacheln von OpenStreetMap; dessen Server erhalten beim Öffnen dieser Seite die üblichen Verbindungsdaten. Links zu E-Mail, WhatsApp und Navigation öffnen die jeweiligen externen Dienste. Über diese Website werden keine Anfragen übermittelt.",
+    "backTop": "Nach oben"
+  },
+  "arrival": {
+    "eyebrow": "Europameisterschaft",
+    "title": "Ein Moment. Eine andere Art, ganz da zu sein.",
+    "enter": "In Matthews Welt eintauchen",
+    "reveal": "Videosteuerung anzeigen"
+  },
+  "seo": {
+    "title": "Matthew Hua | Transformationstherapeut | Zurich",
+    "description": "Ein persönlicher Rückzugsort für Menschen mit einem anspruchsvollen Alltag. Individuelle Körperarbeit, Atemarbeit und Präzisionstechnologie mit Matthew Hua in Zurich."
+  }
+}

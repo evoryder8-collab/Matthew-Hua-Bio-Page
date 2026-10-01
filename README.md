@@ -1,130 +1,63 @@
-# Matthew Hua — Transformational Therapist
+# Matthew Hua
 
-A cinematic, editorial biography site for **Matthew Hua** — Zurich-based transformational therapist and founder of *healwell*.
+Live: [matthewhua.ch](https://matthewhua.ch/)
 
-> **Transformation starts in the body.**
+Static GitHub Pages website. The original pink/mint identity, Comfortaa/Fraunces typography, rounded controls and Matthew/Tony hero are retained. The attention game, animated element and machine demonstrations, gallery, philosophy and contact remain on the homepage. New pages add detail without removing the interactive homepage.
 
-**Live:** https://evoryder8-collab.github.io/Matthew-Hua-Bio-Page/
+## Development
 
----
+Node.js 20 or later. No production npm dependencies.
 
-## What this is
-
-A self-contained, **static** single page. No build step — GitHub Pages serves `index.html` directly, so the preview is always online as long as the files are in the repo. Designed to feel like a private cinematic exhibition: beautiful, guided, calm, and effortless on every screen.
-
-## Experience route
-
-`Hero → Recognition → Journey → Six Elements → Technology → Archive → Philosophy → Studio`
-
-A premium digital business card and legacy profile, not a booking funnel. Refined actions only (Discover the Six Elements, View the Technology, Enter the Archive, Private Inquiry). Each block has its own motion logic; calm pauses between intense moments; a single signature WebGL moment (the hero).
-
-## Signature sections
-
-- **The Six Elements** — an accessible tablist "control room" with the exact six forces in order: Hot / Cold, Breathwork, Mindset, Body, Movement, Community. Each has its own atmosphere and signature motion (thermal shift, breathing, alignment, pressure, kinetic arcs, network), animated only while active and in view.
-- **The Instruments Behind the Method** — split-screen Technology section: Release Cutter (Pro Labo Japan, copper, spiral current) and Zimmer Soleo Series (Zimmer, ice blue, ultrasound waves + sensor-verified dose readout). Pointer-aware lighting, progressive-disclosure spec drawers, comparison block, and a reputation close back to Matthew.
-
-### Compliance (Technology)
-
-Supportive language only — no diagnosis, cure, or guaranteed-outcome claims. Device names are manufacturer marks. **Values to verify before public publishing** (flagged with `VERIFY` HTML comments in `index.html`): SonoSwing simultaneous 0.8 / 2.4 MHz, vacuum suction range, and pulsed-suction cycle. A visible note states figures are indicative and being verified. Confirm device indications and advertising compliance for Switzerland / EU before final publication.
-
-## Tech (core stack)
-
-- Hand-authored HTML + CSS (design-token system, no build)
-- **GSAP + ScrollTrigger** — scroll reveals + gentle desktop-only parallax
-- **Lenis** — smooth scrolling (desktop, disabled under reduced-motion)
-- **Three.js (r128)** — a single-draw-call "breathing" hero shader, **lazy-loaded desktop-only**
-- Progressive enhancement: fully readable and navigable with JavaScript disabled.
-
-## Mobile & accessibility
-
-- Mobile has its own choreography — no shader, no parallax, no scroll-hijack; large touch targets (≥44px), tap to open, swipe to navigate the archive.
-- Every gallery interaction works with **touch, mouse, and keyboard** (`Enter`/`Space` open, `←`/`→` navigate, `Esc` close, focus trap, swipe).
-- `prefers-reduced-motion` disables smooth scroll, the shader, parallax, the grain and reveals.
-- Dimmed label color raised for ~4.7:1 contrast; visible focus rings; semantic landmarks + skip link.
-- Video is **muted, never autoplays sound**.
-
-## File structure
-
-```
-.
-├── index.html            # the whole site (markup, styles, scripts, archive data)
-├── README.md
-├── .nojekyll             # serve files as-is on Pages
-├── assets/
-│   └── og-image.jpg      # 1200×630 social card  (ADD THIS)
-└── videos/               # your media (ADD THESE — see below)
-    ├── hero-loop.webm / .mp4
-    ├── awards/   stage/   practice/
-    └── posters/
+```sh
+npm run build
+npm run check
+npm test
+npm run dev
 ```
 
-## Video strategy — preview vs. full
+Preview: `http://127.0.0.1:4178`. Set `MATTHEW_PORT` to use another port. The server supports video byte ranges and the `/Matthew-Hua-Bio-Page/` prefix for path checks.
 
-The system is designed for **compressed cinematic clips**, never raw footage. Each archive item references two qualities:
+Generated `index.html` files are committed, so GitHub Pages does not need a build service. Run the build after changing templates or English copy.
 
-- **`preview`** — a small, low-res, short loop (used on the gallery card; plays on hover on desktop)
-- **`full`** — a higher-quality version (used only inside the immersive lightbox)
-- **`poster`** — a still for every clip (an elegant gradient placeholder shows until you add one)
+## Main Files
 
-Naming is clean and content-driven, e.g.:
+- `static/templates.js`: page structure, shared homepage sections, media and gallery ordering.
+- `static/locales/*.json`: ten complete language dictionaries.
+- `static/app.js`: navigation, five-second language countdown, sound consent, arrival video, gallery and map.
+- `static/identity.css`: original visual identity applied to layouts in `static/style.css`.
+- `static/mindset.js` and `static/mindset.css`: attention game with isolated state and timers.
+- `static/effects.js`: Canvas 2D sparkler transitions and desktop cursor. `SPARK_TUNING` exposes size, particle budget, lifetime, opacity, gravity, fade speed and colours.
+- `assets/films/`: H.264/AAC derivatives for Safari/Chrome. Original uploads remain unchanged.
+- `assets/editorial/`: real photographs from the supplied biography; see `MEDIA-NOTES.md` for provenance and retained credits.
+- `static/studio-route.json`: illustrative Zurich HB driving route, not live traffic or user-location routing.
 
-```
-videos/awards/european-championship-2024-preview.webm   (+ .mp4)   ← card
-videos/awards/european-championship-2024.webm           (+ .mp4)   ← lightbox
-videos/posters/european-championship-2024.jpg                      ← still
-```
+## Behaviour
 
-Rules of thumb: loops **4–12s**, **WebM primary + MP4 fallback**, **muted**, preview ≤ ~1.5 MB, full ≤ ~5 MB, poster ~1280px. Non-hero videos are lazy (`preload="none"`), play only when needed, and **pause when offscreen**.
+The first visit in a tab runs the portal. A valid URL language takes precedence, then a saved choice, then the browser language. Swiss German preferences map to Zurich Swiss German. Five seconds selects the highlighted language automatically; keyboard interaction or "Take your time" pauses it. The split Swiss/German flag opens a separate dialect choice and also pauses the timer. This choice and the sound prompt have softly blurred, continuously sparkling backgrounds. Returning visits in the same tab skip the portal. The language button always allows changing it.
 
-### ffmpeg
+Sound is never assumed or persisted. The European Championship arrival film starts after the transition. Its upper field uses 70% of the viewport; tapping the actual darkened homepage below dismisses it. Tap the film to reveal controls. Escape and keyboard navigation also work. Autoplay-blocking browsers retain a play control.
 
-```bash
-# PREVIEW — small, low-res loop for the card (≈640px wide, no audio)
-ffmpeg -i source.mov -an -t 8 -c:v libvpx-vp9 -b:v 0 -crf 38 -vf "scale=-2:640" european-championship-2024-preview.webm
-ffmpeg -i source.mov -an -t 8 -c:v libx264 -crf 30 -preset slow -movflags +faststart -vf "scale=-2:640" european-championship-2024-preview.mp4
+Only memory encoding is timed. Active game choices are never blurred or obscured. Reflection appears above the blurred completed game and requires Next. Reduced-motion users receive a short fade instead of moving particles. Touch devices have no custom cursor.
 
-# FULL — higher quality for the lightbox (≈1080p, no audio)
-ffmpeg -i source.mov -an -c:v libvpx-vp9 -b:v 0 -crf 32 -vf "scale=-2:1080" european-championship-2024.webm
-ffmpeg -i source.mov -an -c:v libx264 -crf 22 -preset slow -movflags +faststart -vf "scale=-2:1080" european-championship-2024.mp4
+## Browser Checks
 
-# POSTER — grab a strong frame
-ffmpeg -i source.mov -ss 00:00:02 -frames:v 1 -vf "scale=1280:-2" posters/european-championship-2024.jpg
-```
+Install Playwright for development, or set `PLAYWRIGHT_MODULE` to an existing runtime module path. Start the preview server first.
 
-After adding files, optionally set the `poster:` path in the `items` array (near the bottom of `index.html`). Replace-me spots are marked with `TODO`.
-
-## Archive data model (typed)
-
-Edit the `items` array in `index.html`:
-
-| field | meaning |
-|------|---------|
-| `title`, `year`, `location` | card + lightbox labels |
-| `role` / `group` | `winner`·`judge`·`awarding`·`practice` / filter group (`wins`·`stage`·`practice`) |
-| `award` | e.g. `Gold` |
-| `description` | lightbox copy |
-| `preview` / `full` | `{webm, mp4}` low-res card loop / hi-res lightbox |
-| `poster` | optional still (gradient fallback otherwise) |
-| `ratio` / `span` | card aspect (`r45`·`r169`·`r11`) / grid width (`w4`–`w8`) |
-| `mood` / `tags` | gradient placeholder + lightbox chips |
-
-## Performance
-
-- Static-first; tiny JS; GSAP/Lenis deferred; **Three.js lazy-loaded desktop-only**.
-- `transform`/`opacity` animations only; reveals via `ScrollTrigger`; hero shader is one draw call and **pauses offscreen / when the tab is hidden**.
-- Videos: posters first, `preload="none"`, low-res previews, hi-res only in the lightbox, paused offscreen via `IntersectionObserver`.
-- Target Lighthouse 90+ desktop; the dominant lever is video weight — compress per the commands above.
-
-## Local preview
-
-```bash
-python3 -m http.server 8080   # http://localhost:8080
+```sh
+node scripts/test-experience.mjs
+node scripts/test-language-family.mjs
+node scripts/test-mindset.mjs
+node scripts/test-layout.mjs
 ```
 
-## Deployment (GitHub Pages)
+The experience suite uses Chromium and WebKit. Layout tests cover six routes in ten languages at desktop/mobile sizes, plus narrow-screen German/Japanese. Screenshots are saved under ignored `output/qa/`.
 
-Settings → **Pages** → Source **Deploy from a branch** → **main** / **/(root)**. Rebuilds on every push to `main`.
+## Publication
 
----
+Repository: `evoryder8-collab/Matthew-Hua-Bio-Page`. Pages publishes `main` from `/`. Keep `.nojekyll` and `CNAME` unchanged. The domain is `matthewhua.ch`; relative paths also support the GitHub Pages repository prefix.
 
-*First production-ready version. Copy is cinematic placeholder, ready to refine — drop in real footage and photography to push it toward award level.*
+The existing social cover and absolute Open Graph image URL remain in place. Messaging platforms can cache older previews for previously shared links.
+
+## External Services
+
+Comfortaa and Fraunces load from Google Fonts. Contact-map tiles load from OpenStreetMap with visible attribution. Leaflet 1.9.4 and Lucide 0.468.0 are vendored locally. Flag thumbnails are from FlagCDN; map-provider marks are from Simple Icons. Driving links use the providers' universal URLs; app handling and navigation start depend on the visitor's device.
