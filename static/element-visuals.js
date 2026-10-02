@@ -708,7 +708,9 @@ function createRenderers() {
   const MACE_G = 14, MACE_TOP = 1.9, MACE_ENERGY = 0.5 * MACE_TOP * MACE_TOP + MACE_G + 3.2;
   R.movement = {
     init(st, w, h) {
-      Object.assign(st, { S: h * 0.5, floor: h * 0.7, cx: w * 0.5, phi: 0, omega: 0, dir: 1, mode: 'rest', timer: 0.6, trail: [] });
+      // Sized so the mace head, upright above the head (about 1.3 figure heights up), and
+      // its glow stay inside the frame.
+      Object.assign(st, { S: Math.min(h * 0.4, w * 0.62), floor: h * 0.67, cx: w * 0.5, phi: 0, omega: 0, dir: 1, mode: 'rest', timer: 0.6, trail: [] });
     },
     step(st, dt) {
       if (st.mode === 'rest') {
