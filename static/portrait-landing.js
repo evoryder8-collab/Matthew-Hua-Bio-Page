@@ -22,6 +22,8 @@ export function preparePortraitLanding(hero) {
   if (!figure || !inner) return null;
   win.scrollTo({ top: 0, behavior: 'instant' });
   doc.body.classList.add('is-landing');
+  // Hold the page still while they land (trackpad momentum would otherwise scroll it).
+  doc.documentElement.classList.add('landing-lock');
   const part = (name) => { const node = doc.createElement('div'); node.className = name; return node; };
   const stage = part('landing-stage');
   stage.setAttribute('aria-hidden', 'true');
@@ -49,6 +51,7 @@ export function preparePortraitLanding(hero) {
     animations.forEach((animation) => animation.cancel());
     stage.remove();
     doc.body.classList.remove('is-landing');
+    doc.documentElement.classList.remove('landing-lock');
   }
 
   // The page appears around the portrait: each element starts pulled toward it, small,

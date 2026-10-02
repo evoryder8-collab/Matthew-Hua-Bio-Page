@@ -217,6 +217,12 @@ function prepareArrival({holdMusic=false}={}){
   dialog.querySelector('.arrival-enter').addEventListener('click',leave);
   dialog.addEventListener('cancel',event=>{event.preventDefault();leave();});
   dialog.addEventListener('click',event=>{if(event.target===dialog||event.target===dialog.querySelector('.arrival-screen'))leave();});
+  // Scrolling down (wheel/trackpad), swiping up on touch, or Down/PageDown also enter.
+  dialog.addEventListener('wheel',event=>{if(event.deltaY>6)leave();},{passive:true});
+  let swipeFrom=null;
+  dialog.addEventListener('touchstart',event=>{swipeFrom=event.touches.length===1?event.touches[0].clientY:null;},{passive:true});
+  dialog.addEventListener('touchmove',event=>{if(swipeFrom!==null&&swipeFrom-event.touches[0].clientY>56){swipeFrom=null;leave();}},{passive:true});
+  dialog.addEventListener('keydown',event=>{if(['ArrowDown','PageDown'].includes(event.key)&&!event.target.closest('.arrival-controls')){event.preventDefault();leave();}});
   video.addEventListener('play',update);video.addEventListener('pause',update);
   video.addEventListener('playing',()=>{if(!video.muted)music.claim('arrival');easeVolumeIn(video);});
   video.addEventListener('pause',()=>music.release('arrival'));video.addEventListener('ended',()=>music.release('arrival'));

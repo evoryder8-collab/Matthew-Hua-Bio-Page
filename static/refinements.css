@@ -154,6 +154,19 @@ main h1[tabindex="-1"]:focus {outline:none}
 .arrival-player.is-leaving::backdrop {animation:arrival-backdrop-out .42s cubic-bezier(.5,0,.75,0) forwards}
 @keyframes arrival-backdrop-out {to{background:rgba(3,3,3,0);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0)}}
 .landing-stage {position:fixed;inset:0;z-index:0;pointer-events:none}
+.landing-lock,.landing-lock body {overflow:hidden}
+.heritage-hero h1 .hero-name {white-space:nowrap}
+
+/* "Enter Matthew's world": an unmistakable, warmly glowing way in. */
+.arrival-enter .arrival-link {position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;margin-top:6px;padding:0 28px;border:1px solid #fff7dfcc;border-radius:999px;background:linear-gradient(135deg,#fff7df,#ffd778 42%,#f7a8d4);color:#261521;font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:.01em;box-shadow:0 14px 34px -16px #ffd27acc,inset 0 1px 0 #ffffffc2;animation:arrival-enter-breathe 3s ease-in-out infinite;transition:transform .3s var(--ease)}
+.arrival-enter .arrival-link::before {content:'';position:absolute;inset:-6px;border:1px solid #ffe2abb3;border-radius:inherit;opacity:0;pointer-events:none;animation:arrival-enter-ring 3s ease-out infinite}
+.arrival-enter .arrival-link svg {width:17px;height:17px;stroke-width:2.2;animation:arrival-enter-arrow 1.6s cubic-bezier(.45,0,.55,1) infinite}
+.arrival-enter:hover .arrival-link {transform:translateY(-2px) scale(1.03)}
+.arrival-enter:active .arrival-link {transform:scale(.97)}
+@keyframes arrival-enter-breathe {0%,100%{box-shadow:0 14px 34px -16px #ffd27acc,0 0 18px -4px #ffd27a66,inset 0 1px 0 #ffffffc2}50%{box-shadow:0 0 0 4px #ffd27a26,0 18px 44px -14px #ffd27ae6,0 0 52px 4px #ffd27a8c,inset 0 1px 0 #ffffffc2}}
+@keyframes arrival-enter-ring {0%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:scale(1.14,1.5)}}
+@keyframes arrival-enter-arrow {0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
+@media(max-width:600px){.arrival-player .arrival-label{display:none}.arrival-player .arrival-title{font-size:20px;line-height:1.18}.arrival-player .arrival-enter{gap:8px;padding:6px 18px calc(10px + env(safe-area-inset-bottom))}.arrival-enter .arrival-link{min-height:44px;font-size:13px;margin-top:0}}
 .landing-exposure {position:absolute;inset:0;background:radial-gradient(circle at var(--land-x,50%) var(--land-y,40%),#fffefa 0%,#fffaf1 32%,#fff4e6 58%,#fdeef4 100%)}
 .landing-flare {position:absolute;left:var(--land-x,50%);top:var(--land-y,40%);width:120vmax;height:120vmax;margin:-60vmax 0 0 -60vmax;border-radius:50%;background:radial-gradient(circle,#fff 0%,#fffbe8f2 12%,#ffe9b385 30%,#ffd8e038 48%,transparent 66%);opacity:0}
 .landing-ring {position:absolute;width:440px;height:92px;margin:-46px 0 0 -220px;border-radius:50%;border:2px solid #ffffffe0;box-shadow:0 0 30px #fff3dccc,inset 0 0 20px #ffe6c2b3;opacity:0}
@@ -405,7 +418,7 @@ main h1[tabindex="-1"]:focus {outline:none}
   .tears-footer{gap:12px 26px;margin-top:28px}
   .about-story{padding-block:55px}
 }
-@media(max-height:650px){.arrival-title{font-size:18px}.arrival-label{display:none}.arrival-enter{gap:4px;padding-block:6px}.arrival-link{font-size:9px}.game-window .mindset-field{min-height:300px}.game-window .mindset-meaning .mindset-field{min-height:400px}}
+@media(max-height:650px){.arrival-enter .arrival-link{min-height:42px;font-size:12px;padding:0 20px;margin-top:2px}.arrival-title{font-size:18px}.arrival-label{display:none}.arrival-enter{gap:4px;padding-block:6px}.arrival-link{font-size:9px}.game-window .mindset-field{min-height:300px}.game-window .mindset-meaning .mindset-field{min-height:400px}}
 @media(prefers-reduced-motion:reduce){
   .mh-monogram{animation:none;background:none;-webkit-text-fill-color:currentColor}
   .portrait-alive .heritage-figure,.portrait-alive .portrait-aura,.tony-cutout,.portrait-arrived .portrait-gleam,.language-option.auto-committing,.studio-pin-beam,.modal-surface,.dialog-atmosphere{animation:none}
@@ -421,4 +434,5 @@ main h1[tabindex="-1"]:focus {outline:none}
   .element-tabs [data-element-tab],.element-tabs [data-element-tab]::before,.element-tabs [data-element-tab]::after,.element-tabs [data-element-tab] span{animation:none!important;transition:none}
   .menu-open .mobile-nav-contact a{animation:none}
   .instrument-photo .instrument-aura{animation:none}
+  .arrival-enter .arrival-link,.arrival-enter .arrival-link::before,.arrival-enter .arrival-link svg{animation:none}
 }
