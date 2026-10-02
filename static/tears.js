@@ -42,14 +42,21 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
   let state = 'idle';
   // While the tear falls, scrolling slows right down so it can be watched; it frees on 'done'.
   let lastTouch = null;
-  const brakeWheel = (event) => { if (event.ctrlKey) return; event.preventDefault(); win.scrollBy(0, event.deltaY * 0.15); };
+  // Downward scrolling also stops at a hold point that keeps heading and paragraph in view.
+  const holdY = () => section.getBoundingClientRect().top + win.scrollY - 70;
+  const brakeTo = (delta) => {
+    const next = win.scrollY + delta * 0.15;
+    win.scrollTo({ top: delta > 0 ? Math.min(next, Math.max(win.scrollY, holdY())) : next, behavior: 'instant' });
+  };
+  const brakeWheel = (event) => { if (event.ctrlKey) return; event.preventDefault(); brakeTo(event.deltaY); };
   const brakeStart = (event) => { lastTouch = event.touches[0]?.clientY ?? null; };
   const brakeMove = (event) => {
     const y = event.touches[0]?.clientY;
     if (lastTouch === null || y === undefined) return;
-    event.preventDefault(); win.scrollBy(0, (lastTouch - y) * 0.15); lastTouch = y;
+    event.preventDefault(); brakeTo(lastTouch - y); lastTouch = y;
   };
   let braking = false;
+  let approach = null;
   function brake(on) {
     if (on === braking) return;
     braking = on;
@@ -58,7 +65,11 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
     win[method]('touchstart', brakeStart, { passive: true });
     win[method]('touchmove', brakeMove, { passive: false });
   }
-  const setState = (next) => { state = next; section.dataset.tearState = next; brake(['wave', 'gather', 'falling', 'splash'].includes(next)); };
+  const setState = (next) => {
+    state = next; section.dataset.tearState = next;
+    if (next !== 'idle') brake(next !== 'done' && next !== 'static');
+    if (next === 'done') approach?.disconnect();
+  };
 
   function segments(text, granularity) {
     if (win.Intl?.Segmenter) {
@@ -625,13 +636,20 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
     later(startDrop, arrival + 260);
   }
 
+  // Brake as soon as the section starts to come into view, before the paragraph is
+  // reachable, so a fast scroll cannot pass it; release if the visitor turns back first.
   function arm() {
     if (!('IntersectionObserver' in win)) { later(run, 600); return; }
+    approach = new win.IntersectionObserver((entries) => {
+      if (state !== 'idle') return;
+      brake(entries.some((entry) => entry.isIntersecting));
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+    approach.observe(section);
     observer = new win.IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= 0.6)) return;
       observer.disconnect();
       observer = null;
-      later(run, 320);
+      later(run, 120);
     }, { threshold: [0, 0.6, 1], rootMargin: '0px 0px -10% 0px' });
     observer.observe(copy);
   }
@@ -644,6 +662,7 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
       if (destroyed) return;
       destroyed = true;
       brake(false);
+      approach?.disconnect();
       observer?.disconnect();
       if (frame !== null) win.cancelAnimationFrame(frame);
       for (const id of timers) win.clearTimeout(id);
