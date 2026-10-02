@@ -1,5 +1,5 @@
 const ELEMENT_KEYS = [null, 'hotcold', 'breath', 'body', 'movement', 'community'];
-const { renderers, palette } = createOriginalRenderers();
+const { renderers, palette } = createRenderers();
 
 /** The caller owns localized copy; this mount owns only its decorative canvas. */
 export function mountElementVisual(host, index, { reducedMotion = false } = {}) {
@@ -162,102 +162,551 @@ export function mountElementVisual(host, index, { reducedMotion = false } = {}) 
   };
 }
 
-// Original createElementFX palette and five drawing routines, without Mindset.
-function createOriginalRenderers(){
-    var PAL={ pink:'#ef84be', pink2:'#f7a8d4', pinkB:'#ffc2e4', green:'#8fe3b0', green2:'#b4eecb', greenB:'#d6f7e0', white:'#f3eef5' };
-    function hx(h){ var n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
-    function rgbaA(c,a){ return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')'; }
-    function rgba(h,a){ return rgbaA(hx(h),a); }
-    function lerp(a,b,t){ return a+(b-a)*t; }
-    function mix(h1,h2,t){ var a=hx(h1),b=hx(h2); return [Math.round(lerp(a[0],b[0],t)),Math.round(lerp(a[1],b[1],t)),Math.round(lerp(a[2],b[2],t))]; }
-    function ease(x){ return x<0.5?2*x*x:1-Math.pow(-2*x+2,2)/2; }
-    function radial(ctx,x,y,r,c0,c1){ var g=ctx.createRadialGradient(x,y,0,x,y,Math.max(1,r)); g.addColorStop(0,c0); g.addColorStop(1,c1); return g; }
-    function glow(ctx,x,y,r,c,b){ ctx.save(); ctx.shadowBlur=b||0; ctx.shadowColor=c; ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,Math.max(0.1,r),0,6.2832); ctx.fill(); ctx.restore(); }
-    function dist(a,b){ return Math.hypot(a.x-b.x,a.y-b.y); }
-    function qbez(A,C,B,p){ var q=1-p; return { x:q*q*A.x+2*q*p*C.x+p*p*B.x, y:q*q*A.y+2*q*p*C.y+p*p*B.y }; }
-    var R={};
+// Five living illustrations of the elements. Each keeps its focus in the upper part of
+// the stage (the copy covers the lower third) and advances its own small physics with
+// a clamped time step, so a hidden or slow tab never makes it leap.
+function createRenderers() {
+  const TAU = Math.PI * 2;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${clamp(a)})`;
+  const smooth = (x) => { const t = clamp(x); return t * t * (3 - 2 * t); };
+  const C = {
+    pink: [239, 132, 190], pinkB: [255, 194, 228], mint: [143, 227, 176], mintB: [214, 247, 224],
+    white: [246, 242, 248], ember: [255, 222, 160], ice: [205, 238, 255], gold: [255, 210, 122],
+  };
+  const sprites = new Map();
+  // Pre-rendered soft lights: far cheaper than shadowBlur for many particles.
+  function sprite(c) {
+    const key = c.join();
+    if (sprites.has(key)) return sprites.get(key);
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 64;
+    const g = canvas.getContext('2d');
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, rgba(c, 1));
+    grad.addColorStop(0.2, rgba(c, 0.72));
+    grad.addColorStop(0.5, rgba(c, 0.2));
+    grad.addColorStop(1, rgba(c, 0));
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 64, 64);
+    sprites.set(key, canvas);
+    return canvas;
+  }
+  function light(ctx, c, x, y, r, a) {
+    if (a <= 0.004 || r <= 0.3) return;
+    ctx.globalAlpha = clamp(a);
+    ctx.drawImage(sprite(c), x - r, y - r, r * 2, r * 2);
+  }
+  function backdrop(ctx, w, h, top, bottom) {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, top);
+    g.addColorStop(1, bottom);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+  // Advance physics; a first frame at a later time (reduced motion) is pre-simulated.
+  function advance(st, t, update) {
+    if (st.prev === undefined) {
+      st.prev = 0;
+      for (let s = 0; s < Math.min(t, 6); s += 1 / 30) update(1 / 30, s);
+    }
+    const dt = clamp(t - st.prev, 0, 0.05);
+    st.prev = t;
+    if (dt > 0) update(dt, t);
+  }
+  const R = {};
 
-    /* 1 - HOT / COLD : thermal contrast field */
-    R.hotcold={ init:function(st,w,h){ st.p=[]; for(var i=0;i<72;i++){ var hot=i%2; st.p.push({hot:hot,x:hot?w*0.5+Math.random()*w*0.5:Math.random()*w*0.5,y:Math.random()*h,v:0.3+Math.random()*0.9,r:0.6+Math.random()*1.7,ph:Math.random()*6.28}); } },
-      draw:function(ctx,w,h,t,st,P){
-        var g=ctx.createLinearGradient(0,0,w,0); g.addColorStop(0,'#0b1611'); g.addColorStop(.5,'#0c0a14'); g.addColorStop(1,'#180b14'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-        var sway=Math.sin(t*0.5)*0.05;
-        ctx.globalCompositeOperation='lighter';
-        ctx.fillStyle=radial(ctx,w*(0.24+sway),h*0.5,w*0.55,rgba(P.green,0.28),'rgba(0,0,0,0)'); ctx.fillRect(0,0,w,h);
-        ctx.fillStyle=radial(ctx,w*(0.78-sway),h*0.52,w*0.55,rgba(P.pink,0.30),'rgba(0,0,0,0)'); ctx.fillRect(0,0,w,h);
-        for(var i=0;i<st.p.length;i++){ var o=st.p[i];
-          if(o.hot){ o.y-=o.v; o.x+=Math.sin(t*1.3+o.ph)*0.3; if(o.y<-4){o.y=h+4;o.x=w*0.5+Math.random()*w*0.5;} }
-          else { o.y+=o.v*0.7; o.x+=Math.sin(t*0.9+o.ph)*0.25; if(o.y>h+4){o.y=-4;o.x=Math.random()*w*0.5;} }
-          var fl=0.5+0.5*Math.sin(t*3+o.ph); ctx.globalAlpha=(o.hot?0.55:0.42)*(0.4+0.6*fl); glow(ctx,o.x,o.y,o.r,o.hot?P.pinkB:P.greenB,6); }
-        ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
-        ctx.save(); ctx.lineWidth=1.4; ctx.strokeStyle=rgba(P.white,0.45); ctx.shadowBlur=14; ctx.shadowColor=rgba(P.pinkB,0.6);
-        ctx.beginPath(); for(var y=0;y<=h;y+=6){ var x=w*0.5+Math.sin(y*0.03+t*1.6)*10+Math.sin(t*0.7)*8; if(y===0)ctx.moveTo(x,y); else ctx.lineTo(x,y);} ctx.stroke(); ctx.restore();
-      } };
+  /* HOT / COLD: frost grows from the left, embers rise on the right, steam forms where
+     they meet, and a calm breathing presence holds the centre undisturbed. */
+  R.hotcold = {
+    init(st, w, h) {
+      st.cx = w * 0.5; st.cy = h * 0.34; st.R = Math.min(w, h) * 0.085;
+      const count = Math.round(40 * clamp(w / 900, 0.6, 1.2));
+      st.flakes = Array.from({ length: count }, () => ({ x: Math.random() * w * 0.45, y: Math.random() * h, v: 14 + Math.random() * 22, r: 0.9 + Math.random() * 1.7, ph: Math.random() * TAU, dx: 0 }));
+      st.embers = []; st.steam = []; st.emberClock = 0; st.steamClock = 0; st.rings = []; st.nextRing = 0.4;
+      const segs = [];
+      const L0 = Math.min(w, h) * 0.09;
+      function grow(x, y, a, L, depth, at) {
+        if (depth > 4 || segs.length > 240) return;
+        const x2 = x + Math.cos(a) * L, y2 = y + Math.sin(a) * L;
+        if (x2 > w * 0.42 || y2 < -10 || y2 > h + 10) return;
+        segs.push({ x1: x, y1: y, x2, y2, at, depth });
+        const next = at + 0.45 + Math.random() * 0.25;
+        grow(x2, y2, a + (Math.random() - 0.5) * 0.22, L * 0.84, depth + 1, next);
+        if (Math.random() < 0.8) grow(x2, y2, a + Math.PI / 3, L * 0.5, depth + 1, next + 0.12);
+        if (Math.random() < 0.8) grow(x2, y2, a - Math.PI / 3, L * 0.5, depth + 1, next + 0.12);
+      }
+      for (let r = 0; r < 6; r++) grow(0, h * (0.06 + 0.88 * (r + Math.random() * 0.7) / 6), (Math.random() - 0.5) * 0.6, L0, 0, 0.2 + r * 0.25);
+      st.frost = segs;
+    },
+    draw(ctx, w, h, t, st) {
+      const { cx, cy } = st;
+      const R0 = st.R;
+      const avoid = (p, dt) => {
+        const dx = p.x - cx, dy = p.y - cy, d = Math.hypot(dx, dy) || 1, zone = R0 * 2.1;
+        if (d < zone) { const push = (zone - d) / zone; p.vx = (p.vx || 0) + dx / d * push * 260 * dt; p.vy = (p.vy || 0) + dy / d * push * 260 * dt; }
+      };
+      advance(st, t, (dt, time) => {
+        st.emberClock += dt * 46;
+        while (st.emberClock >= 1) {
+          st.emberClock--;
+          st.embers.push({ x: w * (0.55 + Math.random() * 0.43), y: h + 6, vx: (Math.random() - 0.5) * 14, vy: -18 - Math.random() * 26, life: 0, max: 2.6 + Math.random() * 1.8, r: 1.2 + Math.random() * 2.2, px: 0, py: 0 });
+        }
+        for (let i = st.embers.length - 1; i >= 0; i--) {
+          const e = st.embers[i];
+          e.life += dt; e.px = e.x; e.py = e.y;
+          const flow = Math.sin(e.y * 0.017 + time * 1.3) * 30 + Math.sin(e.x * 0.011 - time * 0.8) * 14;
+          e.vx += (flow - e.vx) * 0.9 * dt;
+          e.vy -= 52 * dt;                          // buoyancy
+          e.vy *= 1 - 0.32 * dt;                    // air drag
+          avoid(e, dt);
+          e.x += e.vx * dt; e.y += e.vy * dt;
+          if (e.x < w * 0.5 && Math.random() < dt * 2.5) { st.steam.push({ x: e.x, y: e.y, r: 6, vy: -16, life: 0, max: 2.6, ph: Math.random() * TAU }); st.embers.splice(i, 1); continue; }
+          if (e.life > e.max || e.y < -12) st.embers.splice(i, 1);
+        }
+        for (const f of st.flakes) {
+          f.y += f.v * dt;
+          f.x += (Math.sin(time * 0.7 + f.ph) * 9 + 5) * dt;
+          const p = { x: f.x, y: f.y, vx: 0, vy: 0 }; avoid(p, dt); f.x += p.vx * dt * 6; f.y += p.vy * dt * 2;
+          if (f.x > w * 0.47) {
+            if (Math.random() < 0.6) st.steam.push({ x: f.x, y: f.y, r: 5, vy: -14, life: 0, max: 2.4, ph: Math.random() * TAU });
+            f.x = Math.random() * w * 0.4; f.y = -6;
+          }
+          if (f.y > h + 6) { f.y = -6; f.x = Math.random() * w * 0.45; }
+        }
+        st.steamClock += dt * 4;
+        while (st.steamClock >= 1) { st.steamClock--; st.steam.push({ x: w * 0.5 + (Math.random() - 0.5) * w * 0.05, y: h * (0.4 + Math.random() * 0.6), r: 7, vy: -18, life: 0, max: 3, ph: Math.random() * TAU }); }
+        for (let i = st.steam.length - 1; i >= 0; i--) {
+          const s = st.steam[i];
+          s.life += dt; s.y += s.vy * dt; s.x += Math.sin(time * 1.1 + s.ph) * 7 * dt; s.r += dt * 15;
+          if (s.life > s.max) st.steam.splice(i, 1);
+        }
+        if (st.steam.length > 90) st.steam.splice(0, st.steam.length - 90);
+        if (time >= st.nextRing) { st.nextRing = time + 3; st.rings.push(time); }
+        st.rings = st.rings.filter((start) => time - start < 3.4);
+      });
+      const bg = ctx.createLinearGradient(0, 0, w, 0);
+      bg.addColorStop(0, '#061419'); bg.addColorStop(0.47, '#0a1016'); bg.addColorStop(0.53, '#140b12'); bg.addColorStop(1, '#1e0b14');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
+      ctx.globalCompositeOperation = 'lighter';
+      light(ctx, C.mint, w * 0.12, h * 0.55, w * 0.42, 0.16);
+      light(ctx, C.pink, w * 0.88, h * 0.75, w * 0.5, 0.32);
+      light(ctx, C.ember, w * 0.8, h * 1.05, w * 0.4, 0.22);
+      // Frost: hexagonal branches growing in, glinting as light passes along them.
+      ctx.lineCap = 'round';
+      for (const s of st.frost) {
+        const p = clamp((t - s.at) / 0.7);
+        if (p <= 0) continue;
+        const x2 = s.x1 + (s.x2 - s.x1) * smooth(p), y2 = s.y1 + (s.y2 - s.y1) * smooth(p);
+        ctx.globalAlpha = 0.16 + 0.34 * (1 - s.depth / 5);
+        ctx.strokeStyle = rgba(C.ice, 1);
+        ctx.lineWidth = Math.max(0.5, 1.7 - s.depth * 0.3);
+        ctx.beginPath(); ctx.moveTo(s.x1, s.y1); ctx.lineTo(x2, y2); ctx.stroke();
+        const glint = Math.pow(Math.max(0, Math.sin(t * 1.5 - s.x2 * 0.025 - s.y2 * 0.008)), 14);
+        if (p >= 1 && glint > 0.05) light(ctx, C.ice, s.x2, s.y2, 5 + glint * 4, glint * 0.7);
+      }
+      for (const f of st.flakes) light(ctx, C.ice, f.x, f.y, f.r * 3, 0.5);
+      // Heat shimmer over the warm side.
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 3; i++) {
+        ctx.globalAlpha = 0.05;
+        ctx.strokeStyle = rgba(C.pinkB, 1);
+        ctx.beginPath();
+        for (let y = h; y >= 0; y -= 8) { const x = w * (0.64 + i * 0.12) + Math.sin(y * 0.045 - t * 3.2 + i * 2) * 5; if (y === h) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+        ctx.stroke();
+      }
+      for (const e of st.embers) {
+        const k = e.life / e.max;
+        const col = k < 0.3 ? mix(C.ember, C.pinkB, k / 0.3) : mix(C.pinkB, C.pink, (k - 0.3) / 0.7);
+        const a = Math.min(1, (1 - k) * 1.1);
+        ctx.globalAlpha = a * 0.5; ctx.strokeStyle = rgba(col, 1); ctx.lineWidth = e.r;
+        ctx.beginPath(); ctx.moveTo(e.x - e.vx * 0.05, e.y - e.vy * 0.05); ctx.lineTo(e.x, e.y); ctx.stroke();
+        light(ctx, col, e.x, e.y, e.r * (4.2 - 1.8 * k), a);
+        light(ctx, C.white, e.x, e.y, e.r * 0.9, a * (1 - k));
+      }
+      for (const s of st.steam) { const k = s.life / s.max; light(ctx, C.white, s.x, s.y, s.r, Math.sin(Math.PI * k) * 0.13); }
+      // The seam where they meet.
+      ctx.globalAlpha = 0.12; ctx.strokeStyle = rgba(C.white, 1); ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let y = 0; y <= h; y += 6) { const x = w * 0.5 + Math.sin(y * 0.03 + t * 1.4) * 5; if (!y) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+      ctx.stroke();
+      // Composure: steady, slowly breathing, cool on one side and warm on the other.
+      const breathe = 1 + 0.04 * Math.sin(t * TAU / 6.5);
+      const r = R0 * breathe;
+      for (const start of st.rings) {
+        const k = (t - start) / 3.4;
+        ctx.globalAlpha = Math.pow(1 - k, 2) * 0.32; ctx.strokeStyle = rgba(C.white, 1); ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.arc(cx, cy, r * (1.25 + k * 2.6), 0, TAU); ctx.stroke();
+      }
+      light(ctx, C.mint, cx - r * 0.45, cy, r * 3.3, 0.4);
+      light(ctx, C.pink, cx + r * 0.45, cy, r * 3.3, 0.42);
+      ctx.globalCompositeOperation = 'source-over';
+      const core = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.35, r * 0.05, cx, cy, r);
+      core.addColorStop(0, 'rgba(255,255,255,1)');
+      core.addColorStop(0.55, 'rgba(250,244,250,.92)');
+      core.addColorStop(1, 'rgba(240,226,240,.55)');
+      ctx.globalAlpha = 1; ctx.fillStyle = core;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = rgba(C.mint, 0.8); ctx.beginPath(); ctx.arc(cx, cy, r + 1.5, Math.PI * 0.55, Math.PI * 1.45); ctx.stroke();
+      ctx.strokeStyle = rgba(C.pink, 0.8); ctx.beginPath(); ctx.arc(cx, cy, r + 1.5, -Math.PI * 0.45, Math.PI * 0.45); ctx.stroke();
+      ctx.globalAlpha = 1;
+    },
+  };
 
-    /* 2 - BREATHWORK : diaphragm aperture, motes drawn in/out, phase ring */
-    R.breath={ init:function(st,w,h){ st.m=[]; for(var i=0;i<48;i++){ st.m.push({a:Math.random()*6.283,r:Math.random(),spd:0.5+Math.random()*0.9,tw:Math.random()*6.283}); } },
-      draw:function(ctx,w,h,t,st,P){
-        ctx.fillStyle='#0c0a12'; ctx.fillRect(0,0,w,h);
-        var cx=w/2, cy=h*0.46, base=Math.min(w,h)*0.16, T=12, ph=t%T, scale, pc;
-        if(ph<4){ var k=ease(ph/4); scale=lerp(0.62,1,k); pc=k; } else if(ph<6){ scale=1; pc=1; } else { var k2=ease((ph-6)/6); scale=lerp(1,0.62,k2); pc=1-k2; }
-        var col=mix(P.pink,P.green,pc), Rr=base*scale*2.4;
-        ctx.globalCompositeOperation='lighter';
-        ctx.fillStyle=radial(ctx,cx,cy,Rr*1.7,rgbaA(col,0.22),'rgba(0,0,0,0)'); ctx.fillRect(0,0,w,h);
-        ctx.fillStyle=radial(ctx,cx,cy,Rr,rgbaA(col,0.5),'rgba(0,0,0,0)'); ctx.beginPath(); ctx.arc(cx,cy,Rr,0,6.283); ctx.fill();
-        for(var i=0;i<3;i++){ var rr=Rr*(1.0+i*0.34)+Math.sin(t*1.2-i)*6; ctx.strokeStyle=rgbaA(col,0.26-i*0.07); ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(cx,cy,rr,0,6.283); ctx.stroke(); }
-        for(var m=0;m<st.m.length;m++){ var o=st.m[m]; o.r+=(scale-o.r)*0.04; var rad2=Rr*(0.7+o.r*1.5), x=cx+Math.cos(o.a+t*0.1*o.spd)*rad2, y=cy+Math.sin(o.a+t*0.1*o.spd)*rad2, tw=0.4+0.6*Math.abs(Math.sin(t*2+o.tw)); ctx.globalAlpha=tw; glow(ctx,x,y,1.3,rgbaA(col,0.7),6); }
-        ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
-        ctx.strokeStyle=rgbaA(col,0.7); ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,Rr*1.5,-1.5708,-1.5708+(ph/T)*6.283); ctx.stroke();
-      } };
+  /* BREATHWORK: a living membrane follows an inhale - hold - exhale guide on a spring,
+     drawing air in and releasing it; colour turns cool on the way in, warm on the way out. */
+  R.breath = {
+    init(st, w, h) {
+      st.cx = w / 2; st.cy = h * 0.36; st.base = Math.min(w, h) * 0.22; st.s = 0.3; st.sv = 0; st.tone = 1;
+      st.reach = Math.hypot(w, h) * 0.55;
+      st.air = Array.from({ length: Math.round(120 * clamp(w / 900, 0.6, 1.2)) }, () => this.spawn(st, true));
+    },
+    spawn(st, anywhere) {
+      const a = Math.random() * TAU, d = anywhere ? st.base * (1 + Math.random() * 3) : st.reach * (0.7 + Math.random() * 0.3);
+      return { x: st.cx + Math.cos(a) * d, y: st.cy + Math.sin(a) * d * 0.8, vx: 0, vy: 0, life: Math.random() };
+    },
+    guide(t) {
+      const T = 11, p = t % T;
+      if (p < 4) return { stage: 'in', v: smooth(p / 4), p: p / T };
+      if (p < 5.5) return { stage: 'hold', v: 1, p: p / T };
+      return { stage: 'out', v: 1 - smooth((p - 5.5) / 5.5), p: p / T };
+    },
+    draw(ctx, w, h, t, st) {
+      const { cx, cy } = st;
+      let g = this.guide(t);
+      advance(st, t, (dt, time) => {
+        g = this.guide(time);
+        const a = 24 * (g.v - st.s) - 8 * st.sv;   // organic lag, gentle overshoot
+        st.sv += a * dt; st.s += st.sv * dt;
+        st.tone += ((g.stage === 'out' ? 0 : 1) - st.tone) * clamp(dt * 1.4);
+        const radius = st.base * (0.55 + 0.45 * st.s);
+        for (const p of st.air) {
+          const dx = cx - p.x, dy = cy - p.y, d = Math.hypot(dx, dy) || 1, nx = dx / d, ny = dy / d;
+          const pull = g.stage === 'in' ? 150 : g.stage === 'out' ? -70 : 6;
+          p.vx += (nx * pull - ny * 46) * dt;
+          p.vy += (ny * pull + nx * 46) * dt;
+          p.vx *= 1 - 1.5 * dt; p.vy *= 1 - 1.5 * dt;
+          p.x += p.vx * dt; p.y += p.vy * dt;
+          p.life = Math.min(1, p.life + dt * 0.8);
+          if (g.stage !== 'out' && d < radius * 0.9) Object.assign(p, this.spawn(st, false), { life: 0 });
+          else if (d > st.reach) {
+            if (g.stage === 'out') { const an = Math.random() * TAU, sp = 60 + Math.random() * 70; Object.assign(p, { x: cx + Math.cos(an) * radius, y: cy + Math.sin(an) * radius, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, life: 0 }); }
+            else Object.assign(p, this.spawn(st, false), { life: 0 });
+          }
+        }
+      });
+      const col = mix(C.pink, C.mint, st.tone), colB = mix(C.pinkB, C.mintB, st.tone);
+      backdrop(ctx, w, h, '#0b0b14', '#0a0910');
+      const radius = st.base * (0.55 + 0.45 * st.s);
+      ctx.globalCompositeOperation = 'lighter';
+      light(ctx, col, cx, cy, radius * 3.2, 0.22 + 0.18 * st.s);
+      for (const p of st.air) {
+        const sp = Math.hypot(p.vx, p.vy);
+        if (sp < 2) { light(ctx, colB, p.x, p.y, 2, 0.25 * p.life); continue; }
+        const len = Math.min(26, sp * 0.12);
+        ctx.globalAlpha = 0.45 * p.life; ctx.strokeStyle = rgba(colB, 1); ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(p.x - p.vx / sp * len, p.y - p.vy / sp * len); ctx.lineTo(p.x, p.y); ctx.stroke();
+      }
+      // The membrane: a soft, slightly irregular form, layered like breath within breath.
+      for (let layer = 0; layer < 3; layer++) {
+        const rr = radius * (1 - layer * 0.26);
+        ctx.beginPath();
+        for (let i = 0; i <= 72; i++) {
+          const a = i / 72 * TAU;
+          const wob = 1 + 0.035 * Math.sin(3 * a + t * 0.7 + layer) + 0.022 * Math.sin(5 * a - t * 1.1);
+          const x = cx + Math.cos(a) * rr * wob, y = cy + Math.sin(a) * rr * wob;
+          if (!i) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        const fill = ctx.createRadialGradient(cx, cy - rr * 0.3, rr * 0.1, cx, cy, rr);
+        fill.addColorStop(0, rgba(colB, 0.34 - layer * 0.06));
+        fill.addColorStop(1, rgba(col, 0.06));
+        ctx.globalAlpha = 1; ctx.fillStyle = fill; ctx.fill();
+        ctx.strokeStyle = rgba(colB, 0.55 - layer * 0.15); ctx.lineWidth = 1.4 - layer * 0.3; ctx.stroke();
+      }
+      light(ctx, C.white, cx, cy - radius * 0.2, radius * 0.6, 0.18 + 0.2 * st.s);
+      // The guide: inhale (cool), hold (white), exhale (warm), and where we are now.
+      const ringR = st.base * 1.32;
+      const arc = (from, to, c, a) => { ctx.globalAlpha = a; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, ringR, -Math.PI / 2 + from * TAU, -Math.PI / 2 + to * TAU); ctx.stroke(); };
+      arc(0, 4 / 11, C.mint, 0.22); arc(4 / 11, 5.5 / 11, C.white, 0.22); arc(5.5 / 11, 1, C.pink, 0.22);
+      arc(Math.max(0, g.p - 0.06), g.p, colB, 0.75);
+      const ma = -Math.PI / 2 + g.p * TAU;
+      light(ctx, colB, cx + Math.cos(ma) * ringR, cy + Math.sin(ma) * ringR, 9, 0.95);
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    },
+  };
 
-    /* 4 - BODY : nervous/fascia network, branching signal cascades */
-    R.body={ init:function(st,w,h){ var n=[]; for(var i=0;i<15;i++) n.push({x:w*(0.12+0.76*Math.random()),y:h*(0.12+0.76*Math.random()),flare:0}); var E=[]; for(var i=0;i<n.length;i++){ var d=[]; for(var j=0;j<n.length;j++) if(j!==i) d.push([dist(n[i],n[j]),j]); d.sort(function(a,b){return a[0]-b[0];}); for(var k=0;k<2;k++){ var j=d[k][1], ex=false; for(var m=0;m<E.length;m++){ if((E[m].a===i&&E[m].b===j)||(E[m].a===j&&E[m].b===i)){ex=true;break;} } if(!ex) E.push({a:i,b:j,c:{x:(n[i].x+n[j].x)/2+(Math.random()-0.5)*40,y:(n[i].y+n[j].y)/2+(Math.random()-0.5)*40}}); } } st.n=n; st.e=E; st.sig=[]; st.next=0; },
-      draw:function(ctx,w,h,t,st,P){
-        ctx.fillStyle='#0d0a12'; ctx.fillRect(0,0,w,h);
-        var n=st.n, E=st.e;
-        function spawn(node,depth){ for(var i=0;i<E.length;i++){ var e=E[i]; if(e.a===node||e.b===node){ if(st.sig.length>48) break; st.sig.push({e:i,dir:e.b===node,p:0,spd:0.018+Math.random()*0.02,depth:depth}); } } }
-        if(t>st.next){ st.next=t+1.3+Math.random()*1.1; var s=Math.floor(Math.random()*n.length); n[s].flare=1; spawn(s,2); }
-        ctx.lineWidth=1; ctx.strokeStyle=rgba(P.green,0.15);
-        for(var i=0;i<E.length;i++){ var e=E[i],A=n[e.a],B=n[e.b]; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.quadraticCurveTo(e.c.x,e.c.y,B.x,B.y); ctx.stroke(); }
-        ctx.globalCompositeOperation='lighter';
-        for(var i=st.sig.length-1;i>=0;i--){ var gg=st.sig[i]; gg.p+=gg.spd; var e=E[gg.e], A=gg.dir?n[e.b]:n[e.a], B=gg.dir?n[e.a]:n[e.b], pt=qbez(A,e.c,B,Math.min(1,gg.p)); glow(ctx,pt.x,pt.y,2.2,rgba(P.pinkB,0.9),12); if(gg.p>=1){ var node=gg.dir?e.a:e.b; n[node].flare=1; if(gg.depth>0) spawn(node,gg.depth-1); st.sig.splice(i,1); } }
-        for(var i=0;i<n.length;i++){ var o=n[i]; o.flare*=0.94; glow(ctx,o.x,o.y,2.3+o.flare*3,rgba(P.pink,0.5+0.5*o.flare),8+o.flare*16); if(o.flare>0.05){ ctx.strokeStyle=rgba(P.pinkB,o.flare*0.5); ctx.lineWidth=1; ctx.beginPath(); ctx.arc(o.x,o.y,(1-o.flare)*22+6,0,6.283); ctx.stroke(); } }
-        ctx.globalCompositeOperation='source-over';
-      } };
+  /* BODY: a responsive surface like skin and fascia. Two hands take turns to press and
+     glide; the surface answers with travelling waves, a conversation through touch. */
+  R.body = {
+    init(st, w, h) {
+      const cols = Math.round(clamp(w / 20, 26, 50)), rows = Math.round(cols * 0.5);
+      Object.assign(st, { cols, rows, x0: w * 0.06, x1: w * 0.94, y0: h * 0.14, y1: h * 0.68, z: new Float32Array(cols * rows), v: new Float32Array(cols * rows) });
+    },
+    hand(i, t) {
+      // Each hand strokes along its own slow path; they alternate presses (call, answer).
+      const turn = Math.floor(t / 1.8), active = turn % 2 === i, k = (t % 1.8) / 1.1;
+      const press = active && k < 1 ? Math.pow(Math.sin(Math.PI * k), 2) : 0;
+      return { u: 0.5 + 0.27 * Math.sin(t * 0.33 + i * 2.4) + (i ? 0.06 : -0.06), v: 0.48 + 0.2 * Math.sin(t * 0.47 + i * 1.7), press };
+    },
+    project(st, i, j, z, w) {
+      const fj = j / (st.rows - 1), depth = 0.78 + 0.22 * fj;            // nearer rows are wider
+      const x = w / 2 + ((st.x0 + (st.x1 - st.x0) * i / (st.cols - 1)) - w / 2) * depth;
+      const y = st.y0 + (st.y1 - st.y0) * Math.pow(fj, 1.15) - z * (28 + 32 * fj);
+      return [x, y];
+    },
+    draw(ctx, w, h, t, st) {
+      const { cols, rows, z, v } = st;
+      advance(st, t, (dt, time) => {
+        const hands = [this.hand(0, time), this.hand(1, time)];
+        const steps = 2, sdt = dt / steps;
+        for (let s = 0; s < steps; s++) {
+          for (let j = 1; j < rows - 1; j++) for (let i = 1; i < cols - 1; i++) {
+            const n = j * cols + i;
+            const lap = z[n - 1] + z[n + 1] + z[n - cols] + z[n + cols] - 4 * z[n];
+            v[n] += (520 * lap - 2.6 * v[n] - 3 * z[n]) * sdt;
+          }
+          for (const hand of hands) {
+            if (hand.press <= 0) continue;
+            const hi = hand.u * (cols - 1), hj = hand.v * (rows - 1);
+            for (let j = Math.max(1, Math.floor(hj - 5)); j < Math.min(rows - 1, hj + 5); j++) for (let i = Math.max(1, Math.floor(hi - 5)); i < Math.min(cols - 1, hi + 5); i++) {
+              const g = Math.exp(-((i - hi) ** 2 + (j - hj) ** 2) / 5);
+              v[j * cols + i] -= 46 * hand.press * g * sdt;
+            }
+          }
+          for (let n = 0; n < z.length; n++) z[n] += v[n] * sdt;
+        }
+      });
+      backdrop(ctx, w, h, '#0c0a12', '#0b0a10');
+      const hands = [this.hand(0, t), this.hand(1, t)];
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 2; i++) {
+        const [hx, hy] = this.project(st, hands[i].u * (cols - 1), hands[i].v * (rows - 1), 0, w);
+        light(ctx, i ? C.mint : C.pink, hx, hy, Math.min(w, h) * 0.32, 0.1 + 0.12 * hands[i].press);
+      }
+      ctx.lineWidth = 1;
+      for (let j = 0; j < rows; j++) {
+        ctx.globalAlpha = 0.12 + 0.2 * (j / rows);
+        ctx.strokeStyle = rgba(C.white, 1);
+        ctx.beginPath();
+        for (let i = 0; i < cols; i++) { const [x, y] = this.project(st, i, j, z[j * cols + i], w); if (!i) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+        ctx.stroke();
+      }
+      for (let i = 0; i < cols; i += 2) {
+        ctx.globalAlpha = 0.09; ctx.beginPath();
+        for (let j = 0; j < rows; j++) { const [x, y] = this.project(st, i, j, z[j * cols + i], w); if (!j) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+        ctx.stroke();
+      }
+      for (let j = 1; j < rows - 1; j++) for (let i = 1; i < cols - 1; i++) {
+        const value = z[j * cols + i];
+        if (Math.abs(value) < 0.05) continue;
+        const [x, y] = this.project(st, i, j, value, w);
+        light(ctx, value < 0 ? C.pinkB : C.mintB, x, y, 2 + Math.abs(value) * 10, Math.min(0.75, Math.abs(value) * 2.4));
+      }
+      // The hands: a soft palm with four fingertips that lower and brighten as they press.
+      for (let i = 0; i < 2; i++) {
+        const hand = hands[i], c = i ? C.mint : C.pink, cb = i ? C.mintB : C.pinkB;
+        const hi = hand.u * (cols - 1), hj = hand.v * (rows - 1);
+        const zi = z[Math.round(hj) * cols + Math.round(hi)] || 0;
+        const [px, py] = this.project(st, hi, hj, zi, w);
+        const lift = (1 - hand.press) * 22 + 6;
+        light(ctx, c, px, py - lift, 46, 0.4 + 0.45 * hand.press);
+        for (let f = 0; f < 4; f++) {
+          const a = -Math.PI / 2 + (f - 1.5) * 0.38 + (i ? 0.15 : -0.15);
+          light(ctx, cb, px + Math.cos(a) * 28, py - lift + Math.sin(a) * 20 + 10, 8 + hand.press * 4, 0.7 + 0.3 * hand.press);
+          light(ctx, C.white, px + Math.cos(a) * 28, py - lift + Math.sin(a) * 20 + 10, 2.2, 0.9);
+        }
+        if (hand.press > 0.05) {
+          ctx.globalAlpha = hand.press * 0.35; ctx.strokeStyle = rgba(cb, 1); ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.ellipse(px, py, 26 + hand.press * 14, (26 + hand.press * 14) * 0.32, 0, 0, TAU); ctx.stroke();
+        }
+      }
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    },
+  };
 
-    /* 5 - MOVEMENT : articulated limbs cycling, motion trails */
-    R.movement={ init:function(st,w,h){ st.t1=[]; st.t2=[]; },
-      draw:function(ctx,w,h,t,st,P){
-        ctx.fillStyle='#0a0d12'; ctx.fillRect(0,0,w,h);
-        var hipx=w*0.5, hipy=h*0.30, L1=Math.min(w,h)*0.22, L2=Math.min(w,h)*0.2;
-        function limb(phase){ var hip=-0.4+Math.sin(t*1.7+phase)*0.5, knee=0.95+Math.sin(t*1.7+phase+1.0)*0.7, a1=Math.PI*0.5+hip, kx=hipx+Math.cos(a1)*L1, ky=hipy+Math.sin(a1)*L1, a2=a1+knee, fx=kx+Math.cos(a2)*L2, fy=ky+Math.sin(a2)*L2; return {kx:kx,ky:ky,fx:fx,fy:fy}; }
-        ctx.strokeStyle=rgba(P.green,0.16); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(w*0.12,h*0.84); ctx.lineTo(w*0.88,h*0.84); ctx.stroke();
-        var A=limb(0), B=limb(Math.PI);
-        st.t1.push({x:A.fx,y:A.fy}); if(st.t1.length>32) st.t1.shift(); st.t2.push({x:B.fx,y:B.fy}); if(st.t2.length>32) st.t2.shift();
-        ctx.globalCompositeOperation='lighter';
-        function trail(arr,hh){ for(var i=1;i<arr.length;i++){ var a=i/arr.length; ctx.strokeStyle=rgba(hh,a*0.4); ctx.lineWidth=a*3; ctx.beginPath(); ctx.moveTo(arr[i-1].x,arr[i-1].y); ctx.lineTo(arr[i].x,arr[i].y); ctx.stroke(); } }
-        function limbDraw(L,seg,joint){ ctx.strokeStyle=seg; ctx.lineWidth=4; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(hipx,hipy); ctx.lineTo(L.kx,L.ky); ctx.lineTo(L.fx,L.fy); ctx.stroke(); glow(ctx,L.kx,L.ky,3.2,joint,10); glow(ctx,L.fx,L.fy,3.6,joint,12); }
-        trail(st.t1,P.pink); trail(st.t2,P.green);
-        limbDraw(B,rgba(P.green,0.5),rgba(P.greenB,0.9));
-        limbDraw(A,rgba(P.pink,0.72),rgba(P.pinkB,1));
-        glow(ctx,hipx,hipy,4,rgba(P.white,0.8),14);
-        ctx.globalCompositeOperation='source-over';
-      } };
+  /* MOVEMENT: a figure flows through a mobility sequence (side reaches, soft squats);
+     silk ribbons trail from the wrists and each shoulder shows its range of motion. */
+  R.movement = {
+    init(st, w, h) {
+      st.S = h * 0.6; st.floor = h * 0.66; st.cx = w * 0.5;
+      const rope = () => ({ pts: Array.from({ length: 30 }, () => ({ x: st.cx, y: h * 0.3, px: st.cx, py: h * 0.3 })), seg: st.S * 0.017 });
+      st.ropes = [rope(), rope()];
+    },
+    pose(st, t) {
+      const S = st.S, w = 2 * Math.PI / 12;
+      const side = Math.sin(t * w), sq = ((1 - Math.cos(2 * t * w)) / 2) * 0.85;
+      const lean = side * 0.24;
+      const P = (x, y) => ({ x, y });
+      const pelvis = P(st.cx - side * S * 0.03, 0);
+      const chest = P(pelvis.x + Math.sin(lean) * S * 0.28, pelvis.y - Math.cos(lean) * S * 0.28);
+      const head = P(chest.x + Math.sin(lean * 1.3) * S * 0.11, chest.y - Math.cos(lean * 1.3) * S * 0.11);
+      const perp = [Math.cos(lean), Math.sin(lean)];
+      const shL = P(chest.x - perp[0] * S * 0.11, chest.y - perp[1] * S * 0.11), shR = P(chest.x + perp[0] * S * 0.11, chest.y + perp[1] * S * 0.11);
+      const raiseL = smooth((side + 0.25) / 1.1), raiseR = smooth((-side + 0.25) / 1.1);
+      const aUL = Math.PI / 2 + 0.35 + raiseL * (Math.PI + 0.6), aUR = Math.PI / 2 - 0.35 - raiseR * (Math.PI + 0.6);
+      const limb = (o, a, L) => P(o.x + Math.cos(a) * L, o.y + Math.sin(a) * L);
+      const elL = limb(shL, aUL, S * 0.15), elR = limb(shR, aUR, S * 0.15);
+      const wrL = limb(elL, aUL - 0.3 * (1 - raiseL) - 0.08, S * 0.14), wrR = limb(elR, aUR + 0.3 * (1 - raiseR) + 0.08, S * 0.14);
+      const hipL = P(pelvis.x - S * 0.06, pelvis.y), hipR = P(pelvis.x + S * 0.06, pelvis.y);
+      const tL = Math.PI / 2 + 0.1 + sq * 0.34, tR = Math.PI / 2 - 0.1 - sq * 0.34;
+      const knL = limb(hipL, tL, S * 0.24), knR = limb(hipR, tR, S * 0.24);
+      const ftL = limb(knL, tL - 0.12 - sq * 0.66, S * 0.23), ftR = limb(knR, tR + 0.12 + sq * 0.66, S * 0.23);
+      const joints = { pelvis, chest, head, shL, shR, elL, elR, wrL, wrR, hipL, hipR, knL, knR, ftL, ftR };
+      const drop = st.floor - Math.max(ftL.y, ftR.y);   // feet stay on the floor
+      for (const k in joints) joints[k].y += drop;
+      return { joints, aUL, aUR, raiseL, raiseR };
+    },
+    draw(ctx, w, h, t, st) {
+      advance(st, t, (dt, time) => {
+        const { joints } = this.pose(st, time);
+        const steps = Math.max(1, Math.round(dt * 120));
+        const sdt = dt / steps;
+        st.ropes.forEach((rope, r) => {
+          const anchor = r ? joints.wrR : joints.wrL;
+          for (let s = 0; s < steps; s++) {
+            const pts = rope.pts;
+            pts[0].px = pts[0].x; pts[0].py = pts[0].y; pts[0].x = anchor.x; pts[0].y = anchor.y;
+            for (let i = 1; i < pts.length; i++) {
+              const p = pts[i], vx = (p.x - p.px) * 0.985, vy = (p.y - p.py) * 0.985;
+              p.px = p.x; p.py = p.y; p.x += vx + Math.sin(time * 1.3 + i * 0.3) * 0.02; p.y += vy + 240 * sdt * sdt;
+            }
+            for (let k = 0; k < 4; k++) for (let i = 1; i < pts.length; i++) {
+              const a = pts[i - 1], b = pts[i], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1, diff = (d - rope.seg) / d;
+              if (i === 1) { b.x -= dx * diff; b.y -= dy * diff; } else { a.x += dx * diff * 0.5; a.y += dy * diff * 0.5; b.x -= dx * diff * 0.5; b.y -= dy * diff * 0.5; }
+            }
+          }
+        });
+      });
+      backdrop(ctx, w, h, '#0b0d14', '#0a0b10');
+      const { joints: J, aUL, aUR } = this.pose(st, t);
+      const S = st.S;
+      ctx.globalCompositeOperation = 'lighter';
+      light(ctx, C.pink, w * 0.3, h * 0.35, w * 0.35, 0.09);
+      light(ctx, C.mint, w * 0.7, h * 0.35, w * 0.35, 0.09);
+      // Floor and soft contact shadow.
+      ctx.globalAlpha = 0.14; ctx.strokeStyle = rgba(C.white, 1); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(w * 0.15, st.floor + 2); ctx.lineTo(w * 0.85, st.floor + 2); ctx.stroke();
+      light(ctx, C.white, (J.ftL.x + J.ftR.x) / 2, st.floor + 2, S * 0.22, 0.08);
+      // Range of motion: the shoulders' arcs, lit where the arm is now.
+      const rom = (o, from, to, now, c) => {
+        ctx.globalAlpha = 0.09; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = 1; ctx.setLineDash([2, 5]);
+        ctx.beginPath(); ctx.arc(o.x, o.y, S * 0.15, Math.min(from, to), Math.max(from, to)); ctx.stroke(); ctx.setLineDash([]);
+        ctx.globalAlpha = 0.45; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(o.x, o.y, S * 0.15, now - 0.18, now + 0.18); ctx.stroke();
+      };
+      rom(J.shL, Math.PI / 2 + 0.35, Math.PI / 2 + 0.35 + Math.PI + 0.6, aUL, C.pink);
+      rom(J.shR, Math.PI / 2 - 0.35 - Math.PI - 0.6, Math.PI / 2 - 0.35, aUR, C.mint);
+      // Ribbons: tapered silk with a fading gradient, the motion made visible.
+      st.ropes.forEach((rope, r) => {
+        const c = r ? C.mintB : C.pinkB, pts = rope.pts;
+        for (let i = 1; i < pts.length; i++) {
+          const k = i / pts.length;
+          ctx.globalAlpha = (1 - k) * 0.7; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = (1 - k) * 4 + 0.4;
+          ctx.beginPath(); ctx.moveTo(pts[i - 1].x, pts[i - 1].y); ctx.lineTo(pts[i].x, pts[i].y); ctx.stroke();
+        }
+      });
+      // The body: luminous limbs, cooler on one side and warmer on the other.
+      ctx.lineCap = 'round';
+      const bone = (a, b, c, width) => {
+        ctx.globalAlpha = 0.12; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = width * 4;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        ctx.globalAlpha = 0.9; ctx.lineWidth = Math.max(1.2, width * 0.45);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      };
+      const unit = S / 100;
+      // A soft torso gives the figure body and weight beneath its lines of light.
+      ctx.globalAlpha = 0.16; ctx.fillStyle = rgba(C.white, 1);
+      ctx.beginPath(); ctx.moveTo(J.shL.x, J.shL.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.hipL.x, J.hipL.y); ctx.lineTo(J.hipR.x, J.hipR.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.shR.x, J.shR.y); ctx.closePath(); ctx.fill();
+      bone(J.pelvis, J.chest, C.white, 4.2 * unit);
+      bone(J.shL, J.shR, C.white, 3.4 * unit);
+      bone(J.hipL, J.hipR, C.white, 3.4 * unit);
+      bone(J.shL, J.elL, C.pink, 3.2 * unit); bone(J.elL, J.wrL, C.pink, 2.6 * unit);
+      bone(J.shR, J.elR, C.mint, 3.2 * unit); bone(J.elR, J.wrR, C.mint, 2.6 * unit);
+      bone(J.hipL, J.knL, C.pink, 3.6 * unit); bone(J.knL, J.ftL, C.pink, 3 * unit);
+      bone(J.hipR, J.knR, C.mint, 3.6 * unit); bone(J.knR, J.ftR, C.mint, 3 * unit);
+      light(ctx, C.white, J.head.x, J.head.y, S * 0.12, 0.7);
+      light(ctx, C.white, J.head.x, J.head.y, S * 0.04, 1);
+      for (const [k, c] of [['shL', C.pinkB], ['elL', C.pinkB], ['wrL', C.pinkB], ['knL', C.pinkB], ['shR', C.mintB], ['elR', C.mintB], ['wrR', C.mintB], ['knR', C.mintB], ['pelvis', C.white], ['chest', C.white]]) { light(ctx, c, J[k].x, J[k].y, S * 0.045, 0.75); light(ctx, C.white, J[k].x, J[k].y, S * 0.012, 1); }
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    },
+  };
 
-    /* 6 - COMMUNITY : coupled oscillators (Kuramoto) syncing into a bloom */
-    R.community={ init:function(st,w,h){ var N=18; st.nd=[]; for(var i=0;i<N;i++){ var a=i/N*6.283, rr=Math.min(w,h)*(0.17+0.16*Math.random()); st.nd.push({x:w*0.5+Math.cos(a)*rr*1.3,y:h*0.44+Math.sin(a)*rr,th:Math.random()*6.283,w:1.3+Math.random()*0.6}); } st.K=1.1; },
-      draw:function(ctx,w,h,t,st,P){
-        ctx.fillStyle='#0a110d'; ctx.fillRect(0,0,w,h);
-        var nd=st.nd, N=nd.length, dt=1/60, sx=0, sy=0;
-        for(var i=0;i<N;i++){ sx+=Math.cos(nd[i].th); sy+=Math.sin(nd[i].th); }
-        var mth=Math.atan2(sy,sx), Rord=Math.hypot(sx,sy)/N;
-        for(var i=0;i<N;i++){ nd[i].th+=(nd[i].w+st.K*Rord*Math.sin(mth-nd[i].th))*dt+(Math.random()-0.5)*0.02; }
-        for(var i=0;i<N;i++) for(var j=i+1;j<N;j++){ var A=nd[i],B=nd[j],dd=Math.hypot(A.x-B.x,A.y-B.y); if(dd<Math.min(w,h)*0.36){ var sc=(Math.cos(A.th-B.th)+1)/2; if(sc>0.4){ ctx.strokeStyle=rgbaA(mix(P.pink,P.green,sc),0.04+0.18*sc); ctx.lineWidth=0.8; ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke(); } } }
-        ctx.globalCompositeOperation='lighter';
-        ctx.fillStyle=radial(ctx,w*0.5,h*0.44,Math.min(w,h)*0.5,rgbaA(mix(P.pink,P.green,0.5),0.05+0.22*Rord),'rgba(0,0,0,0)'); ctx.fillRect(0,0,w,h);
-        for(var i=0;i<N;i++){ var o=nd[i], pulse=Math.pow((Math.sin(o.th)+1)/2,3), col=mix(P.green,P.pink,pulse); glow(ctx,o.x,o.y,2.2+pulse*4,rgbaA(col,0.5+0.5*pulse),6+pulse*16); }
-        ctx.globalCompositeOperation='source-over';
-      } };
+  /* COMMUNITY: lights arrive one by one and are welcomed into a circle; their pulses
+     fall into step (coupled oscillators) and the shared centre glows as they do. */
+  R.community = {
+    init(st, w, h) {
+      Object.assign(st, { cx: w * 0.5, cy: h * 0.36, unit: Math.min(w, h), members: [], order: [], ripples: [], nextArrival: 0.6, spin: 0 });
+      for (let i = 0; i < 5; i++) this.add(st, w, h, true);
+    },
+    add(st, w, h, seated) {
+      const a = Math.random() * TAU;
+      const far = Math.hypot(w, h) * 0.6;
+      const member = { x: seated ? st.cx : st.cx + Math.cos(a) * far, y: seated ? st.cy : st.cy + Math.sin(a) * far, vx: 0, vy: 0, th: Math.random() * TAU, w: 1.6 + Math.random() * 0.5, joined: seated ? 1 : 0 };
+      st.members.push(member);
+      // A newcomer takes the place in the circle nearest to where they arrive from.
+      const n = st.order.length + 1;
+      const at = seated ? st.order.length : Math.round((((a - st.spin) % TAU + TAU) % TAU) / TAU * n) % n;
+      st.order.splice(at, 0, member);
+    },
+    draw(ctx, w, h, t, st) {
+      const ring = () => st.unit * (0.13 + 0.011 * st.members.length);
+      advance(st, t, (dt, time) => {
+        if (time >= st.nextArrival && st.members.length < 14) { st.nextArrival = time + 3.4; this.add(st, w, h, false); }
+        st.spin += dt * 0.07;
+        // Seats are kept, and shared evenly; the circle widens a little for each arrival.
+        const radius = ring(), N = st.members.length;
+        st.order.forEach((m, k) => { m.seat = k / N * TAU + st.spin; });
+        let sx = 0, sy = 0;
+        for (const m of st.members) { sx += Math.cos(m.th); sy += Math.sin(m.th); }
+        const mean = Math.atan2(sy, sx), order1 = Math.hypot(sx, sy) / N;
+        st.sync = order1; st.mean = mean;
+        for (const m of st.members) {
+          const tx = st.cx + Math.cos(m.seat) * radius * 1.25, ty = st.cy + Math.sin(m.seat) * radius;
+          const k = m.joined ? 7 : 2.2, damp = m.joined ? 4.6 : 2.4;
+          m.vx += ((tx - m.x) * k - m.vx * damp) * dt; m.vy += ((ty - m.y) * k - m.vy * damp) * dt;
+          m.x += m.vx * dt; m.y += m.vy * dt;
+          if (!m.joined && Math.hypot(tx - m.x, ty - m.y) < 8) { m.joined = 1; st.ripples.push({ x: m.x, y: m.y, at: time }); }
+          const coupling = m.joined ? 1.5 : 0.25;
+          m.th += (m.w + coupling * order1 * Math.sin(mean - m.th)) * dt;
+        }
+        st.ripples = st.ripples.filter((r) => time - r.at < 1.6);
+      });
+      backdrop(ctx, w, h, '#0a110e', '#0a0d0c');
+      const { cx, cy } = st;
+      const pulseOf = (m) => Math.pow((1 + Math.sin(m.th)) / 2, 4);
+      const shared = Math.pow((1 + Math.sin(st.mean || 0)) / 2, 3) * (st.sync || 0);
+      ctx.globalCompositeOperation = 'lighter';
+      light(ctx, mix(C.mint, C.pink, shared), cx, cy, ring() * (2.3 + shared * 0.8), 0.12 + 0.3 * shared);
+      light(ctx, C.white, cx, cy, ring() * 0.5, 0.05 + 0.25 * shared);
+      // Threads between neighbours, brighter as they move together.
+      const seated = st.order.filter((m) => m.joined);
+      for (let i = 0; i < seated.length; i++) {
+        const a = seated[i], b = seated[(i + 1) % seated.length];
+        if (seated.length < 2) break;
+        const together = (Math.cos(a.th - b.th) + 1) / 2;
+        ctx.globalAlpha = 0.06 + 0.3 * together * together; ctx.strokeStyle = rgba(mix(C.mint, C.pink, together), 1); ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo((a.x + b.x) / 2 + (cx - (a.x + b.x) / 2) * 0.15, (a.y + b.y) / 2 + (cy - (a.y + b.y) / 2) * 0.15, b.x, b.y); ctx.stroke();
+        const p = pulseOf(a);
+        if (p > 0.3) { ctx.globalAlpha = (p - 0.3) * 0.22; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(cx, cy); ctx.stroke(); }
+      }
+      for (const r of st.ripples) {
+        const k = (t - r.at) / 1.6;
+        ctx.globalAlpha = Math.pow(1 - k, 2) * 0.5; ctx.strokeStyle = rgba(C.white, 1); ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.arc(r.x, r.y, 6 + k * 42, 0, TAU); ctx.stroke();
+      }
+      for (const m of st.members) {
+        const p = pulseOf(m), c = mix(C.mint, C.pink, p);
+        if (!m.joined) {
+          ctx.globalAlpha = 0.25; ctx.strokeStyle = rgba(C.mintB, 1); ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(m.x - m.vx * 0.25, m.y - m.vy * 0.25); ctx.lineTo(m.x, m.y); ctx.stroke();
+        }
+        light(ctx, c, m.x, m.y, 10 + p * 18, 0.45 + 0.5 * p);
+        light(ctx, C.white, m.x, m.y, 3 + p * 2.5, 0.9);
+      }
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    },
+  };
 
-    return { renderers: R, palette: PAL };
+  return { renderers: R, palette: C };
 }
