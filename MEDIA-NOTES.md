@@ -176,3 +176,7 @@ ffmpeg -f lavfi -i color=c=white:s=96x96:r=30:d=2 -pix_fmt yuv420p10le -c:v libx
 ## Game portrait derivative (2026-10-02)
 
 `assets/matthew-tony-game-2400.webp` (148,186 bytes, 2400 x 2400 RGBA, SHA-256 `41bb29d1e3a0cdc23e7c8e794459eaa0522cbe60a69887cf1b66628292cf6147`) is a Lanczos downscale of the unchanged V3 original (`assets/v3 mat x tonyPHOTO-2026-03-16-21-22-09-2.webp`, 6696 x 6696), WebP quality 88 via Pillow 11.3. Same canvas and transparent framing, so the game's existing crop/zoom applies unchanged. Used by the homepage hero (all three layers), the About cutout and the attention game's final slide, where decoding the 45-megapixel original stalled the hero landing and the slide transition. The original remains in the repository, unmodified.
+
+## Link-in-bio card photographs
+
+`assets/bio/*.webp` are 640x320 WebP crops (quality 72) for the `/linkinbio/` cards, made from images already in `assets/` and `assets/editorial/` (about-matthew, stillness, workshop, hero-bodywork, European Championship, Champ of the Champs, Advice as a judge, Reignite your inner fire, the group photo, both Swiss championship photos and the Matthew/Tony portrait). Originals are unchanged; the cards tone them in each platform's colour with CSS.

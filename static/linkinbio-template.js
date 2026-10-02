@@ -2,7 +2,7 @@
 // the arrival film, the tears moment, every way to reach Matthew, the six elements as a
 // spinning wheel and the studio map. Rendered at build time in English and again in the
 // visitor's language by linkinbio.js.
-import {escapeHTML as e,icon,PORTRAIT,languages,whatsappMark} from './templates.js';
+import {escapeHTML as e,icon,PORTRAIT,languages} from './templates.js';
 
 export const BIO_FILM='films/european-championship.mp4';
 export const BIO_POSTER='European Championship.webp';
@@ -18,15 +18,27 @@ export const ELEMENT_ICONS=['brain','thermometer-snowflake','wind','hand-heart',
 // Each element's light on the wheel: [inner, outer] colours of its sector.
 export const ELEMENT_TINTS=[['#ff7cc0','#c81d77'],['#8fdcff','#ffb35c'],['#9fe7ff','#ff9fc4'],['#ffb3cf','#ef84be'],['#ffe09a','#e9a93b'],['#9ff3c8','#38c98a']];
 
-// Line marks in the Lucide idiom (the vendored set has no brand icons).
-const mark=paths=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
-const BRANDS={
-  instagram:mark('<rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r=".9" fill="currentColor" stroke="none"/>'),
-  facebook:mark('<path d="M15.5 3.5h-2.3a4 4 0 0 0-4 4v2.8H7v3.4h2.2v6.8h3.5v-6.8h2.6l.5-3.4h-3.1V8a1 1 0 0 1 1-1h1.8z"/>'),
-  threads:mark('<path d="M16.6 11.1c-.4-2.6-2.1-3.9-4.5-3.9-2.9 0-4.6 2.1-4.6 4.9 0 2.9 1.7 4.9 4.6 4.9 2.4 0 4-1.3 4-3.3 0-1.9-1.5-2.9-3.4-2.9-1.7 0-2.9.9-2.9 2.2 0 1.2 1 2 2.3 2 2.5 0 3.6-2 3.6-4.6"/><path d="M20 12c0 4.6-3.2 8.5-8 8.5S4 16.8 4 12s3.2-8.5 8-8.5c3.6 0 6.3 2 7.4 5.2"/>'),
-  youtube:mark('<path d="M2.6 16.8a23 23 0 0 1 0-9.6 2 2 0 0 1 1.5-1.5 48 48 0 0 1 15.8 0 2 2 0 0 1 1.5 1.5 23 23 0 0 1 0 9.6 2 2 0 0 1-1.5 1.5 48 48 0 0 1-15.8 0 2 2 0 0 1-1.5-1.5"/><path d="m10 15 5-3-5-3z"/>'),
-  linkedin:mark('<rect x="3" y="3" width="18" height="18" rx="3.5"/><path d="M8 10.5v6M8 7.6v.1M11.6 16.5v-3.4a2.4 2.4 0 0 1 4.8 0v3.4M11.6 10.5v6"/>')
+// Matthew's own glyphs: solid white forms on glossy platform-coloured chips. Cut-outs
+// use currentColor, which each chip sets to its platform's deeper shade.
+const glyph=body=>`<svg viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
+const GLYPHS={
+  whatsapp:glyph('<path fill="#fff" d="M12 2.4a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.9-1.3A9.5 9.5 0 1 0 12 2.4z"/><path fill="currentColor" d="M9.3 7.3c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.2 3.5 5.5 4.8 2.7 1.1 3.3.9 3.9.8.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4l-2-1c-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6z"/>'),
+  contact:glyph('<rect x="2.5" y="4.6" width="19" height="14.8" rx="3.4" fill="#fff"/><circle cx="8.6" cy="10.4" r="2.3" fill="currentColor"/><path fill="currentColor" d="M4.9 16.3c.5-2 2-3.1 3.7-3.1s3.2 1.1 3.7 3.1z"/><rect x="13.6" y="9" width="5.4" height="1.7" rx=".85" fill="currentColor"/><rect x="13.6" y="12.4" width="3.8" height="1.7" rx=".85" fill="currentColor" opacity=".7"/>'),
+  phone:glyph('<path fill="#fff" d="M6.7 3.1c.5-.4 1.3-.3 1.7.2l2.2 2.8c.4.5.4 1.2 0 1.7l-1.3 1.6a11.8 11.8 0 0 0 5.3 5.3l1.6-1.3c.5-.4 1.2-.4 1.7 0l2.8 2.2c.5.4.6 1.2.2 1.7l-1.3 1.7c-.8 1-2.2 1.5-3.4 1.1C9.9 18.4 5.6 14.1 3.9 7.8c-.3-1.2.1-2.6 1.1-3.4z"/><path fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" d="M14.6 3.6a6.3 6.3 0 0 1 5.8 5.8M14.3 6.9a3.2 3.2 0 0 1 2.8 2.8" opacity=".85"/>'),
+  mail:glyph('<rect x="2.6" y="5" width="18.8" height="14" rx="3.2" fill="#fff"/><path d="M4.3 7.4 12 13l7.7-5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'),
+  instagram:glyph('<rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.4" fill="none" stroke="#fff" stroke-width="2.1"/><circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="2.1"/><circle cx="17.2" cy="6.8" r="1.35" fill="#fff"/>'),
+  facebook:glyph('<path fill="#fff" d="M13.7 21.2v-7.6h2.6l.4-3.1h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.3H8v3.1h2.6v7.6z"/>'),
+  threads:glyph('<path fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" d="M16.5 11.2c-.4-2.6-2.1-3.9-4.4-3.9-2.8 0-4.5 2-4.5 4.7s1.7 4.7 4.4 4.7c2.3 0 3.9-1.2 3.9-3.2 0-1.8-1.4-2.8-3.3-2.8-1.6 0-2.8.9-2.8 2.1 0 1.1.9 1.9 2.2 1.9 2.4 0 3.4-1.9 3.4-4.5"/><path fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" d="M20 13.3A8.1 8.1 0 1 1 18.8 7"/>'),
+  youtube:glyph('<rect x="2" y="5.4" width="20" height="13.2" rx="4.2" fill="#fff"/><path d="M10 9.1v5.8l5-2.9z" fill="currentColor"/>'),
+  linkedin:glyph('<rect x="3.6" y="9.2" width="3.5" height="11" rx=".8" fill="#fff"/><circle cx="5.35" cy="5.4" r="2.05" fill="#fff"/><path fill="#fff" d="M9.8 9.2h3.3v1.6c.5-.9 1.8-1.9 3.6-1.9 3.4 0 4 2.3 4 5.2v6.1h-3.5v-5.4c0-1.3 0-2.9-1.8-2.9s-2.1 1.4-2.1 2.8v5.5H9.8z"/>'),
+  maps:glyph('<path fill="#fff" d="M12 2.3a7 7 0 0 0-7 7c0 5.2 7 12.4 7 12.4s7-7.2 7-12.4a7 7 0 0 0-7-7z"/><circle cx="12" cy="9.3" r="2.7" fill="currentColor"/>'),
+  method:glyph('<path fill="#fff" d="M11 2.6c.6 4.7 2.9 7 7.6 7.6-4.7.6-7 2.9-7.6 7.6-.6-4.7-2.9-7-7.6-7.6 4.7-.6 7-2.9 7.6-7.6z"/><path fill="#fff" opacity=".8" d="M18.4 14.6c.3 2.1 1.3 3.1 3.4 3.4-2.1.3-3.1 1.3-3.4 3.4-.3-2.1-1.3-3.1-3.4-3.4 2.1-.3 3.1-1.3 3.4-3.4z"/>'),
+  practice:glyph('<path fill="#fff" d="M12 3.6c2 2.3 3 4.7 3 7.4s-1 5.3-3 7c-2-1.7-3-4.3-3-7s1-5.1 3-7.4z"/><path fill="#fff" opacity=".82" d="M2.9 9.4c3.2.2 5.8 1.6 7.4 4.3.7 1.1 1.1 2.5 1.7 4.4-2.8 0-5.2-.8-6.9-2.4-1.5-1.6-2.1-3.7-2.2-6.3zm18.2 0c-.1 2.6-.7 4.7-2.2 6.3-1.7 1.6-4.1 2.4-6.9 2.4.6-1.9 1-3.3 1.7-4.4 1.6-2.7 4.2-4.1 7.4-4.3z"/>'),
+  about:glyph('<circle cx="12" cy="7.9" r="4.1" fill="#fff"/><path fill="#fff" d="M4.3 20.3c.8-4.1 3.9-6.5 7.7-6.5s6.9 2.4 7.7 6.5z"/>')
 };
+const GO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.2 15.8 15.8 8.2M10.2 8h5.8v5.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// A drawn street plan for the Maps card (Zurich-like grid, the river, the route in).
+const MAP_ART='<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="200" height="100" fill="#e3f0e8"/><path d="M-10 74C40 62 72 84 122 64s70-26 96-18" stroke="#b9dcf4" stroke-width="10" fill="none"/><g stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M22-6 60 106"/><path d="M-6 30 210 17"/><path d="M112-6 96 106"/><path d="M152-6l26 112"/><path d="M-6 90 210 81"/></g><g stroke="#fff" stroke-width="1.7" opacity=".95"><path d="M42-6l5 112"/><path d="M-6 51 210 44"/><path d="M132-6l10 112"/><path d="M80-6 70 106"/><path d="M172-6 186 106"/></g><path d="M28 94C66 74 98 68 128 41" stroke="#c81d77" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-dasharray="1 5.5"/><circle cx="128" cy="41" r="11" fill="#34a853" opacity=".18"/><circle cx="128" cy="41" r="4.6" fill="#34a853" stroke="#fff" stroke-width="1.8"/></svg>';
 
 const polar=(r,deg)=>{const a=deg*Math.PI/180;return [(r*Math.sin(a)).toFixed(2),(-r*Math.cos(a)).toFixed(2)];};
 // One annular sector of the wheel, centred on `centre` degrees (0 = top, clockwise).
@@ -50,8 +62,12 @@ function wheel(d){
   return `<div class="bio-wheel" data-bio-wheel><div class="bio-wheel__halo" aria-hidden="true"></div><div class="bio-wheel__disc">${art}<div class="bio-wheel__labels" role="tablist" aria-label="${e(d.method.title)}">${segments}</div></div><div class="bio-wheel__hub" aria-hidden="true"><span class="mh-monogram">mh</span></div></div>`;
 }
 
-function card({tone,title,detail,url,symbol,extra='',primary=false}){
-  return `<a class="bio-link${primary?' bio-link--primary':''}" data-tone="${tone}" href="${e(url)}" ${extra} data-bio-reveal><span class="bio-link__sheen" aria-hidden="true"></span><span class="bio-link__icon">${symbol}</span><span class="bio-link__copy"><strong>${e(title)}</strong><small>${e(detail)}</small></span><span class="bio-link__arrow">${icon('arrow-up-right')}</span></a>`;
+// A photographic glass card: the platform-toned photo on the right under frosted glass,
+// a glossy glyph chip, a small label, the invitation in the serif, and a light that
+// travels round the frame.
+function card(l,asset){
+  const art=l.art==='map'?MAP_ART:`<img src="${e(asset('bio/'+l.art+'.webp'))}" alt="" width="640" height="320" loading="lazy" decoding="async">`;
+  return `<a class="bio-link${l.primary?' bio-link--primary':''}" data-tone="${l.tone}" href="${e(l.url)}" ${l.extra||''} data-bio-reveal><span class="bio-link__art" aria-hidden="true">${art}</span><span class="bio-link__glass" aria-hidden="true"></span><span class="bio-link__chip" aria-hidden="true">${GLYPHS[l.tone]}</span><span class="bio-link__copy"><span class="bio-link__eyebrow">${e(l.eyebrow)}</span><strong>${e(l.title)}</strong>${l.detail?`<small>${e(l.detail)}</small>`:''}</span><span class="bio-link__go" aria-hidden="true">${GO}</span></a>`;
 }
 
 /**
@@ -62,21 +78,22 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
   const b=d.bio,current=languages.find(l=>l.code===d.locale)||languages[0];
   const external='target="_blank" rel="noopener noreferrer"';
   const greeting=encodeURIComponent(`${b.welcome} · matthewhua.ch`);
+  const phone='+41 76 506 74 88';
   const links=[
-    {tone:'contact',title:b.save,detail:b.saveDetail,url:file('matthew-hua.vcf'),symbol:icon('user-round-plus'),extra:'download="Matthew-Hua.vcf"'},
-    {tone:'phone',title:b.call,detail:'+41 76 506 74 88',url:'tel:+41765067488',symbol:icon('phone')},
-    {tone:'mail',title:b.email,detail:'info@healwell.ch',url:`mailto:info@healwell.ch?subject=${encodeURIComponent(b.subject)}`,symbol:icon('mail')},
-    {tone:'instagram',title:'Instagram',detail:b.instagramDetail,url:SOCIAL.instagram,symbol:BRANDS.instagram,extra:external},
-    {tone:'facebook',title:'Facebook',detail:b.facebookDetail,url:SOCIAL.facebook,symbol:BRANDS.facebook,extra:external},
-    {tone:'threads',title:'Threads',detail:b.threadsDetail,url:SOCIAL.threads,symbol:BRANDS.threads,extra:external},
-    {tone:'youtube',title:'YouTube',detail:b.youtubeDetail,url:SOCIAL.youtube,symbol:BRANDS.youtube,extra:external},
-    {tone:'linkedin',title:'LinkedIn',detail:b.linkedinDetail,url:SOCIAL.linkedin,symbol:BRANDS.linkedin,extra:external},
-    {tone:'maps',title:d.contact.google,detail:b.mapsDetail,url:SOCIAL.maps,symbol:icon('map-pinned'),extra:external}
+    {tone:'contact',art:'contact',eyebrow:'vCard · Matthew Hua',title:b.save,detail:b.saveDetail,url:file('matthew-hua.vcf'),extra:'download="Matthew-Hua.vcf"'},
+    {tone:'phone',art:'phone',eyebrow:phone,title:b.call,detail:d.contact.near,url:'tel:+41765067488'},
+    {tone:'mail',art:'mail',eyebrow:'info@healwell.ch',title:b.email,detail:d.contact.direct,url:`mailto:info@healwell.ch?subject=${encodeURIComponent(b.subject)}`},
+    {tone:'instagram',art:'instagram',eyebrow:'Instagram · @healwell.ch',title:b.instagramDetail,url:SOCIAL.instagram,extra:external},
+    {tone:'facebook',art:'facebook',eyebrow:'Facebook',title:b.facebookDetail,url:SOCIAL.facebook,extra:external},
+    {tone:'threads',art:'threads',eyebrow:'Threads · @healwell.ch',title:b.threadsDetail,url:SOCIAL.threads,extra:external},
+    {tone:'youtube',art:'youtube',eyebrow:'YouTube',title:b.youtubeDetail,url:SOCIAL.youtube,extra:external},
+    {tone:'linkedin',art:'linkedin',eyebrow:'LinkedIn · Matthew Hua',title:b.linkedinDetail,url:SOCIAL.linkedin,extra:external},
+    {tone:'maps',art:'map',eyebrow:`${d.contact.google} · healwell`,title:b.mapsDetail,detail:'Rüdigerstrasse 7 · 8045 Zürich',url:SOCIAL.maps,extra:external}
   ];
   const site=[
-    {tone:'method',title:d.nav.method,detail:d.method.title,url:href('method'),symbol:icon('sparkles')},
-    {tone:'practice',title:d.nav.practice,detail:d.home.practiceTitle,url:href('private-practice'),symbol:icon('leaf')},
-    {tone:'about',title:d.nav.about,detail:d.home.aboutTitle,url:href('about'),symbol:icon('user-round')}
+    {tone:'method',art:'method',eyebrow:d.nav.method,title:d.method.title,url:href('method')},
+    {tone:'practice',art:'practice',eyebrow:d.nav.practice,title:d.home.practiceTitle,url:href('private-practice')},
+    {tone:'about',art:'about',eyebrow:d.nav.about,title:d.home.aboutTitle,url:href('about')}
   ];
   const honours=[d.home.awardRome,d.home.awardGermany,d.home.awardSwiss,d.home.awardJury];
   return `<header class="bio-bar">
@@ -111,11 +128,11 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
   <div id="element-panel" class="bio-stage" role="tabpanel" aria-labelledby="bio-element-0" tabindex="0" hidden></div>
 </section>
 <nav class="bio-links" aria-label="${e(b.links)}">
-  ${card({tone:'whatsapp',title:b.whatsapp,detail:b.whatsappDetail,url:`https://wa.me/41765067488?text=${greeting}`,symbol:whatsappMark,extra:external,primary:true})}
+  ${card({tone:'whatsapp',art:'whatsapp',eyebrow:`WhatsApp · ${phone}`,title:b.whatsapp,detail:b.whatsappDetail,url:`https://wa.me/41765067488?text=${greeting}`,extra:external,primary:true},asset)}
   <p class="bio-group-label">${e(b.links)}</p>
-  ${links.map(card).join('')}
+  ${links.map(l=>card(l,asset)).join('')}
 </nav>
-<nav class="bio-links bio-links--site" aria-label="${e(b.explore)}"><p class="bio-group-label">${e(b.explore)}</p>${site.map(card).join('')}</nav>
+<nav class="bio-links bio-links--site" aria-label="${e(b.explore)}"><p class="bio-group-label">${e(b.explore)}</p>${site.map(l=>card(l,asset)).join('')}</nav>
 <section class="bio-studio" aria-labelledby="bio-studio-title" data-bio-reveal>
   <p class="bio-group-label" id="bio-studio-title">${e(b.studio)}</p>
   <div class="map-section"><div class="map-topline"><span class="map-wordmark">healwell <small>ZÜRICH</small></span><span class="coordinates">47.36079° N / 8.52105° E</span></div><div class="map-frame"><div id="studio-map" role="region" aria-label="${e(d.contact.mapLabel)}"></div><span class="map-north" aria-hidden="true">${icon('compass')}N</span><div class="map-fallback" id="map-fallback" hidden><p>Rüdigerstrasse 7 · Zürich</p><a href="${e(SOCIAL.maps)}" ${external}>${e(d.contact.mapFallback)}</a></div><div class="map-destination"><span class="destination-star" aria-hidden="true">${icon('map-pin')}</span><span class="map-address"><span>matthew hua <small>· healwell</small></span><strong>Rüdigerstrasse 7<button class="bio-copy" type="button" data-action="copy-address" aria-label="${e(d.contact.copyAddress)}" title="${e(d.contact.copyAddress)}">${icon('copy')}</button></strong><span>${e(d.contact.floor)} · 8045 Zürich</span></span></div></div><div class="map-footer"><div>${icon('train-front')}<span class="route-swatch" aria-hidden="true"></span><span>${e(d.contact.route)}</span></div><button class="button button-dark drive-button" type="button" data-action="maps">${icon('navigation')}<span>${e(d.contact.drive)}</span></button></div></div>

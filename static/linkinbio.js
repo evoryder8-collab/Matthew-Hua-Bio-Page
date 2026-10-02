@@ -13,6 +13,7 @@ import {createSoundEffects} from './sound.js';
 import {mountTabSparks} from './tab-sparks.js';
 import {playSunJourney} from './sun-journey.js';
 import {mountDialogAtmosphere} from './dialog-atmosphere.js';
+import {mountAmbientSparks} from './effects.js';
 
 const base=new URL('../',import.meta.url);
 const asset=file=>new URL('assets/'+file.split('/').map(encodeURIComponent).join('/'),base).href;
@@ -131,8 +132,20 @@ function mountFilm(frame,resume){
       catch{if(!destroyed)cover.hidden=false;}
     }
   }
+  // Called from the sound prompt's tap, so audible playback is allowed.
+  function begin(withSound){
+    if(destroyed)return;
+    if(motion.matches){cover.hidden=false;sync();return;}
+    video.muted=!withSound;
+    const attempt=video.play();
+    attempt?.catch(()=>{
+      if(destroyed)return;
+      if(!video.muted){video.muted=true;video.play()?.then(()=>{unmute.hidden=false;},()=>{cover.hidden=false;sync();});}
+      else{cover.hidden=false;sync();}
+    });
+  }
   return {
-    start,
+    start,begin,
     setMuted(muted){video.muted=muted;if(!muted)unmute.hidden=true;},
     state:()=>({time:video.currentTime||0,playing:playing()||autoPaused}),
     destroy(){destroyed=true;observer?.disconnect();cancelAnimationFrame(frameId);video.pause();video.removeAttribute('src');video.load();}
@@ -261,6 +274,36 @@ function continueFromGame(image){
   });
 }
 
+/* The sound prompt ------------------------------------------------------------------- */
+// The website's own question, asked once per visit: the page waits beneath a near-black,
+// blurred layer of drifting sparks. Yes unlocks the effects and starts the film with
+// sound inside the same tap; No starts it quietly.
+function askSound(){
+  const dialog=document.createElement('dialog');
+  dialog.className='portal bio-sound-dialog';dialog.setAttribute('aria-label',dict.portal.sound);
+  dialog.innerHTML=`<div class="portal-shade is-arriving" aria-hidden="true"></div><canvas class="portal-ambient is-arriving" aria-hidden="true"></canvas><div class="portal-frost is-arriving" aria-hidden="true"></div><div class="portal-focus is-in"><div class="portal-focus-content sound-stage"><span class="mh-monogram bio-sound-mark" aria-hidden="true">mh</span><div class="sound-symbol">${icon('audio-lines')}</div><h2 class="portal-title">${e(dict.portal.sound)}</h2><p class="portal-sub">${e(dict.portal.soundCopy)}</p><div class="sound-choices"><button class="sound-yes" type="button"><span>${e(dict.portal.yes)}<small>${e(dict.portal.recommended)}</small></span>${icon('arrow-right')}</button><button class="sound-no" type="button">${e(dict.portal.no)}</button></div></div></div>`;
+  overlayRoot.append(dialog);icons();dialog.showModal();
+  const stopSparks=mountAmbientSparks(dialog.querySelector('.portal-ambient'));
+  let chosen=false;
+  const choose=on=>{
+    if(chosen)return;chosen=true;
+    try{sessionStorage.setItem('matthew-bio-asked','1');}catch{}
+    setSound(on);
+    film?.begin(on);
+    if(on)cue('nav');
+    dialog.querySelectorAll('button').forEach(button=>button.disabled=true);
+    const finish=()=>{stopSparks?.();dialog.close();dialog.remove();};
+    if(motion.matches){finish();return;}
+    dialog.classList.add('is-leaving');
+    for(const layer of dialog.querySelectorAll('.portal-shade,.portal-frost')){layer.classList.remove('is-arriving');layer.classList.add('is-leaving');}
+    setTimeout(finish,460);
+  };
+  dialog.querySelector('.sound-yes').addEventListener('click',()=>choose(true));
+  dialog.querySelector('.sound-no').addEventListener('click',()=>choose(false));
+  dialog.addEventListener('cancel',event=>{event.preventDefault();choose(false);});
+  dialog.querySelector('.sound-yes').focus({preventScroll:true});
+}
+
 /* Links, language, map, dialogs ------------------------------------------------------ */
 function setupLinks(){
   const animations=new Set();
@@ -269,7 +312,10 @@ function setupLinks(){
     target.dataset.bioVisible=String(isIntersecting);
     if(!isIntersecting||target.dataset.bioRevealed)return;
     target.dataset.bioRevealed='true';
-    if(!motion.matches&&target.animate)play(target,[{opacity:.2,translate:'0 22px'},{opacity:1,translate:'0 0'}],{duration:680,easing:'cubic-bezier(.16,1,.3,1)'});
+    if(motion.matches||!target.animate)return;
+    play(target,[{opacity:.2,translate:'0 22px'},{opacity:1,translate:'0 0'}],{duration:680,easing:'cubic-bezier(.16,1,.3,1)'});
+    const art=target.querySelector('.bio-link__art');
+    if(art)play(art,[{opacity:0,transform:'scale(1.14) translateX(16px)'},{opacity:1,transform:'none'}],{duration:1100,easing:'cubic-bezier(.16,1,.3,1)'});
   }),{threshold:.12,rootMargin:'0px 0px -20px 0px'}):null;
   shell.querySelectorAll('[data-bio-reveal]').forEach(node=>observer?observer.observe(node):node.dataset.bioRevealed='true');
   const removers=[];
@@ -282,15 +328,12 @@ function setupLinks(){
     };
     const leave=()=>{link.style.setProperty('--bio-rx','0deg');link.style.setProperty('--bio-ry','0deg');};
     const press=event=>{
-      if(motion.matches||event.button!==0||!link.animate)return;
-      const box=link.getBoundingClientRect(),ripple=document.createElement('span');
-      ripple.className='bio-link__ripple';ripple.setAttribute('aria-hidden','true');
-      ripple.style.setProperty('--tap-x',`${event.clientX-box.left}px`);ripple.style.setProperty('--tap-y',`${event.clientY-box.top}px`);
-      link.append(ripple);
-      play(ripple,[{transform:'scale(.12)',opacity:.85},{transform:'scale(2.8)',opacity:0}],{duration:650,easing:'cubic-bezier(.16,1,.3,1)'}).finished.then(()=>ripple.remove(),()=>ripple.remove());
+      if(motion.matches||event.button!==0)return;
+      link.classList.remove('is-pressed');void link.offsetWidth;link.classList.add('is-pressed');
     };
-    link.addEventListener('pointermove',move,{passive:true});link.addEventListener('pointerleave',leave);link.addEventListener('pointerdown',press,{passive:true});
-    removers.push(()=>{link.removeEventListener('pointermove',move);link.removeEventListener('pointerleave',leave);link.removeEventListener('pointerdown',press);});
+    const released=()=>link.classList.remove('is-pressed');
+    link.addEventListener('pointermove',move,{passive:true});link.addEventListener('pointerleave',leave);link.addEventListener('pointerdown',press,{passive:true});link.addEventListener('animationend',released);
+    removers.push(()=>{link.removeEventListener('pointermove',move);link.removeEventListener('pointerleave',leave);link.removeEventListener('pointerdown',press);link.removeEventListener('animationend',released);});
   });
   cleanups.push(()=>{observer?.disconnect();animations.forEach(animation=>animation.cancel());removers.forEach(fn=>fn());});
 }
@@ -397,7 +440,8 @@ function render({hydrate=false}={}){
   setupLinks();setupLanguage();setupMap();updateSoundButtons();
   if(keep>=0)selectElement(keep,{quiet:true,instant:true});
   document.documentElement.classList.add('ready');
-  film.start();
+  let asked=false;try{asked=!!sessionStorage.getItem('matthew-bio-asked');}catch{}
+  if(resume||asked)film.start();else askSound();
 }
 
 async function init(){
