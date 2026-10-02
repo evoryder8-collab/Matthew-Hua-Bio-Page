@@ -222,10 +222,15 @@ async function showStage(index,{instant=false}={}){
   icons();
   if(instant||motion.matches)return;
   // It blooms open from the wheel above it, light-struck, and settles.
-  panel.animate?.([
-    {opacity:0,clipPath:'circle(0% at 50% 0%)',transform:'translateY(-18px) scale(.95)',filter:'blur(10px) brightness(1.7)'},
-    {opacity:1,clipPath:'circle(150% at 50% 0%)',transform:'none',filter:'blur(0) brightness(1)'}
+  // No opacity in this reveal: the element visual only draws while it is visible, and a
+  // fully transparent first frame would stop it before it starts.
+  panel.classList.remove('is-settled');
+  const bloom=panel.animate?.([
+    {clipPath:'circle(0% at 50% 0%)',transform:'translateY(-18px) scale(.95)',filter:'blur(10px) brightness(1.7)'},
+    {clipPath:'circle(150% at 50% 0%)',transform:'none',filter:'blur(0) brightness(1)'}
   ],{duration:reveal?1000:820,easing:'cubic-bezier(.16,1,.3,1)'});
+  // A class change also prompts the visual to re-check that it may draw.
+  bloom?.finished.then(()=>{if(token===stageToken)panel.classList.add('is-settled');},()=>{});
   // Bring the stage into view while keeping the wheel's lower half on screen.
   setTimeout(()=>{
     if(token!==stageToken)return;
@@ -248,7 +253,12 @@ function continueFromGame(image){
   playSunJourney({image,hdrSrc:asset('films/hdr-white.mp4'),reducedMotion:motion.matches,onCovered:()=>{
     document.querySelector('.bio-elements')?.scrollIntoView({block:'start',behavior:'instant'});
     selectElement(1,{quiet:true});
-  }}).then(()=>tabSparks?.burst());
+  }}).then(()=>{
+    // The pressed button left with the game; don't leave a focus ring on the new panel.
+    const panel=document.getElementById('element-panel');
+    if(panel&&(panel===document.activeElement||panel.contains(document.activeElement)))document.activeElement.blur();
+    tabSparks?.burst();
+  });
 }
 
 /* Links, language, map, dialogs ------------------------------------------------------ */
@@ -358,6 +368,13 @@ document.addEventListener('click',event=>{
   else if(action==='maps')openMaps();
   else if(action==='privacy')openModal('privacy-dialog',`<h2>${e(dict.footer.privacy)}</h2><p>${e(dict.footer.privacyText)}</p>`);
   else if(action==='close-dialog')closeModal();
+  else if(action==='copy-address'){
+    const button=event.target.closest('[data-action="copy-address"]');
+    navigator.clipboard?.writeText('Rüdigerstrasse 7, Ground Floor, 8045 Zürich, Switzerland').then(()=>{
+      button.classList.add('is-copied');button.setAttribute('aria-label',dict.contact.copied);button.title=dict.contact.copied;button.innerHTML=icon('check');icons();
+      setTimeout(()=>{if(!button.isConnected)return;button.classList.remove('is-copied');button.setAttribute('aria-label',dict.contact.copyAddress);button.title=dict.contact.copyAddress;button.innerHTML=icon('copy');icons();},2000);
+    }).catch(()=>{});
+  }
 });
 
 /* Rendering ---------------------------------------------------------------------- */

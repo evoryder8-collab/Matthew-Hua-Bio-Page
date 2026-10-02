@@ -33,7 +33,8 @@ body.bio-page{min-height:100svh}
 .bio-profile>.eyebrow{margin:0 0 8px;color:#5b3f54;font-size:11px}
 .bio-profile h1{margin:0;font-size:clamp(40px,11.4vw,54px);line-height:.95;font-weight:700;text-transform:uppercase;color:#1c1018}
 .bio-profile h1>span{display:block}
-.bio-profile h1 em{display:block;margin-top:12px;font-family:var(--serif);font-size:clamp(19px,5.4vw,24px);font-style:italic;font-weight:300;line-height:1.25;text-transform:none;color:#c81d77}
+.bio-profile h1 em{display:block;max-width:19em;margin:12px auto 0;font-family:var(--serif);font-size:clamp(20px,5.6vw,25px);font-style:italic;font-weight:300;line-height:1.25;text-transform:none;color:#c81d77;text-wrap:balance}
+.bio-intro{max-width:34em;margin:12px auto 0;font-size:13.5px;line-height:1.6;color:#4c3a48;text-wrap:balance}
 .bio-role{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:11.5px;color:#4c3a48}
 .bio-role__dot{width:6px;height:6px;border-radius:50%;background:#c81d77;box-shadow:0 0 12px #c81d77}
 .bio-honours{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:14px 0 0;padding:0;list-style:none}
@@ -106,7 +107,7 @@ body.bio-page{min-height:100svh}
 .bio-link:focus-visible{outline:2px solid #c81d77;outline-offset:5px}
 
 /* The six elements, on a turning wheel */
-.bio-elements{margin-top:56px;text-align:center}
+.bio-elements{margin-top:10px;padding-bottom:12px;text-align:center}
 .bio-section-head .eyebrow{margin-bottom:10px;color:#c81d77}
 .bio-section-head h2{margin:0 0 8px;font-family:var(--serif);font-size:clamp(30px,8.6vw,40px);font-style:italic;font-weight:400;line-height:1.1;color:#1c1018}
 .bio-section-head p{font-size:13px;color:#4c3a48}
@@ -128,7 +129,6 @@ body.bio-page{min-height:100svh}
 .bio-wheel__seg[aria-selected="true"] .bio-wheel__label{transform:scale(1.14)}
 .bio-wheel__seg[aria-selected="true"] svg.lucide{color:#fff;filter:drop-shadow(0 0 8px var(--tint)) drop-shadow(0 0 14px var(--tint))}
 .bio-wheel__seg:focus-visible{outline:2px solid #ffb4dc;outline-offset:2px}
-.bio-wheel__pointer{position:absolute;left:50%;top:-14px;z-index:3;width:22px;height:22px;border-radius:50% 50% 50% 0;background:linear-gradient(225deg,#fff5fb 0%,#ff8fc6 55%,#c81d77);transform:translateX(-50%) rotate(-45deg);box-shadow:0 0 0 3px rgba(255,255,255,.75),0 6px 14px rgba(200,29,119,.55);pointer-events:none}
 .bio-wheel__hub{position:absolute;inset:35%;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 50% 30%,#2c1f36,#120c18 70%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),0 0 26px #ff8fc655;pointer-events:none}
 .bio-wheel__hub .mh-monogram{font-size:clamp(26px,9cqw,40px);background:linear-gradient(115deg,#ffd6ea 40%,#ff8fc6 47%,#ffffff 50%,#9ff3c8 53%,#ffd6ea 60%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text}
 .bio-stage{margin-top:6px;text-align:left;border-radius:20px;outline-offset:6px}
@@ -138,6 +138,10 @@ body.bio-page{min-height:100svh}
 .bio-studio #bio-studio-title{margin:0 0 18px;font-family:var(--serif);font-size:clamp(28px,8vw,36px);font-style:italic;font-weight:400;letter-spacing:0;text-transform:none;color:#1c1018}
 .bio-studio .map-section{width:auto;padding:0;margin:0}
 .bio-studio .map-frame{height:340px}
+.bio-copy{display:inline-grid;place-items:center;width:32px;height:32px;margin-left:8px;border:1px solid #c81d7733;border-radius:50%;background:#fff;color:#c81d77;vertical-align:middle;pointer-events:auto;box-shadow:0 4px 10px -4px #c81d7766;transition:transform .25s var(--ease),background .25s,color .25s}
+.bio-copy svg.lucide{width:15px;height:15px}
+.bio-copy:active{transform:scale(.92)}
+.bio-copy.is-copied{background:#c81d77;color:#fff}
 .bio-footer{padding:46px 0 6px;text-align:center}
 .bio-footer p{margin:0 0 8px;font-family:var(--serif);font-size:23px;font-style:italic;font-weight:300;color:#241420}
 .bio-footer>span{font-size:12px;color:#5b4a55}

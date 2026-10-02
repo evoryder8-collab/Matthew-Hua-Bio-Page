@@ -47,7 +47,7 @@ function wheel(d){
     return `<radialGradient id="wheel-glow-${i}" cx="0" cy="0" r="95" gradientUnits="userSpaceOnUse"><stop offset=".3" stop-color="#140d1b"/><stop offset=".62" stop-color="${b}" stop-opacity=".34"/><stop offset="1" stop-color="${a}" stop-opacity=".78"/></radialGradient><radialGradient id="wheel-flare-${i}" cx="0" cy="0" r="95" gradientUnits="userSpaceOnUse"><stop offset=".32" stop-color="${a}" stop-opacity="0"/><stop offset=".7" stop-color="${a}" stop-opacity=".45"/><stop offset="1" stop-color="#fff5fb" stop-opacity=".85"/></radialGradient><linearGradient id="wheel-edge-${i}" x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
   }).join('')}<linearGradient id="wheel-rim" x1="-1" y1="-1" x2="1" y2="1"><stop offset="0" stop-color="#ffb4dc"/><stop offset=".5" stop-color="#fff5fb"/><stop offset="1" stop-color="#8fe9bd"/></linearGradient></defs><circle r="99" fill="#120c18"/><circle r="98.2" fill="none" stroke="url(#wheel-rim)" stroke-width="1.2" opacity=".85"/>${ELEMENT_TINTS.map((t,i)=>`<g class="bio-wheel__sector" data-sector="${i}"><path class="bio-wheel__fill" d="${sector(i*60)}" fill="url(#wheel-glow-${i})"/><path class="bio-wheel__flare" d="${sector(i*60)}" fill="url(#wheel-flare-${i})"/><path class="bio-wheel__edge" d="${sector(i*60,94,97,1.4)}" fill="url(#wheel-edge-${i})"/></g>`).join('')}<g class="bio-wheel__seams" stroke="#120c18" stroke-width="1.6">${ELEMENT_TINTS.map((t,i)=>{const [x1,y1]=polar(30,i*60+30),[x2,y2]=polar(97.5,i*60+30);return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;}).join('')}</g><g class="bio-wheel__dust" fill="#fff5fb">${dust()}</g><circle r="30" fill="#120c18" stroke="url(#wheel-rim)" stroke-width=".7" opacity=".95"/></svg>`;
   const segments=d.method.elements.map((x,i)=>`<button class="bio-wheel__seg" type="button" role="tab" id="bio-element-${i}" aria-selected="false" aria-controls="element-panel" tabindex="${i?-1:0}" data-element="${i}" style="--a:${i*60}deg;--tint:${ELEMENT_TINTS[i][0]}"><span class="bio-wheel__label">${icon(ELEMENT_ICONS[i])}<span>${e(x.name)}</span></span></button>`).join('');
-  return `<div class="bio-wheel" data-bio-wheel><span class="bio-wheel__pointer" aria-hidden="true"></span><div class="bio-wheel__halo" aria-hidden="true"></div><div class="bio-wheel__disc">${art}<div class="bio-wheel__labels" role="tablist" aria-label="${e(d.method.title)}">${segments}</div></div><div class="bio-wheel__hub" aria-hidden="true"><span class="mh-monogram">mh</span></div></div>`;
+  return `<div class="bio-wheel" data-bio-wheel><div class="bio-wheel__halo" aria-hidden="true"></div><div class="bio-wheel__disc">${art}<div class="bio-wheel__labels" role="tablist" aria-label="${e(d.method.title)}">${segments}</div></div><div class="bio-wheel__hub" aria-hidden="true"><span class="mh-monogram">mh</span></div></div>`;
 }
 
 function card({tone,title,detail,url,symbol,extra='',primary=false}){
@@ -87,7 +87,8 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
 <section class="bio-profile" aria-labelledby="bio-name">
   <figure class="bio-portrait"><img class="bio-portrait__aura" src="${e(asset(PORTRAIT))}" alt="" aria-hidden="true" decoding="async"><img class="bio-portrait__main" src="${e(asset(PORTRAIT))}" alt="${e(d.common.imageAlt)}" decoding="async" fetchpriority="high"></figure>
   <p class="eyebrow">${e(b.welcome)}</p>
-  <h1 id="bio-name"><span>Matthew Hua</span><em>${e(d.home.signature)}</em></h1>
+  <h1 id="bio-name"><span>Matthew Hua</span><em>${e(d.home.headline)}</em></h1>
+  <p class="bio-intro">${e(d.home.intro)}</p>
   <p class="bio-role"><span class="bio-role__dot" aria-hidden="true"></span>${e(d.home.eyebrow)}</p>
   <ul class="bio-honours" aria-label="${e(d.home.awardsLabel)}">${honours.map(x=>`<li>${icon('star')}${e(x)}</li>`).join('')}</ul>
 </section>
@@ -104,20 +105,20 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
   <p class="bio-film__caption"><span>${e(d.arrival.eyebrow)}</span><span>Rome · 2024</span></p>
 </section>
 <section class="tears-moment bio-tears" aria-labelledby="tears-title"><div class="tears-layout"><p class="eyebrow">${e(d.emotion.eyebrow)}</p><h2 class="tears-title" id="tears-title">${e(d.emotion.title)}</h2><p class="tears-copy">${e(d.emotion.copy)}</p><div class="tears-footer"><span class="tears-note">${e(d.emotion.note)}</span></div></div><canvas class="tears-canvas" aria-hidden="true"></canvas></section>
-<nav class="bio-links" aria-label="${e(b.links)}">
-  ${card({tone:'whatsapp',title:b.whatsapp,detail:b.whatsappDetail,url:`https://wa.me/41765067488?text=${greeting}`,symbol:whatsappMark,extra:external,primary:true})}
-  <p class="bio-group-label">${e(b.links)}</p>
-  ${links.map(card).join('')}
-</nav>
 <section class="bio-elements" aria-labelledby="bio-elements-title">
   <header class="bio-section-head"><p class="eyebrow">${e(d.method.eyebrow)}</p><h2 id="bio-elements-title">${e(d.method.title)}</h2><p>${e(b.wheelHint)}</p></header>
   ${wheel(d)}
   <div id="element-panel" class="bio-stage" role="tabpanel" aria-labelledby="bio-element-0" tabindex="0" hidden></div>
 </section>
+<nav class="bio-links" aria-label="${e(b.links)}">
+  ${card({tone:'whatsapp',title:b.whatsapp,detail:b.whatsappDetail,url:`https://wa.me/41765067488?text=${greeting}`,symbol:whatsappMark,extra:external,primary:true})}
+  <p class="bio-group-label">${e(b.links)}</p>
+  ${links.map(card).join('')}
+</nav>
 <nav class="bio-links bio-links--site" aria-label="${e(b.explore)}"><p class="bio-group-label">${e(b.explore)}</p>${site.map(card).join('')}</nav>
 <section class="bio-studio" aria-labelledby="bio-studio-title" data-bio-reveal>
   <p class="bio-group-label" id="bio-studio-title">${e(b.studio)}</p>
-  <div class="map-section"><div class="map-topline"><span class="map-wordmark">healwell <small>ZÜRICH</small></span><span class="coordinates">47.36079° N / 8.52105° E</span></div><div class="map-frame"><div id="studio-map" role="region" aria-label="${e(d.contact.mapLabel)}"></div><span class="map-north" aria-hidden="true">${icon('compass')}N</span><div class="map-fallback" id="map-fallback" hidden><p>Rüdigerstrasse 7 · Zürich</p><a href="${e(SOCIAL.maps)}" ${external}>${e(d.contact.mapFallback)}</a></div><div class="map-destination"><span class="destination-star" aria-hidden="true">${icon('map-pin')}</span><span class="map-address"><span>matthew hua <small>· healwell</small></span><strong>Rüdigerstrasse 7</strong><span>${e(d.contact.floor)} · 8045 Zürich</span></span></div></div><div class="map-footer"><div>${icon('train-front')}<span class="route-swatch" aria-hidden="true"></span><span>${e(d.contact.route)}</span></div><button class="button button-dark drive-button" type="button" data-action="maps">${icon('navigation')}<span>${e(d.contact.drive)}</span></button></div></div>
+  <div class="map-section"><div class="map-topline"><span class="map-wordmark">healwell <small>ZÜRICH</small></span><span class="coordinates">47.36079° N / 8.52105° E</span></div><div class="map-frame"><div id="studio-map" role="region" aria-label="${e(d.contact.mapLabel)}"></div><span class="map-north" aria-hidden="true">${icon('compass')}N</span><div class="map-fallback" id="map-fallback" hidden><p>Rüdigerstrasse 7 · Zürich</p><a href="${e(SOCIAL.maps)}" ${external}>${e(d.contact.mapFallback)}</a></div><div class="map-destination"><span class="destination-star" aria-hidden="true">${icon('map-pin')}</span><span class="map-address"><span>matthew hua <small>· healwell</small></span><strong>Rüdigerstrasse 7<button class="bio-copy" type="button" data-action="copy-address" aria-label="${e(d.contact.copyAddress)}" title="${e(d.contact.copyAddress)}">${icon('copy')}</button></strong><span>${e(d.contact.floor)} · 8045 Zürich</span></span></div></div><div class="map-footer"><div>${icon('train-front')}<span class="route-swatch" aria-hidden="true"></span><span>${e(d.contact.route)}</span></div><button class="button button-dark drive-button" type="button" data-action="maps">${icon('navigation')}<span>${e(d.contact.drive)}</span></button></div></div>
 </section>
 </main>
 <footer class="bio-footer"><p>${e(b.farewell)}</p><span>${e(d.contact.near)}</span><nav aria-label="${e(b.more)}"><a href="${e(href('home'))}">Matthew Hua</a><a href="${e(href('contact'))}">${e(d.nav.contact)}</a><button type="button" data-action="privacy">${e(d.footer.privacy)}</button></nav><span class="bio-signature">matthew</span></footer>`;
