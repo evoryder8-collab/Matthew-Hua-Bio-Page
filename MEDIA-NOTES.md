@@ -161,4 +161,4 @@ ffmpeg -ss 0.105 -i water-drop.mp3 -t 0.6 -af "afade=t=out:st=0.42:d=0.18" -c:a 
 ffmpeg -i "Effortless Prestige.m4a" -af "afade=t=in:st=0:d=0.8,afade=t=out:st=198.2:d=1.8" -c:a aac -b:a 128k -ar 44100 -movflags +faststart effortless-prestige.m4a
 ```
 
-The Opus source was transcoded because Safari does not reliably play Opus inside MP4. Licence terms for all audio sources come from the user's purchased/asset libraries and were not independently verified here; confirm web-use rights (and any attribution the AudioJungle licence requires) before treating them as cleared. The original `Effortless Prestige.m4a` remains untracked at the repository root and is not referenced by the site.
+The Opus source was transcoded because Safari does not reliably play Opus inside MP4. Rights: the user confirmed on 2026-10-02 that they created these sounds and the soundtrack and hold the rights to use them on the website. The original `Effortless Prestige.m4a` remains untracked at the repository root and is not referenced by the site.

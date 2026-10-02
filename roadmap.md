@@ -147,7 +147,7 @@ All six have independently addressable generated English HTML. Runtime localisat
 - Only after explicit consent (portal or header speaker); consent is never persisted. Declining loads no soundtrack and plays nothing.
 - Effects: sparkle sizzle, tear drop (plus softer beads), element-tab wink, recall-tap note, missed-red twinkle, teaching-slide fire whoosh, conclusion pop. Effects mix on top of the soundtrack.
 - Soundtrack ("Effortless Prestige", gain 0.3): silent only through the opening sequence, then continuous; any playing film lowers it to silence on an S-curve and returns it afterwards. Hidden tabs fade and pause it.
-- External prerequisite: confirm web-use licences for the supplied audio (see MEDIA-NOTES). Physical iPhone/Android checks (silent switch, Low Power Mode, Bluetooth latency) are not yet done.
+- Audio rights confirmed by the user (their own work). Physical iPhone/Android checks (silent switch, Low Power Mode, Bluetooth latency) are not yet done.
 
 ### Gallery, Technology And Contact
 
@@ -232,7 +232,7 @@ Refine form validation, submission progress, failure recovery and success wordin
 | P2-05 | Permissioned testimonials or an editorial recognition dossier. | Written publication consent and accurate award/event provenance; no implied Tony endorsement. Keep client discretion central. |
 | P2-06 | Stronger film accessibility: accurate captions/transcripts and thoughtful poster variants. | Review every spoken language, embedded text and media rights. Text remains useful when audio is declined. |
 | P2-07 | Search and sharing refinement: route-specific descriptions, verified structured data and a deliberate multilingual indexing strategy. | Current server-rendered HTML is English; runtime dictionaries alone are not static translated pages. Decide canonical/hreflang generation together rather than adding inconsistent tags. |
-| P2-08 | Implemented in `8837e16` at the user's request: consent-based effects and a soundtrack. Remaining: licence confirmation, device listening tests and level tuning on phone speakers. | No surprise audio; nothing before consent; no re-enabling audio after mute. |
+| P2-08 | Implemented in `8837e16` at the user's request: consent-based effects and a soundtrack. Remaining: device listening tests and level tuning on phone speakers. | No surprise audio; nothing before consent; no re-enabling audio after mute. |
 | P2-09 | CSS cascade consolidation in small, visually tested sections. | Capture baselines first. Preserve specificity/layout contracts. Do not turn cleanup into a palette or component redesign. |
 | P2-10 | Privacy-aware performance/error monitoring and a lightweight release dashboard. | Define data minimisation, owner access, service costs and alert usefulness. Never record enquiry bodies or sensitive visitor input. |
 

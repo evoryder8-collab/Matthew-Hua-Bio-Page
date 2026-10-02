@@ -63,7 +63,7 @@ Requested in one session by the user and published as `8837e16` (pushed to `main
 
 ### Remaining
 
-Device listening (iOS silent switch, autoplay, Bluetooth delay, levels on phone speakers); audio licence confirmation; native review of the tears heading wrap in long locales; rerun of the corrected layout matrix.
+Device listening (iOS silent switch, autoplay, Bluetooth delay, levels on phone speakers); audio rights confirmed by the user (own work); native review of the tears heading wrap in long locales; rerun of the corrected layout matrix.
 
 ## 2A. Previous Release (`f811195`)
 
