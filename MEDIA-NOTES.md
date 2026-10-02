@@ -153,6 +153,7 @@ Supplied by the user for this release. Originals were read, never modified; only
 | `assets/sfx/red-twinkle.mp3` (21,000 bytes, 1.27 s) | `.../TWINKLE SFX.mp3` | `002a7a370a9ec83e667a8378e5d934c84409c1e76015d8ec29555ae6abe7db85` | +26 dB with limiter (source peaked near -30 dBFS), tail fade | The red signal being revealed after it was missed |
 | `assets/sfx/conclusion-pop.mp3` (29,537 bytes, 1.80 s) | `.../Pop Positive 4.wav` | `77a919cf27cfeebe646940f1b8455b500863b9a7cd8f997db2a9bd3a0a07da2a` | -3 dB (source clipped), trimmed to 1.8 s with fade | The concluding Matthew/Tony slide arriving |
 | `assets/sfx/slide-whoosh.mp3` (23,681 bytes, 1.40 s) | `CB SFX/Whooshes/FIRE WOOSH quick.wav` (6 s source) | `0c9dc5bba5485de05f65eb687e26c09cc0833dc5f5b80fd8d6508f9ce36cb7dc` | First 0.2 s trimmed, 1.4 s body with 0.5 s fade | The right-to-left "torch" pass between the game's teaching slides |
+| `assets/sfx/magic-wink.mp3` (1.25 s) | `CB SFX/Glitch/Good for UI & Overlay motion graphics/MAGIC WINK.mp3` | `5974670e581cc0057bccc950e972a40549f466afe9bcf34d9244064a9f20c466` | 40 ms lead trimmed, +30 dB with limiter (source peaked near -34 dBFS), tail fade | Game navigation buttons (Begin, Continue, Next, Let's continue, Try again) |
 | `assets/audio/effortless-prestige.m4a` (3,245,106 bytes, 200 s) | `Effortless Prestige.m4a` at the repository root (Opus in MP4, 48 kHz, integrated loudness -16.8 LUFS) | `6ec6aac845bc436d4662bb8b1d93e5dce9566f0f1db18cccc73fd5052ed805da` | AAC-LC 128 kbps, 44.1 kHz, faststart; 0.8 s fade-in and 1.8 s fade-out so the loop restarts gently | Background soundtrack at gain 0.3: silent through the first sparkle and arrival film only, then continuous (effects play on top), lowered to silence only while a film plays |
 
 ```sh
@@ -162,3 +163,11 @@ ffmpeg -i "Effortless Prestige.m4a" -af "afade=t=in:st=0:d=0.8,afade=t=out:st=19
 ```
 
 The Opus source was transcoded because Safari does not reliably play Opus inside MP4. Rights: the user confirmed on 2026-10-02 that they created these sounds and the soundtrack and hold the rights to use them on the website. The original `Effortless Prestige.m4a` remains untracked at the repository root and is not referenced by the site.
+
+## HDR white clip (2026-10-02)
+
+`assets/films/hdr-white.mp4` (7,576 bytes) is generated, not supplied: a 2 s, 96 x 96, solid-white HEVC Main 10 clip tagged BT.2020 / SMPTE ST 2084 (PQ) with HDR10 metadata (`hvc1`). The game's closing "Let's continue" light fades it in at full screen so EDR/HDR displays (recent iPhone Pro, MacBook Pro) can exceed SDR white; other browsers show the CSS white beneath it.
+
+```sh
+ffmpeg -f lavfi -i color=c=white:s=96x96:r=30:d=2 -pix_fmt yuv420p10le -c:v libx265 -tag:v hvc1 -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -x265-params "colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc:range=limited:hdr10=1:master-display=G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,1):max-cll=1000,400" -movflags +faststart -an hdr-white.mp4
+```
