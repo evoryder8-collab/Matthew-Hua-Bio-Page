@@ -42,11 +42,17 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
   let state = 'idle';
   // While the tear falls, scrolling slows right down so it can be watched; it frees on 'done'.
   let lastTouch = null;
-  // Downward scrolling also stops at a hold point that keeps heading and paragraph in view.
+  // The brake eases in as the heading rises past the middle of the screen (full speed
+  // below 58%, heavy above 42%), and past the hold point it turns into an elastic
+  // resistance that grows with the overshoot rather than a hard stop.
   const holdY = () => section.getBoundingClientRect().top + win.scrollY - 70;
   const brakeTo = (delta) => {
-    const next = win.scrollY + delta * 0.15;
-    win.scrollTo({ top: delta > 0 ? Math.min(next, Math.max(win.scrollY, holdY())) : next, behavior: 'instant' });
+    const rise = (title.getBoundingClientRect().top / win.innerHeight - 0.42) / 0.16;
+    const ease = Math.min(1, Math.max(0, rise));
+    let factor = 0.16 + 0.84 * ease * ease * (3 - 2 * ease);
+    const over = win.scrollY - holdY();
+    if (delta > 0 && over > 0) factor /= (1 + over / 60) ** 2;
+    win.scrollTo({ top: win.scrollY + delta * factor, behavior: 'instant' });
   };
   const brakeWheel = (event) => { if (event.ctrlKey) return; event.preventDefault(); brakeTo(event.deltaY); };
   const brakeStart = (event) => { lastTouch = event.touches[0]?.clientY ?? null; };
@@ -636,22 +642,23 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
     later(startDrop, arrival + 260);
   }
 
-  // Brake as soon as the section starts to come into view, before the paragraph is
-  // reachable, so a fast scroll cannot pass it; release if the visitor turns back first.
+  // Arm the brake once the section is well into view (it stays at full speed until the
+  // heading nears the middle), so a fast scroll cannot pass it; release on turning back.
+  // The fall itself begins once the heading has risen above the middle of the screen.
   function arm() {
     if (!('IntersectionObserver' in win)) { later(run, 600); return; }
     approach = new win.IntersectionObserver((entries) => {
       if (state !== 'idle') return;
       brake(entries.some((entry) => entry.isIntersecting));
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+    }, { rootMargin: '0px 0px -30% 0px', threshold: 0 });
     approach.observe(section);
     observer = new win.IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= 0.6)) return;
+      if (!entries.some((entry) => entry.isIntersecting)) return;
       observer.disconnect();
       observer = null;
       later(run, 120);
-    }, { threshold: [0, 0.6, 1], rootMargin: '0px 0px -10% 0px' });
-    observer.observe(copy);
+    }, { threshold: 0, rootMargin: '0px 0px -55% 0px' });
+    observer.observe(title);
   }
 
   setState('idle');
