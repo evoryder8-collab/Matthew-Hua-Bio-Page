@@ -197,7 +197,7 @@ A known editorial example for P0-03: the German contact value currently ends in 
 
 ### P1: Precision In The Main Experience
 
-**P1-01: Choreograph film dismissal into the portrait. Proposed, M.**
+**P1-01: Choreograph film dismissal into the portrait. Implemented (portrait landing, 2026-10-02); device feel still to be confirmed.**
 
 The current film dismisses immediately and the portrait sweep begins 300ms later. A carefully controlled 280-380ms frame/backdrop exit could make this feel more continuous. Pause audio immediately, prevent duplicate dismissals, restore the homepage at its existing scroll position, then begin the portrait shine only after the film is visually gone. Retain the current click/Escape targets and one-shot semantics. Reduced motion should remove spatial movement. This must not introduce another two-second signature curtain on close.
 

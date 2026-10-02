@@ -10,6 +10,7 @@ import {mountTearsMoment} from './tears.js';
 import {createSoundEffects,createBackgroundMusic} from './sound.js';
 import {mountElementInvite} from './element-invite.js';
 import {playSunJourney} from './sun-journey.js';
+import {preparePortraitLanding} from './portrait-landing.js';
 
 const base=new URL('../',import.meta.url);
 document.querySelector('link[rel="icon"]').href=new URL('static/favicon.svg',base).href;
@@ -28,7 +29,7 @@ let portraitGleamed=false,portraitGleamPending=false,tears=null,cleanupRecogniti
 const gameMemory={lifted:false};
 // Elements opened during this visit; the rest keep their small "there is more" dot.
 const exploredElements=new Set([0]);
-let elementInvite=null;
+let elementInvite=null,landing=null;
 function markExplored(){document.querySelectorAll('[data-element-tab]').forEach(tab=>tab.toggleAttribute('data-explored',exploredElements.has(Number(tab.dataset.elementTab))));}
 const flagURL=code=>new URL('flags/'+code+'.png',import.meta.url).href;
 // Effects sound only after an explicit "sound on" (portal or header speaker) and never with reduced motion.
@@ -74,7 +75,7 @@ function setMetadata(){
   document.querySelector('link[rel="canonical"]').href=canonical;
   document.querySelector('meta[property="og:url"]').content=canonical;
 }
-function cleanPage(){elementInvite?.destroy();elementInvite=null;spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;technology?.destroy();technology=null;tears?.destroy();tears=null;cleanupRecognition();cleanupRecognition=()=>{};map?.remove();map=null;mapRouteBounds=null;observer?.disconnect();cleanupTilt();cleanupTilt=()=>{};if(heroVideo){heroVideo.pause();heroVideo=null;}}
+function cleanPage(){landing?.cancel();landing=null;elementInvite?.destroy();elementInvite=null;spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;technology?.destroy();technology=null;tears?.destroy();tears=null;cleanupRecognition();cleanupRecognition=()=>{};map?.remove();map=null;mapRouteBounds=null;observer?.disconnect();cleanupTilt();cleanupTilt=()=>{};if(heroVideo){heroVideo.pause();heroVideo=null;}}
 function renderSite({element=0}={}){
   cleanPage();document.body.dataset.route=route;document.body.classList.remove('menu-open');
   shell.innerHTML=renderHeader(dict,href,route,flagURL)+`<main id="main">${renderPage(route,dict,asset,href)}</main>`+renderFooter(dict,href);
@@ -183,28 +184,43 @@ function prepareArrival({holdMusic=false}={}){
     if(!video.paused)hideTimer=setTimeout(()=>{if(!dialog.querySelector('.arrival-controls').contains(document.activeElement))dialog.classList.remove('controls-visible');},3200);
   };
   const update=()=>{const label=video.paused?dict.common.play:dict.common.pause;play.innerHTML=icon(video.paused?'play':'pause');play.setAttribute('aria-label',label);play.title=label;icons();};
-  const dismiss=()=>{
+  const dismiss=({reveal=true}={})=>{
     if(closing)return;closing=true;video.pause();clearTimeout(hideTimer);
     if(dialog.open&&!portraitGleamed)portraitGleamPending=true;
     stopAtmosphere?.();stopAtmosphere=null;
     if(dialog.contains(transitionCanvas))document.body.append(transitionCanvas);
     dialog.close();dialog.remove();arrival=null;music.release('arrival');music.release('intro');
     document.querySelector('main h1')?.focus({preventScroll:true});
-    revealPortrait();spotlight?.refresh();
+    if(reveal)revealPortrait();spotlight?.refresh();
+  };
+  // Leaving the film by choice (Enter, X, outside, Escape) or by its end: the film
+  // dissolves into warm light and Matthew and Tony land in the hero, then the page
+  // gathers around them. Navigation away still uses the plain, immediate dismiss.
+  let leaving=false;
+  const leave=()=>{
+    if(closing||leaving)return;
+    const hero=route==='home'&&!motion.matches&&dialog.open?document.getElementById('hero'):null;
+    const flight=hero?preparePortraitLanding(hero):null;
+    if(!flight){dismiss();return;}
+    leaving=true;landing=flight;video.pause();clearTimeout(hideTimer);
+    dialog.classList.add('is-leaving');
+    dialog.animate?.([{opacity:1,filter:'brightness(1)'},{opacity:0,filter:'brightness(2.6)'}],{duration:420,easing:'cubic-bezier(.5,0,.75,0)',fill:'forwards'});
+    setTimeout(()=>flight.start(()=>{if(landing===flight)landing=null;revealPortrait();}),200);
+    setTimeout(()=>dismiss({reveal:false}),430);
   };
   arrival={video,dialog,show(){if(closing||!dialog.isConnected)return;dialog.showModal();stopAtmosphere=mountDialogAtmosphere(dialog);dialog.append(transitionCanvas);dialog.querySelector('.arrival-enter').focus({preventScroll:true});},start(){if(closing||!dialog.open)return;video.currentTime=0;video.play()?.catch(showControls);},dismiss};
   video.muted=!soundEnabled;updateSoundButtons();
   dialog.querySelector('.arrival-reveal').addEventListener('click',showControls);
   dialog.querySelector('.arrival-controls').addEventListener('focusin',showControls);
   play.addEventListener('click',()=>{if(video.paused){video.play()?.catch(showControls);}else video.pause();showControls();});
-  dialog.querySelector('.arrival-close').addEventListener('click',dismiss);
-  dialog.querySelector('.arrival-enter').addEventListener('click',dismiss);
-  dialog.addEventListener('cancel',event=>{event.preventDefault();dismiss();});
-  dialog.addEventListener('click',event=>{if(event.target===dialog||event.target===dialog.querySelector('.arrival-screen'))dismiss();});
+  dialog.querySelector('.arrival-close').addEventListener('click',leave);
+  dialog.querySelector('.arrival-enter').addEventListener('click',leave);
+  dialog.addEventListener('cancel',event=>{event.preventDefault();leave();});
+  dialog.addEventListener('click',event=>{if(event.target===dialog||event.target===dialog.querySelector('.arrival-screen'))leave();});
   video.addEventListener('play',update);video.addEventListener('pause',update);
   video.addEventListener('playing',()=>{if(!video.muted)music.claim('arrival');easeVolumeIn(video);});
   video.addEventListener('pause',()=>music.release('arrival'));video.addEventListener('ended',()=>music.release('arrival'));
-  video.addEventListener('ended',update);
+  video.addEventListener('ended',()=>{update();leave();});
   video.addEventListener('timeupdate',()=>{const left=Math.ceil(Math.max(0,(video.duration||28)-video.currentTime));dialog.querySelector('.arrival-time').textContent=`00:${String(left).padStart(2,'0')}`;});
   video.addEventListener('error',()=>{dialog.querySelector('.arrival-error').hidden=false;showControls();});
   // Authorize this media element in the gesture, but start the film only after the curtain.
