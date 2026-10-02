@@ -373,34 +373,46 @@ function createRenderers() {
     },
   };
 
-  /* BREATHWORK: two soft lungs with a branching bronchial tree. On the inhale light runs
-     from the windpipe out to every tip and air is drawn in; on the exhale warm light
-     retreats and the breath leaves. Inhale 4 s, hold 1.5 s, exhale 5.5 s. */
+  /* BREATHWORK: anatomical lungs around a beating heart. On the inhale (4 s) arctic-blue
+     oxygen streams like stars down the windpipe and bronchi and blooms into the lungs as
+     a nebula; through the hold it rests; on the exhale (5.5 s) carbon dioxide gathers as
+     crimson light, travels back up the tree and leaves. The lungs swell on a spring. */
+  const O2 = [150, 225, 255], O2_CORE = [235, 250, 255], CO2 = [255, 50, 60], CO2_CORE = [255, 140, 130];
   R.breath = {
     init(st, w, h) {
-      const S = Math.min(w * 0.42, h * 0.62);
-      Object.assign(st, { cx: w / 2, top: h * 0.07, S, s: 0.25, sv: 0, tone: 1, air: [], flow: [], airClock: 0 });
-      const fork = { x: st.cx, y: st.top + S * 0.36 };
-      const segs = [{ x1: st.cx, y1: st.top, x2: fork.x, y2: fork.y, depth: 0, parent: -1 }];
-      const grow = (x, y, a, len, depth, parent) => {
-        if (depth > 6) return;
-        const x2 = x + Math.cos(a) * len, y2 = y + Math.sin(a) * len;
-        const index = segs.push({ x1: x, y1: y, x2, y2, depth, parent }) - 1;
-        const spread = 0.42 - depth * 0.025;
-        grow(x2, y2, a - spread * (0.75 + Math.random() * 0.5), len * (0.7 + Math.random() * 0.08), depth + 1, index);
-        grow(x2, y2, a + spread * (0.75 + Math.random() * 0.5), len * (0.7 + Math.random() * 0.08), depth + 1, index);
-      };
-      grow(fork.x, fork.y, Math.PI / 2 + 0.78, S * 0.3, 1, 0);
-      grow(fork.x, fork.y, Math.PI / 2 - 0.78, S * 0.3, 1, 0);
-      st.segs = segs;
-      st.fork = fork;
-      // Every leaf's route from the windpipe, for the air that travels through the tree.
-      st.routes = segs.map((s, i) => i).filter((i) => segs[i].depth === 6).map((leaf) => {
+      const S = Math.min(w * 0.5, h * 0.56), cx = w / 2, top = h * 0.05;
+      Object.assign(st, { S, cx, top, s: 0.25, sv: 0, o2: 0.3, red: 0, stars: [], co2: [], puffs: [], o2Clock: 0, co2Clock: 0 });
+      st.fork = { x: cx, y: top + S * 0.3 };
+      st.lungs = [-1, 1].map((side) => ({ side, medialX: cx + side * S * 0.075, apexY: top + S * 0.18, W: S * 0.47, H: S * 0.82, notch: side === 1 }));
+      // The bronchial tree, grown inside each lung in its own (lateral, vertical) units.
+      const inside = (lx, ly) => ((lx - 0.55) / 0.43) ** 2 + ((ly - 0.56) / 0.44) ** 2 < 1;
+      st.tree = [];
+      st.lungs.forEach((L, li) => {
+        const grow = (x, y, a, len, depth, parent) => {
+          if (depth > 5) return;
+          const x2 = x + Math.cos(a) * len, y2 = y + Math.sin(a) * len;
+          if (!inside(x2, y2)) return;
+          const index = st.tree.push({ li, x1: x, y1: y, x2, y2, depth, parent }) - 1;
+          const spread = 0.5 - depth * 0.04;
+          grow(x2, y2, a - spread * (0.7 + Math.random() * 0.5), len * (0.72 + Math.random() * 0.1), depth + 1, index);
+          grow(x2, y2, a + spread * (0.7 + Math.random() * 0.5), len * (0.72 + Math.random() * 0.1), depth + 1, index);
+        };
+        const root = st.tree.push({ li, x1: 0.06, y1: 0.16, x2: 0.24, y2: 0.34, depth: 1, parent: -1 }) - 1;
+        grow(0.24, 0.34, 0.55, 0.2, 2, root);   // down and out
+        grow(0.24, 0.34, -0.35, 0.16, 2, root); // up toward the apex
+        grow(0.24, 0.34, 1.2, 0.2, 2, root);    // down toward the base
+      });
+      st.routes = st.tree.map((seg, i) => i).filter((i) => !st.tree.some((c) => c.parent === i)).map((leaf) => {
         const chain = [];
-        for (let i = leaf; i >= 0; i = segs[i].parent) chain.unshift(segs[i]);
+        for (let i = leaf; i >= 0; i = st.tree[i].parent) chain.unshift(st.tree[i]);
         return chain;
       });
-      st.flow = Array.from({ length: 46 }, () => ({ route: Math.floor(Math.random() * st.routes.length), u: Math.random() }));
+      st.dust = st.lungs.map(() => Array.from({ length: 34 }, () => {
+        let lx, ly;
+        do { lx = Math.random(); ly = Math.random(); } while (!inside(lx, ly));
+        return { lx, ly, tw: Math.random() * TAU, r: 0.5 + Math.random() };
+      }));
+      st.nebula = st.lungs.map(() => Array.from({ length: 4 }, () => ({ lx: 0.3 + Math.random() * 0.5, ly: 0.25 + Math.random() * 0.6, ph: Math.random() * TAU, r: 0.32 + Math.random() * 0.2 })));
     },
     guide(t) {
       const p = t % 11;
@@ -408,75 +420,187 @@ function createRenderers() {
       if (p < 5.5) return { stage: 'hold', v: 1 };
       return { stage: 'out', v: 1 - smooth((p - 5.5) / 5.5) };
     },
-    at(st, x, y) {   // the whole tree swells about the fork as the lungs fill
-      const k = 0.86 + 0.16 * st.s;
-      return [st.fork.x + (x - st.fork.x) * k, st.fork.y + (y - st.fork.y) * k];
+    point(st, L, lx, ly) {                         // lung units -> screen, with the breath
+      const kx = 0.9 + 0.12 * st.s, ky = 0.92 + 0.1 * st.s;
+      return [L.medialX + L.side * lx * L.W * kx, L.apexY + ly * L.H * ky];
+    },
+    routePoints(st, chain) {
+      const L = st.lungs[chain[0].li];
+      return [[st.fork.x, st.fork.y], ...chain.map((seg) => this.point(st, L, seg.x2, seg.y2))].map(([x, y], i, all) => i === 1 ? [x, y] : [x, y]);
+    },
+    along(points, u) {
+      const n = points.length - 1, f = clamp(u) * n, i = Math.min(n - 1, Math.floor(f)), k = f - i;
+      return [points[i][0] + (points[i + 1][0] - points[i][0]) * k, points[i][1] + (points[i + 1][1] - points[i][1]) * k];
+    },
+    lungPath(ctx, st, L) {
+      const P = (lx, ly) => this.point(st, L, lx, ly);
+      ctx.beginPath();
+      ctx.moveTo(...P(0.32, 0));
+      ctx.bezierCurveTo(...P(0.64, -0.01), ...P(0.98, 0.3), ...P(0.99, 0.62));
+      ctx.bezierCurveTo(...P(1.0, 0.82), ...P(0.98, 0.96), ...P(0.88, 0.99));
+      ctx.bezierCurveTo(...P(0.62, 0.89), ...P(0.36, 0.86), ...P(0.1, 0.95));     // the diaphragm's dome
+      if (L.notch) {                                                               // room for the heart
+        ctx.bezierCurveTo(...P(0.34, 0.88), ...P(0.38, 0.6), ...P(0.12, 0.5));
+        ctx.bezierCurveTo(...P(0.03, 0.38), ...P(0.07, 0.08), ...P(0.32, 0));
+      } else {
+        ctx.bezierCurveTo(...P(0.0, 0.7), ...P(0.02, 0.3), ...P(0.1, 0.12));
+        ctx.bezierCurveTo(...P(0.16, 0.03), ...P(0.24, 0), ...P(0.32, 0));
+      }
+      ctx.closePath();
+    },
+    heart(ctx, x, y, size, beat) {
+      const k = size * (1 + 0.07 * beat);
+      ctx.save();
+      ctx.translate(x, y); ctx.rotate(-0.25); ctx.scale(k, k);
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#b02a46'; ctx.lineWidth = 0.15;                          // aortic arch
+      ctx.beginPath(); ctx.moveTo(-0.02, -0.25); ctx.bezierCurveTo(-0.02, -0.72, -0.5, -0.72, -0.48, -0.32); ctx.stroke();
+      ctx.strokeStyle = '#c03552'; ctx.lineWidth = 0.13;                          // pulmonary trunk
+      ctx.beginPath(); ctx.moveTo(0.16, -0.24); ctx.quadraticCurveTo(0.24, -0.5, 0.4, -0.56); ctx.stroke();
+      const body = ctx.createLinearGradient(-0.4, -0.3, 0.4, 0.6);
+      body.addColorStop(0, '#e2566f'); body.addColorStop(0.6, '#b9304b'); body.addColorStop(1, '#7f1a30');
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.moveTo(-0.42, -0.18);
+      ctx.bezierCurveTo(-0.62, 0.05, -0.38, 0.46, 0.22, 0.62);
+      ctx.bezierCurveTo(0.42, 0.66, 0.5, 0.42, 0.46, 0.1);
+      ctx.bezierCurveTo(0.44, -0.2, 0.2, -0.36, -0.05, -0.32);
+      ctx.bezierCurveTo(-0.22, -0.3, -0.36, -0.28, -0.42, -0.18);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(120,20,40,.55)'; ctx.lineWidth = 0.03;               // coronary groove
+      ctx.beginPath(); ctx.moveTo(-0.3, -0.12); ctx.quadraticCurveTo(0.05, 0.12, 0.3, 0.5); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,235,240,.28)';
+      ctx.beginPath(); ctx.ellipse(-0.2, -0.08, 0.12, 0.07, -0.5, 0, TAU); ctx.fill();
+      ctx.restore();
     },
     draw(ctx, w, h, t, st) {
-      const { cx, top, S } = st;
+      const { S, cx, top, fork } = st;
       let g = this.guide(t);
       advance(st, t, (dt, time) => {
         g = this.guide(time);
         st.sv += (26 * (g.v - st.s) - 8 * st.sv) * dt;
         st.s += st.sv * dt;
-        st.tone += ((g.stage === 'out' ? 0 : 1) - st.tone) * clamp(dt * 1.6);
-        const dir = g.stage === 'in' ? 1 : g.stage === 'out' ? -1 : 0;
-        for (const f of st.flow) {
-          f.u += dir * (0.35 + 0.2 * Math.random()) * dt;
-          if (f.u > 1 || f.u < 0) { f.route = Math.floor(Math.random() * st.routes.length); f.u = dir > 0 ? 0 : 1; }
+        st.o2 += ((g.stage === 'out' ? 0.05 : 1) - st.o2) * clamp(dt * (g.stage === 'out' ? 1.4 : 0.7));
+        st.red += ((g.stage === 'out' ? 1 : 0) - st.red) * clamp(dt * 1.2);
+        // Oxygen: drawn in from above as stars, carried down to a branch tip, then diffused.
+        if (g.stage === 'in') {
+          st.o2Clock += dt * 34;
+          while (st.o2Clock >= 1) { st.o2Clock--; st.stars.push({ phase: 'air', x: cx + (Math.random() - 0.5) * S * 0.5, y: top - S * 0.08 - Math.random() * S * 0.1, route: Math.floor(Math.random() * st.routes.length), u: 0, tw: Math.random() * TAU }); }
         }
-        // Air at the opening: drawn in from above, or released upward and away.
-        st.airClock += dt * (dir ? 26 : 4);
-        while (st.airClock >= 1) {
-          st.airClock--;
-          if (dir >= 0) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.6, d = S * (0.25 + Math.random() * 0.25); st.air.push({ x: cx + Math.cos(a) * d, y: top + Math.sin(a) * d * 0.6, vx: 0, vy: 0, life: 0, max: 1.4, mode: 'in' }); }
-          else st.air.push({ x: cx + (Math.random() - 0.5) * 4, y: top, vx: (Math.random() - 0.5) * 40, vy: -30 - Math.random() * 30, life: 0, max: 1.8, mode: 'out' });
+        for (let i = st.stars.length - 1; i >= 0; i--) {
+          const p = st.stars[i];
+          if (p.phase === 'air') { p.x += (cx - p.x) * clamp(dt * 3); p.y += (top + 4 - p.y) * clamp(dt * 3.2) + 30 * dt; if (p.y > top) { p.phase = 'trachea'; } }
+          else if (p.phase === 'trachea') { p.y += S * 1.1 * dt; p.x = cx + (p.x - cx) * 0.9; if (p.y >= fork.y) p.phase = 'tree'; }
+          else { p.u += dt / 1.1; if (p.u >= 1) { const chain = st.routes[p.route], end = chain[chain.length - 1]; st.puffs.push({ li: end.li, lx: end.x2, ly: end.y2, age: 0 }); st.stars.splice(i, 1); } }
         }
-        for (let i = st.air.length - 1; i >= 0; i--) {
-          const p = st.air[i];
-          p.life += dt;
-          if (p.mode === 'in') { p.vx += (cx - p.x) * 6 * dt; p.vy += (top - p.y) * 6 * dt; p.vx *= 1 - 2.2 * dt; p.vy *= 1 - 2.2 * dt; }
-          else { p.vx *= 1 - 0.6 * dt; p.vy *= 1 - 0.4 * dt; p.vx += Math.sin(time * 2 + i) * 6 * dt; }
-          p.x += p.vx * dt; p.y += p.vy * dt;
-          if (p.life > p.max || (p.mode === 'in' && Math.hypot(cx - p.x, top - p.y) < 3)) st.air.splice(i, 1);
+        // Carbon dioxide: gathers at the tips, climbs the tree and the windpipe, and leaves.
+        if (g.stage === 'out') {
+          st.co2Clock += dt * 26;
+          while (st.co2Clock >= 1) { st.co2Clock--; st.co2.push({ phase: 'tree', route: Math.floor(Math.random() * st.routes.length), u: 1, x: 0, y: 0, vx: 0, vy: 0, life: 0, tw: Math.random() * TAU }); }
         }
-        if (st.air.length > 70) st.air.splice(0, st.air.length - 70);
+        for (let i = st.co2.length - 1; i >= 0; i--) {
+          const p = st.co2[i];
+          if (p.phase === 'tree') { p.u -= dt / 1.3; if (p.u <= 0) { p.phase = 'trachea'; p.x = cx; p.y = fork.y; } }
+          else if (p.phase === 'trachea') { p.y -= S * 0.9 * dt; if (p.y <= top) { p.phase = 'out'; const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.6; p.vx = Math.cos(a) * 60; p.vy = Math.sin(a) * 60; } }
+          else { p.life += dt; p.vx *= 1 - 0.8 * dt; p.vy *= 1 - 0.6 * dt; p.x += p.vx * dt; p.y += p.vy * dt; if (p.life > 1.6) st.co2.splice(i, 1); }
+        }
+        for (let i = st.puffs.length - 1; i >= 0; i--) { st.puffs[i].age += dt; if (st.puffs[i].age > 2.4) st.puffs.splice(i, 1); }
+        if (st.stars.length > 160) st.stars.splice(0, st.stars.length - 160);
+        if (st.co2.length > 160) st.co2.splice(0, st.co2.length - 160);
       });
-      const cool = [180, 240, 220], warm = C.pinkB;
-      const col = mix(warm, cool, st.tone), deep = mix(C.pink, C.mint, st.tone);
-      backdrop(ctx, w, h, '#0b0b14', '#09090f');
+      backdrop(ctx, w, h, '#0b0b16', '#08080f');
       ctx.globalCompositeOperation = 'lighter';
-      light(ctx, deep, cx, top + S * 0.7, S * 1.3, 0.12 + 0.12 * st.s);
-      // Lobes: soft volumes that fill and empty.
-      for (const side of [-1, 1]) {
-        const k = 0.86 + 0.16 * st.s;
-        const lx = cx + side * S * 0.42 * k, ly = top + S * 0.74, rx = S * 0.46 * k, ry = S * 0.56 * k;
-        const fill = ctx.createRadialGradient(lx, ly - ry * 0.2, rx * 0.1, lx, ly, ry);
-        fill.addColorStop(0, rgba(col, 0.16 + 0.12 * st.s)); fill.addColorStop(1, rgba(deep, 0.02));
-        ctx.globalAlpha = 1; ctx.fillStyle = fill;
-        ctx.beginPath(); ctx.ellipse(lx, ly, rx, ry, side * -0.12, 0, TAU); ctx.fill();
-        ctx.strokeStyle = rgba(col, 0.18 + 0.12 * st.s); ctx.lineWidth = 1; ctx.stroke();
+      light(ctx, O2, cx, top + S * 0.6, S * 1.1, 0.06 + 0.1 * st.o2);
+      light(ctx, CO2, cx, top + S * 0.6, S * 1.1, 0.08 * st.red);
+      ctx.globalCompositeOperation = 'source-over';
+      const beatPhase = t % 1.05, beat = Math.pow(Math.max(0, 1 - beatPhase / 0.16), 2) + 0.55 * Math.max(0, 1 - Math.abs(beatPhase - 0.27) / 0.12);
+      // Lungs: soft tissue, a darker inner lobe, then the nebula held inside them.
+      for (const L of st.lungs) {
+        const li = st.lungs.indexOf(L);
+        const [bx, by] = this.point(st, L, 0.55, 0.0), [, bb] = this.point(st, L, 0.55, 1);
+        this.lungPath(ctx, st, L);
+        const tissue = ctx.createLinearGradient(0, by, 0, bb);
+        tissue.addColorStop(0, '#f7b9b4'); tissue.addColorStop(1, '#ec8c88');
+        ctx.globalAlpha = 1; ctx.fillStyle = tissue; ctx.fill();
+        ctx.save();
+        ctx.clip();
+        const [ix, iy] = this.point(st, L, 0.3, 0.7);
+        const inner = ctx.createRadialGradient(ix, iy, 0, ix, iy, L.W * 0.7);
+        inner.addColorStop(0, 'rgba(226,110,110,.55)'); inner.addColorStop(1, 'rgba(226,110,110,0)');
+        ctx.fillStyle = inner; ctx.fillRect(0, 0, w, h);
+        for (const n of st.nebula[li]) {
+          const [nx, ny] = this.point(st, L, n.lx + 0.05 * Math.sin(t * 0.3 + n.ph), n.ly + 0.04 * Math.cos(t * 0.25 + n.ph));
+          light(ctx, [70, 150, 240], nx, ny, L.W * n.r * 1.6, 0.62 * st.o2);
+          light(ctx, [215, 22, 40], nx, ny, L.W * n.r * 1.6, 0.7 * st.red * (1 - st.o2 * 0.7));
+        }
+        ctx.globalCompositeOperation = 'lighter';
+        for (const n of st.nebula[li]) {
+          const [nx, ny] = this.point(st, L, n.lx + 0.05 * Math.sin(t * 0.3 + n.ph), n.ly + 0.04 * Math.cos(t * 0.25 + n.ph));
+          light(ctx, O2, nx, ny, L.W * n.r * 0.7, 0.14 * st.o2);
+        }
+        for (const p of st.puffs) {
+          if (p.li !== li) continue;
+          const [px, py] = this.point(st, L, p.lx, p.ly), k = p.age / 2.4;
+          light(ctx, O2, px, py, L.W * (0.1 + 0.25 * k), 0.4 * (1 - k));
+        }
+        for (const d of st.dust[li]) {
+          const [dx, dy] = this.point(st, L, d.lx, d.ly);
+          const a = (0.35 + 0.65 * Math.abs(Math.sin(t * 1.3 + d.tw))) * (0.25 + 0.75 * Math.max(st.o2, st.red * 0.7));
+          light(ctx, st.red > st.o2 ? CO2_CORE : O2_CORE, dx, dy, d.r * 2.2, a);
+        }
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 0.45; ctx.strokeStyle = '#c96a72'; ctx.lineWidth = Math.max(1, S * 0.006);
+        const fissures = L.notch ? [[[0.2, 0.22], [0.6, 0.46], [0.86, 0.94]]] : [[[0.16, 0.2], [0.6, 0.42], [0.9, 0.9]], [[0.42, 0.33], [0.7, 0.5], [0.99, 0.58]]];
+        for (const [a, b, c] of fissures) { ctx.beginPath(); ctx.moveTo(...this.point(st, L, ...a)); ctx.quadraticCurveTo(...this.point(st, L, ...b), ...this.point(st, L, ...c)); ctx.stroke(); }
+        ctx.restore();
+        this.lungPath(ctx, st, L);
+        ctx.globalAlpha = 0.55; ctx.strokeStyle = '#fbd2cd'; ctx.lineWidth = 1.4; ctx.stroke();
+        ctx.globalAlpha = 1;
       }
-      // The tree: lit from the windpipe outward as far as the breath has reached.
-      const front = 0.4 + st.s * 6.8;
+      // Bronchial tree.
       ctx.lineCap = 'round';
-      for (const s of st.segs) {
-        const lit = clamp(front - s.depth);
-        const [x1, y1] = this.at(st, s.x1, s.y1), [x2, y2] = this.at(st, s.x2, s.y2);
-        ctx.globalAlpha = 0.12 + 0.6 * lit;
-        ctx.strokeStyle = rgba(lit > 0.02 ? col : C.white, 1);
-        ctx.lineWidth = Math.max(0.6, (3.4 - s.depth * 0.45) * (S / 300));
+      for (const seg of st.tree) {
+        const L = st.lungs[seg.li];
+        const [x1, y1] = seg.parent < 0 ? [L.medialX + L.side * S * 0.01, fork.y + S * 0.02] : this.point(st, L, seg.x1, seg.y1);
+        const [x2, y2] = this.point(st, L, seg.x2, seg.y2);
+        ctx.strokeStyle = '#df4b70'; ctx.lineWidth = Math.max(0.8, S * (0.034 - seg.depth * 0.005));
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-        if (s.depth === 6 && lit > 0.05) light(ctx, col, x2, y2, (5 + 6 * lit) * (S / 300), 0.55 * lit);
       }
-      for (const f of st.flow) {
-        const chain = st.routes[f.route], pos = f.u * chain.length, i = Math.min(chain.length - 1, Math.floor(pos)), k = pos - i, s = chain[i];
-        const [x, y] = this.at(st, s.x1 + (s.x2 - s.x1) * k, s.y1 + (s.y2 - s.y1) * k);
-        light(ctx, col, x, y, 4 * (S / 300), g.stage === 'hold' ? 0.25 : 0.85);
+      // Main bronchi and the windpipe, ringed with cartilage.
+      for (const L of st.lungs) {
+        const [ex, ey] = this.point(st, L, 0.06, 0.16);
+        ctx.strokeStyle = '#e65a7e'; ctx.lineWidth = S * 0.05;
+        ctx.beginPath(); ctx.moveTo(fork.x, fork.y); ctx.quadraticCurveTo(fork.x + L.side * S * 0.02, fork.y + S * 0.07, ex, ey); ctx.stroke();
       }
-      for (const p of st.air) {
-        const a = Math.sin(Math.PI * clamp(p.life / p.max)) * 0.8;
-        light(ctx, p.mode === 'in' ? cool : C.pinkB, p.x, p.y, 3, a);
+      ctx.fillStyle = '#e8607f';
+      const tw = S * 0.075;
+      ctx.beginPath(); ctx.roundRect?.(cx - tw / 2, top, tw, fork.y - top + 2, tw * 0.35); if (!ctx.roundRect) ctx.rect(cx - tw / 2, top, tw, fork.y - top + 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,214,222,.75)'; ctx.lineWidth = Math.max(1, S * 0.008);
+      for (let y = top + S * 0.02; y < fork.y - S * 0.01; y += S * 0.024) { ctx.beginPath(); ctx.moveTo(cx - tw * 0.36, y); ctx.quadraticCurveTo(cx, y + S * 0.008, cx + tw * 0.36, y); ctx.stroke(); }
+      // The heart, nestled in the left lung's notch, beating lub-dub.
+      const hx = cx + S * 0.07, hy = top + S * 0.78;
+      ctx.globalCompositeOperation = 'lighter';
+      light(ctx, [255, 70, 100], hx, hy, S * 0.3 * (1 + beat * 0.3), 0.18 + 0.25 * beat);
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+      this.heart(ctx, hx, hy, S * 0.26, beat);
+      // Oxygen and carbon dioxide in flight.
+      ctx.globalCompositeOperation = 'lighter';
+      const star = (x, y, core, halo, size, a) => {
+        light(ctx, halo, x, y, size * 4, a * 0.6);
+        light(ctx, core, x, y, size * 1.4, a);
+        ctx.globalAlpha = a * 0.7; ctx.strokeStyle = rgba(core, 1); ctx.lineWidth = 0.7;
+        ctx.beginPath(); ctx.moveTo(x - size * 3, y); ctx.lineTo(x + size * 3, y); ctx.moveTo(x, y - size * 3); ctx.lineTo(x, y + size * 3); ctx.stroke();
+      };
+      for (const p of st.stars) {
+        let x = p.x, y = p.y;
+        if (p.phase === 'tree') [x, y] = this.along(this.routePoints(st, st.routes[p.route]), p.u);
+        star(x, y, O2_CORE, O2, 1.4, 0.6 + 0.4 * Math.abs(Math.sin(t * 6 + p.tw)));
+      }
+      for (const p of st.co2) {
+        let x = p.x, y = p.y, a = 0.6 + 0.4 * Math.abs(Math.sin(t * 5 + p.tw));
+        if (p.phase === 'tree') [x, y] = this.along(this.routePoints(st, st.routes[p.route]), p.u);
+        if (p.phase === 'out') a *= 1 - p.life / 1.6;
+        star(x, y, CO2_CORE, CO2, 1.3, a);
       }
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     },
