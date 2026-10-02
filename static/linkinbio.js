@@ -4,7 +4,6 @@
 // on a wheel that reveals each element's visual (the Mindset game included, with its
 // sounds), and every way to reach Matthew sits in platform-tinted glass.
 import {languages,escapeHTML as e,icon,renderElement} from './templates.js';
-import {renderLinkInBio} from './linkinbio-template.js';
 import {resolveLocale} from './language.js';
 import {mountMindset} from './mindset.js';
 import {mountElementVisual} from './element-visuals.js';
@@ -15,6 +14,8 @@ import {playSunJourney} from './sun-journey.js';
 import {mountDialogAtmosphere} from './dialog-atmosphere.js';
 import {mountAmbientSparks} from './effects.js';
 
+// The template travels with this module's version (see build.mjs).
+const {renderLinkInBio}=await import(new URL('linkinbio-template.js'+new URL(import.meta.url).search,import.meta.url).href);
 const base=new URL('../',import.meta.url);
 const asset=file=>new URL('assets/'+file.split('/').map(encodeURIComponent).join('/'),base).href;
 const file=path=>new URL(path,base).href;

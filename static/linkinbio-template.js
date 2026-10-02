@@ -20,7 +20,7 @@ export const ELEMENT_TINTS=[['#ff7cc0','#c81d77'],['#8fdcff','#ffb35c'],['#9fe7f
 
 // Matthew's own glyphs: solid white forms on glossy platform-coloured chips. Cut-outs
 // use currentColor, which each chip sets to its platform's deeper shade.
-const glyph=body=>`<svg viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
+const glyph=body=>`<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">${body}</svg>`;
 const GLYPHS={
   whatsapp:glyph('<path fill="#fff" d="M12 2.4a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.9-1.3A9.5 9.5 0 1 0 12 2.4z"/><path fill="currentColor" d="M9.3 7.3c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.2 3.5 5.5 4.8 2.7 1.1 3.3.9 3.9.8.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4l-2-1c-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6z"/>'),
   contact:glyph('<rect x="2.5" y="4.6" width="19" height="14.8" rx="3.4" fill="#fff"/><circle cx="8.6" cy="10.4" r="2.3" fill="currentColor"/><path fill="currentColor" d="M4.9 16.3c.5-2 2-3.1 3.7-3.1s3.2 1.1 3.7 3.1z"/><rect x="13.6" y="9" width="5.4" height="1.7" rx=".85" fill="currentColor"/><rect x="13.6" y="12.4" width="3.8" height="1.7" rx=".85" fill="currentColor" opacity=".7"/>'),
@@ -36,9 +36,9 @@ const GLYPHS={
   practice:glyph('<path fill="#fff" d="M12 3.6c2 2.3 3 4.7 3 7.4s-1 5.3-3 7c-2-1.7-3-4.3-3-7s1-5.1 3-7.4z"/><path fill="#fff" opacity=".82" d="M2.9 9.4c3.2.2 5.8 1.6 7.4 4.3.7 1.1 1.1 2.5 1.7 4.4-2.8 0-5.2-.8-6.9-2.4-1.5-1.6-2.1-3.7-2.2-6.3zm18.2 0c-.1 2.6-.7 4.7-2.2 6.3-1.7 1.6-4.1 2.4-6.9 2.4.6-1.9 1-3.3 1.7-4.4 1.6-2.7 4.2-4.1 7.4-4.3z"/>'),
   about:glyph('<circle cx="12" cy="7.9" r="4.1" fill="#fff"/><path fill="#fff" d="M4.3 20.3c.8-4.1 3.9-6.5 7.7-6.5s6.9 2.4 7.7 6.5z"/>')
 };
-const GO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.2 15.8 15.8 8.2M10.2 8h5.8v5.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const GO='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8.2 15.8 15.8 8.2M10.2 8h5.8v5.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 // A drawn street plan for the Maps card (Zurich-like grid, the river, the route in).
-const MAP_ART='<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="200" height="100" fill="#e3f0e8"/><path d="M-10 74C40 62 72 84 122 64s70-26 96-18" stroke="#b9dcf4" stroke-width="10" fill="none"/><g stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M22-6 60 106"/><path d="M-6 30 210 17"/><path d="M112-6 96 106"/><path d="M152-6l26 112"/><path d="M-6 90 210 81"/></g><g stroke="#fff" stroke-width="1.7" opacity=".95"><path d="M42-6l5 112"/><path d="M-6 51 210 44"/><path d="M132-6l10 112"/><path d="M80-6 70 106"/><path d="M172-6 186 106"/></g><path d="M28 94C66 74 98 68 128 41" stroke="#c81d77" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-dasharray="1 5.5"/><circle cx="128" cy="41" r="11" fill="#34a853" opacity=".18"/><circle cx="128" cy="41" r="4.6" fill="#34a853" stroke="#fff" stroke-width="1.8"/></svg>';
+const MAP_ART='<svg viewBox="0 0 200 100" width="200" height="100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="200" height="100" fill="#e3f0e8"/><path d="M-10 74C40 62 72 84 122 64s70-26 96-18" stroke="#b9dcf4" stroke-width="10" fill="none"/><g stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M22-6 60 106"/><path d="M-6 30 210 17"/><path d="M112-6 96 106"/><path d="M152-6l26 112"/><path d="M-6 90 210 81"/></g><g stroke="#fff" stroke-width="1.7" opacity=".95"><path d="M42-6l5 112"/><path d="M-6 51 210 44"/><path d="M132-6l10 112"/><path d="M80-6 70 106"/><path d="M172-6 186 106"/></g><path d="M28 94C66 74 98 68 128 41" stroke="#c81d77" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-dasharray="1 5.5"/><circle cx="128" cy="41" r="11" fill="#34a853" opacity=".18"/><circle cx="128" cy="41" r="4.6" fill="#34a853" stroke="#fff" stroke-width="1.8"/></svg>';
 
 const polar=(r,deg)=>{const a=deg*Math.PI/180;return [(r*Math.sin(a)).toFixed(2),(-r*Math.cos(a)).toFixed(2)];};
 // One annular sector of the wheel, centred on `centre` degrees (0 = top, clockwise).
@@ -66,7 +66,7 @@ function wheel(d){
 // a glossy glyph chip, a small label, the invitation in the serif, and a light that
 // travels round the frame.
 function card(l,asset){
-  const art=l.art==='map'?MAP_ART:`<img src="${e(asset('bio/'+l.art+'.webp'))}" alt="" width="640" height="320" loading="lazy" decoding="async">`;
+  const art=l.art==='map'?MAP_ART:`<img src="${e(asset('bio/'+l.art+'.webp'))}" alt="" width="200" height="100" loading="lazy" decoding="async">`;
   return `<a class="bio-link${l.primary?' bio-link--primary':''}" data-tone="${l.tone}" href="${e(l.url)}" ${l.extra||''} data-bio-reveal><span class="bio-link__art" aria-hidden="true">${art}</span><span class="bio-link__glass" aria-hidden="true"></span><span class="bio-link__chip" aria-hidden="true">${GLYPHS[l.tone]}</span><span class="bio-link__copy"><span class="bio-link__eyebrow">${e(l.eyebrow)}</span><strong>${e(l.title)}</strong>${l.detail?`<small>${e(l.detail)}</small>`:''}</span><span class="bio-link__go" aria-hidden="true">${GO}</span></a>`;
 }
 
