@@ -18,23 +18,23 @@ export const ELEMENT_ICONS=['brain','thermometer-snowflake','wind','hand-heart',
 // Each element's light on the wheel: [inner, outer] colours of its sector.
 export const ELEMENT_TINTS=[['#ff7cc0','#c81d77'],['#8fdcff','#ffb35c'],['#9fe7ff','#ff9fc4'],['#ffb3cf','#ef84be'],['#ffe09a','#e9a93b'],['#9ff3c8','#38c98a']];
 
-// Matthew's own glyphs: solid white forms on glossy platform-coloured chips. Cut-outs
-// use currentColor, which each chip sets to its platform's deeper shade.
-const glyph=body=>`<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">${body}</svg>`;
+// Matthew's own brand marks: flat, solid forms in each platform's colour (currentColor),
+// with cut-outs in the card's glass colour (.g-cut), no containers.
+const glyph=body=>`<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">${body}</svg>`;
 const GLYPHS={
-  whatsapp:glyph('<path fill="#fff" d="M12 2.4a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.9-1.3A9.5 9.5 0 1 0 12 2.4z"/><path fill="currentColor" d="M9.3 7.3c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.2 3.5 5.5 4.8 2.7 1.1 3.3.9 3.9.8.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4l-2-1c-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6z"/>'),
-  contact:glyph('<rect x="2.5" y="4.6" width="19" height="14.8" rx="3.4" fill="#fff"/><circle cx="8.6" cy="10.4" r="2.3" fill="currentColor"/><path fill="currentColor" d="M4.9 16.3c.5-2 2-3.1 3.7-3.1s3.2 1.1 3.7 3.1z"/><rect x="13.6" y="9" width="5.4" height="1.7" rx=".85" fill="currentColor"/><rect x="13.6" y="12.4" width="3.8" height="1.7" rx=".85" fill="currentColor" opacity=".7"/>'),
-  phone:glyph('<path fill="#fff" d="M6.7 3.1c.5-.4 1.3-.3 1.7.2l2.2 2.8c.4.5.4 1.2 0 1.7l-1.3 1.6a11.8 11.8 0 0 0 5.3 5.3l1.6-1.3c.5-.4 1.2-.4 1.7 0l2.8 2.2c.5.4.6 1.2.2 1.7l-1.3 1.7c-.8 1-2.2 1.5-3.4 1.1C9.9 18.4 5.6 14.1 3.9 7.8c-.3-1.2.1-2.6 1.1-3.4z"/><path fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" d="M14.6 3.6a6.3 6.3 0 0 1 5.8 5.8M14.3 6.9a3.2 3.2 0 0 1 2.8 2.8" opacity=".85"/>'),
-  mail:glyph('<rect x="2.6" y="5" width="18.8" height="14" rx="3.2" fill="#fff"/><path d="M4.3 7.4 12 13l7.7-5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'),
-  instagram:glyph('<rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.4" fill="none" stroke="#fff" stroke-width="2.1"/><circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="2.1"/><circle cx="17.2" cy="6.8" r="1.35" fill="#fff"/>'),
-  facebook:glyph('<path fill="#fff" d="M13.7 21.2v-7.6h2.6l.4-3.1h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.3H8v3.1h2.6v7.6z"/>'),
-  threads:glyph('<path fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" d="M16.5 11.2c-.4-2.6-2.1-3.9-4.4-3.9-2.8 0-4.5 2-4.5 4.7s1.7 4.7 4.4 4.7c2.3 0 3.9-1.2 3.9-3.2 0-1.8-1.4-2.8-3.3-2.8-1.6 0-2.8.9-2.8 2.1 0 1.1.9 1.9 2.2 1.9 2.4 0 3.4-1.9 3.4-4.5"/><path fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" d="M20 13.3A8.1 8.1 0 1 1 18.8 7"/>'),
-  youtube:glyph('<rect x="2" y="5.4" width="20" height="13.2" rx="4.2" fill="#fff"/><path d="M10 9.1v5.8l5-2.9z" fill="currentColor"/>'),
-  linkedin:glyph('<rect x="3.6" y="9.2" width="3.5" height="11" rx=".8" fill="#fff"/><circle cx="5.35" cy="5.4" r="2.05" fill="#fff"/><path fill="#fff" d="M9.8 9.2h3.3v1.6c.5-.9 1.8-1.9 3.6-1.9 3.4 0 4 2.3 4 5.2v6.1h-3.5v-5.4c0-1.3 0-2.9-1.8-2.9s-2.1 1.4-2.1 2.8v5.5H9.8z"/>'),
-  maps:glyph('<path fill="#fff" d="M12 2.3a7 7 0 0 0-7 7c0 5.2 7 12.4 7 12.4s7-7.2 7-12.4a7 7 0 0 0-7-7z"/><circle cx="12" cy="9.3" r="2.7" fill="currentColor"/>'),
-  method:glyph('<path fill="#fff" d="M11 2.6c.6 4.7 2.9 7 7.6 7.6-4.7.6-7 2.9-7.6 7.6-.6-4.7-2.9-7-7.6-7.6 4.7-.6 7-2.9 7.6-7.6z"/><path fill="#fff" opacity=".8" d="M18.4 14.6c.3 2.1 1.3 3.1 3.4 3.4-2.1.3-3.1 1.3-3.4 3.4-.3-2.1-1.3-3.1-3.4-3.4 2.1-.3 3.1-1.3 3.4-3.4z"/>'),
-  practice:glyph('<path fill="#fff" d="M12 3.6c2 2.3 3 4.7 3 7.4s-1 5.3-3 7c-2-1.7-3-4.3-3-7s1-5.1 3-7.4z"/><path fill="#fff" opacity=".82" d="M2.9 9.4c3.2.2 5.8 1.6 7.4 4.3.7 1.1 1.1 2.5 1.7 4.4-2.8 0-5.2-.8-6.9-2.4-1.5-1.6-2.1-3.7-2.2-6.3zm18.2 0c-.1 2.6-.7 4.7-2.2 6.3-1.7 1.6-4.1 2.4-6.9 2.4.6-1.9 1-3.3 1.7-4.4 1.6-2.7 4.2-4.1 7.4-4.3z"/>'),
-  about:glyph('<circle cx="12" cy="7.9" r="4.1" fill="#fff"/><path fill="#fff" d="M4.3 20.3c.8-4.1 3.9-6.5 7.7-6.5s6.9 2.4 7.7 6.5z"/>')
+  whatsapp:glyph('<path fill="currentColor" d="M12 2.4a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.9-1.3A9.5 9.5 0 1 0 12 2.4z"/><path class="g-cut" d="M9.3 7.3c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.2 3.5 5.5 4.8 2.7 1.1 3.3.9 3.9.8.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4l-2-1c-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6z"/>'),
+  contact:glyph('<rect x="2.5" y="4.6" width="19" height="14.8" rx="3.4" fill="currentColor"/><circle class="g-cut" cx="8.6" cy="10.4" r="2.3"/><path class="g-cut" d="M4.9 16.3c.5-2 2-3.1 3.7-3.1s3.2 1.1 3.7 3.1z"/><rect class="g-cut" x="13.6" y="9" width="5.4" height="1.7" rx=".85"/><rect class="g-cut" x="13.6" y="12.4" width="3.8" height="1.7" rx=".85" opacity=".7"/>'),
+  phone:glyph('<path fill="currentColor" d="M6.7 3.1c.5-.4 1.3-.3 1.7.2l2.2 2.8c.4.5.4 1.2 0 1.7l-1.3 1.6a11.8 11.8 0 0 0 5.3 5.3l1.6-1.3c.5-.4 1.2-.4 1.7 0l2.8 2.2c.5.4.6 1.2.2 1.7l-1.3 1.7c-.8 1-2.2 1.5-3.4 1.1C9.9 18.4 5.6 14.1 3.9 7.8c-.3-1.2.1-2.6 1.1-3.4z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M14.6 3.6a6.3 6.3 0 0 1 5.8 5.8M14.3 6.9a3.2 3.2 0 0 1 2.8 2.8" opacity=".8"/>'),
+  mail:glyph('<rect x="2.6" y="5" width="18.8" height="14" rx="3.2" fill="currentColor"/><path class="g-cut-line" d="M4.3 7.4 12 13l7.7-5.6" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'),
+  instagram:glyph('<defs><linearGradient id="bio-ig" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".28" stop-color="#fa7e1e"/><stop offset=".55" stop-color="#d62976"/><stop offset=".8" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.4" fill="none" stroke="url(#bio-ig)" stroke-width="2.1"/><circle cx="12" cy="12" r="4" fill="none" stroke="url(#bio-ig)" stroke-width="2.1"/><circle cx="17.2" cy="6.8" r="1.35" fill="url(#bio-ig)"/>'),
+  facebook:glyph('<path fill="currentColor" d="M13.7 21.2v-7.6h2.6l.4-3.1h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.3H8v3.1h2.6v7.6z"/>'),
+  threads:glyph('<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M16.5 11.2c-.4-2.6-2.1-3.9-4.4-3.9-2.8 0-4.5 2-4.5 4.7s1.7 4.7 4.4 4.7c2.3 0 3.9-1.2 3.9-3.2 0-1.8-1.4-2.8-3.3-2.8-1.6 0-2.8.9-2.8 2.1 0 1.1.9 1.9 2.2 1.9 2.4 0 3.4-1.9 3.4-4.5"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M20 13.3A8.1 8.1 0 1 1 18.8 7"/>'),
+  youtube:glyph('<rect x="2" y="5.4" width="20" height="13.2" rx="4.2" fill="currentColor"/><path class="g-cut" d="M10 9.1v5.8l5-2.9z"/>'),
+  linkedin:glyph('<rect x="3.6" y="9.2" width="3.5" height="11" rx=".8" fill="currentColor"/><circle cx="5.35" cy="5.4" r="2.05" fill="currentColor"/><path fill="currentColor" d="M9.8 9.2h3.3v1.6c.5-.9 1.8-1.9 3.6-1.9 3.4 0 4 2.3 4 5.2v6.1h-3.5v-5.4c0-1.3 0-2.9-1.8-2.9s-2.1 1.4-2.1 2.8v5.5H9.8z"/>'),
+  maps:glyph('<path fill="currentColor" d="M12 2.3a7 7 0 0 0-7 7c0 5.2 7 12.4 7 12.4s7-7.2 7-12.4a7 7 0 0 0-7-7z"/><circle class="g-cut" cx="12" cy="9.3" r="2.7"/>'),
+  method:glyph('<path fill="currentColor" d="M11 2.6c.6 4.7 2.9 7 7.6 7.6-4.7.6-7 2.9-7.6 7.6-.6-4.7-2.9-7-7.6-7.6 4.7-.6 7-2.9 7.6-7.6z"/><path fill="currentColor" opacity=".7" d="M18.4 14.6c.3 2.1 1.3 3.1 3.4 3.4-2.1.3-3.1 1.3-3.4 3.4-.3-2.1-1.3-3.1-3.4-3.4 2.1-.3 3.1-1.3 3.4-3.4z"/>'),
+  practice:glyph('<path fill="currentColor" d="M12 3.6c2 2.3 3 4.7 3 7.4s-1 5.3-3 7c-2-1.7-3-4.3-3-7s1-5.1 3-7.4z"/><path fill="currentColor" opacity=".72" d="M2.9 9.4c3.2.2 5.8 1.6 7.4 4.3.7 1.1 1.1 2.5 1.7 4.4-2.8 0-5.2-.8-6.9-2.4-1.5-1.6-2.1-3.7-2.2-6.3zm18.2 0c-.1 2.6-.7 4.7-2.2 6.3-1.7 1.6-4.1 2.4-6.9 2.4.6-1.9 1-3.3 1.7-4.4 1.6-2.7 4.2-4.1 7.4-4.3z"/>'),
+  about:glyph('<circle cx="12" cy="7.9" r="4.1" fill="currentColor"/><path fill="currentColor" d="M4.3 20.3c.8-4.1 3.9-6.5 7.7-6.5s6.9 2.4 7.7 6.5z"/>')
 };
 const GO='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8.2 15.8 15.8 8.2M10.2 8h5.8v5.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 // A drawn street plan for the Maps card (Zurich-like grid, the river, the route in).
@@ -63,11 +63,11 @@ function wheel(d){
 }
 
 // A photographic glass card: the platform-toned photo on the right under frosted glass,
-// a glossy glyph chip, a small label, the invitation in the serif, and a light that
+// the platform's mark beside a hairline, a small label, the invitation, and a light that
 // travels round the frame.
 function card(l,asset){
   const art=l.art==='map'?MAP_ART:`<img src="${e(asset('bio/'+l.art+'.webp'))}" alt="" width="200" height="100" loading="lazy" decoding="async">`;
-  return `<a class="bio-link${l.primary?' bio-link--primary':''}" data-tone="${l.tone}" href="${e(l.url)}" ${l.extra||''} data-bio-reveal><span class="bio-link__art" aria-hidden="true">${art}</span><span class="bio-link__glass" aria-hidden="true"></span><span class="bio-link__chip" aria-hidden="true">${GLYPHS[l.tone]}</span><span class="bio-link__copy"><span class="bio-link__eyebrow">${e(l.eyebrow)}</span><strong>${e(l.title)}</strong>${l.detail?`<small>${e(l.detail)}</small>`:''}</span><span class="bio-link__go" aria-hidden="true">${GO}</span></a>`;
+  return `<a class="bio-link${l.primary?' bio-link--primary':''}" data-tone="${l.tone}" href="${e(l.url)}" ${l.extra||''} data-bio-reveal><span class="bio-link__art" aria-hidden="true">${art}</span><span class="bio-link__glass" aria-hidden="true"></span><span class="bio-link__mark" aria-hidden="true">${GLYPHS[l.tone]}</span><span class="bio-link__copy"><span class="bio-link__eyebrow">${e(l.eyebrow)}</span><strong>${e(l.title)}</strong>${l.detail?`<small>${e(l.detail)}</small>`:''}</span><span class="bio-link__go" aria-hidden="true">${GO}</span></a>`;
 }
 
 /**
