@@ -19,7 +19,7 @@ const localeCache=new Map();
 let dict,locale,route,game,map,observer,portal,portalCleanup,heroVideo,elementVisual,technology,cleanupTilt=()=>{};
 let soundEnabled=false,navigating=false,pendingNavigation=null,selectedElement=0,archiveFilter='all',modal=null;
 let restoreFocus=null,arrival=null,modalCleanup=null,spotlight=null,mapRouteBounds=null;
-let portraitGleamed=false;
+let portraitGleamed=false,portraitGleamPending=false;
 const readStore=(store,key)=>{try{return store.getItem(key);}catch{return null;}};
 const writeStore=(store,key,value)=>{try{store.setItem(key,value);}catch{}};
 const availableStorage=name=>{try{return window[name];}catch{return null;}};
@@ -90,7 +90,7 @@ function revealPortrait(){
   if(route!=='home'||portal||arrival||navigating||!readStore(sessionStorage,'matthew-entered'))return;
   const hero=document.getElementById('hero');if(!hero)return;
   hero.classList.add('portrait-alive');
-  if(!portraitGleamed){portraitGleamed=true;hero.classList.add('portrait-arrived');}
+  if(portraitGleamPending&&!portraitGleamed){portraitGleamed=true;portraitGleamPending=false;hero.classList.add('portrait-arrived');}
 }
 function playHero(){
   const video=heroVideo;if(!video)return;
@@ -128,6 +128,7 @@ function prepareArrival(){
   const update=()=>{const label=video.paused?dict.common.play:dict.common.pause;play.innerHTML=icon(video.paused?'play':'pause');play.setAttribute('aria-label',label);play.title=label;icons();};
   const dismiss=()=>{
     if(closing)return;closing=true;video.pause();clearTimeout(hideTimer);
+    if(dialog.open&&!portraitGleamed)portraitGleamPending=true;
     stopAtmosphere?.();stopAtmosphere=null;
     if(dialog.contains(transitionCanvas))document.body.append(transitionCanvas);
     dialog.close();dialog.remove();arrival=null;

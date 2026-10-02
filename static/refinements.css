@@ -19,22 +19,30 @@ main h1[tabindex="-1"]:focus {outline:none}
 .portal-brand .mh-monogram {font-size:54px;margin-bottom:8px}
 @keyframes monogram-gleam {0%,65%{background-position:100% 0}88%,100%{background-position:0 0}}
 
-.heritage-portrait:not(.portrait-gleam) {
-  filter:drop-shadow(0 18px 30px #28101e40) drop-shadow(0 0 5px #ffffff7a) drop-shadow(0 0 16px #fff8fc38);
+.heritage-hero {--portrait-lift:8px;--portrait-cycle:6.8s;--portrait-shine-duration:2.6s}
+.heritage-portrait.portrait-main {filter:drop-shadow(0 18px 30px #28101e35) drop-shadow(0 0 3px #ffffff7a)}
+.heritage-portrait.portrait-aura {
+  opacity:.32;
+  filter:brightness(0) invert(1) blur(.6px) drop-shadow(0 0 7px #fffaf5) drop-shadow(0 0 19px #fff6efcc);
+  pointer-events:none;
 }
-.portrait-alive .heritage-figure,.tony-cutout {animation:portrait-float 7s ease-in-out infinite}
+.portrait-alive .heritage-figure {animation:portrait-float var(--portrait-cycle) ease-in-out infinite;transform-origin:50% 60%}
+.portrait-alive .portrait-aura {animation:portrait-breathe var(--portrait-cycle) ease-in-out infinite}
+.tony-cutout {animation:about-portrait-float 7s ease-in-out infinite}
 .heritage-portrait.portrait-gleam {
   opacity:0;
   filter:brightness(0) invert(1);
-  mask-image:linear-gradient(128deg,transparent 43%,#000 49%,transparent 55%);
-  mask-size:300% 300%;
+  mask-image:linear-gradient(128deg,transparent 47%,#000 50%,transparent 53%);
+  mask-size:180% 180%;
   mask-repeat:no-repeat;
   mask-position:100% 100%;
   pointer-events:none;
 }
-.portrait-arrived .portrait-gleam {animation:portrait-gleam 2.8s ease-in-out .25s 1 both}
-@keyframes portrait-float {0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes portrait-gleam {0%{opacity:0;mask-position:100% 100%}18%,72%{opacity:.48}100%{opacity:0;mask-position:0 0}}
+.portrait-arrived .portrait-gleam {animation:portrait-gleam var(--portrait-shine-duration) cubic-bezier(.22,.61,.36,1) .3s 1 both}
+@keyframes portrait-float {0%,100%{transform:translate3d(0,0,0) rotate(-.15deg)}50%{transform:translate3d(0,calc(-1 * var(--portrait-lift,5px)),0) rotate(.15deg)}}
+@keyframes about-portrait-float {0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes portrait-breathe {0%,100%{opacity:.24}50%{opacity:.5}}
+@keyframes portrait-gleam {0%{opacity:0;mask-position:100% 100%}18%,72%{opacity:.62}100%{opacity:0;mask-position:0 0}}
 
 .language-option.auto-selecting::after {
   content:'';
@@ -138,10 +146,13 @@ main h1[tabindex="-1"]:focus {outline:none}
 .game-window .mindset-content {padding-bottom:28px}
 .game-dialog.returning .dialog-atmosphere {opacity:0;transition:opacity .52s ease}
 
-.contact-channels>a {display:grid;grid-template-columns:52px minmax(0,1fr) 20px;gap:18px;align-items:center;padding:21px 0;min-width:0}
-.contact-symbol {width:50px;height:50px;display:grid;place-items:center;border:1px solid #c81d7738;border-radius:14px;background:linear-gradient(135deg,#ffe2f255,#e7fff17d);color:#b31f6d}
-.contact-symbol svg {width:22px;height:22px}
-.contact-channel-copy {min-width:0}
+.contact-details .contact-channels>a {display:grid;grid-template-columns:52px minmax(0,1fr) 20px;gap:18px;align-items:center;padding:21px 0;min-width:0}
+.contact-channels .contact-symbol {grid-area:1 / 1;margin:0;width:50px;height:50px;display:grid;place-items:center;border:1px solid #c81d7738;border-radius:14px;background:linear-gradient(135deg,#fff8fcad,#e7fff17d);color:#a71a65;box-shadow:inset 0 1px 0 #ffffffc7,0 5px 16px -10px #8d315e45;transition:transform .25s var(--ease),border-color .25s,box-shadow .25s}
+.contact-channels .contact-symbol svg {grid-area:1 / 1;place-self:center;display:block;width:22px;height:22px;stroke-width:1.75}
+.contact-channels .contact-channel-copy {grid-area:1 / 2;margin:0;min-width:0}
+.contact-channels>a>svg {grid-area:1 / 3;width:18px;height:18px;color:#765368;transition:transform .25s var(--ease),color .25s}
+.contact-channels>a:is(:hover,:focus-visible) .contact-symbol {transform:translateY(-2px);border-color:#c81d7766;box-shadow:inset 0 1px 0 #fff,0 8px 22px -12px #b32b7066}
+.contact-channels>a:is(:hover,:focus-visible)>svg {transform:translate(2px,-2px);color:#a71a65}
 .contact-channel-copy>span {display:block;margin-bottom:7px;color:#654c5e;font-size:10px;line-height:1.4}
 .contact-channels .contact-channel-copy strong {display:block;font-size:23px;font-weight:500;line-height:1.4;overflow-wrap:anywhere}
 .studio-address .eyebrow {display:flex;align-items:center;gap:10px}
@@ -226,8 +237,8 @@ main h1[tabindex="-1"]:focus {outline:none}
   .game-window .mindset-field{height:auto;aspect-ratio:1;min-height:300px}
   .game-window .mindset-meaning .mindset-field{aspect-ratio:auto;min-height:480px;height:100%}
   .game-window .mindset-game[data-phase=finalPhoto] .mindset-field{min-height:300px}
-  .contact-channels>a{grid-template-columns:44px minmax(0,1fr) 16px;gap:14px;padding:18px 0}
-  .contact-symbol{width:42px;height:42px;border-radius:12px}
+  .contact-details .contact-channels>a{grid-template-columns:44px minmax(0,1fr) 18px;gap:14px;padding:18px 0}
+  .contact-channels .contact-symbol{width:42px;height:42px;border-radius:12px}
   .contact-channels .contact-channel-copy strong{font-size:19px}
   .map-frame{height:480px;border-radius:20px}
   .map-wordmark{font-size:31px;gap:12px}.map-wordmark small{font-size:8px}
@@ -248,7 +259,9 @@ main h1[tabindex="-1"]:focus {outline:none}
 @media(max-height:650px){.arrival-title{font-size:18px}.arrival-label{display:none}.arrival-enter{gap:4px;padding-block:6px}.arrival-link{font-size:9px}.game-window .mindset-field{min-height:300px}.game-window .mindset-meaning .mindset-field{min-height:400px}}
 @media(prefers-reduced-motion:reduce){
   .mh-monogram{animation:none;background:none;-webkit-text-fill-color:currentColor}
-  .portrait-alive .heritage-figure,.tony-cutout,.portrait-arrived .portrait-gleam,.language-option.auto-committing,.studio-pin-beam,.modal-surface,.dialog-atmosphere{animation:none}
+  .portrait-alive .heritage-figure,.portrait-alive .portrait-aura,.tony-cutout,.portrait-arrived .portrait-gleam,.language-option.auto-committing,.studio-pin-beam,.modal-surface,.dialog-atmosphere{animation:none}
   .portrait-gleam{display:none}
+  .contact-channels .contact-symbol,.contact-channels>a>svg{transition:none}
+  .contact-channels>a:is(:hover,:focus-visible) .contact-symbol,.contact-channels>a:is(:hover,:focus-visible)>svg{transform:none}
   .game-dialog.returning .dialog-atmosphere{transition:none}
 }
