@@ -136,9 +136,15 @@ body.bio-page{min-height:100svh}
 .bio-wheel__sector.is-active .bio-wheel__edge{opacity:1}
 .bio-wheel__dust circle{opacity:.25}
 .bio-wheel__labels{position:absolute;inset:0;border-radius:50%}
-.bio-wheel__seg{position:absolute;left:50%;top:50%;display:grid;justify-items:center;gap:5px;min-width:78px;padding:7px 8px;border-radius:16px;color:#fff5fb;font-size:clamp(9.5px,2.6cqw,11.5px);font-weight:600;line-height:1.15;text-shadow:0 1px 8px rgba(0,0,0,.6);transform:translate(-50%,-50%) rotate(var(--a)) translateY(-31.5cqw) rotate(calc(var(--a) * -1 - var(--spin,0deg)));transition:color .4s}
+.bio-wheel__seg{position:absolute;left:50%;top:50%;display:grid;justify-items:center;gap:5px;padding:0;border-radius:16px;color:#fff5fb;font-size:clamp(9.5px,2.6cqw,11.5px);font-weight:600;line-height:1.15;text-shadow:0 1px 8px rgba(0,0,0,.6);transform:translate(-50%,-50%) rotate(var(--a)) translateY(-31.5cqw) rotate(calc(var(--a) * -1 - var(--spin,0deg)));transition:color .4s}
 .bio-wheel__seg svg.lucide{width:clamp(18px,5.6cqw,24px);height:clamp(18px,5.6cqw,24px);color:var(--tint);filter:drop-shadow(0 0 6px var(--tint))}
-.bio-wheel__label{display:grid;justify-items:center;gap:5px;transition:transform .5s var(--ease)}
+.bio-wheel__label{position:relative;display:grid;justify-items:center;gap:5px;min-width:76px;padding:8px 10px 7px;border:1px solid rgba(255,255,255,.2);border-radius:15px;background:rgba(255,255,255,.07);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 8px 18px -10px rgba(0,0,0,.7);transition:transform .5s var(--ease),border-color .4s,background .4s}
+.bio-wheel__label::after{content:'';position:absolute;inset:-1px;border:1.5px solid var(--tint);border-radius:inherit;opacity:0;pointer-events:none}
+.bio-wheel__seg[aria-selected="true"] .bio-wheel__label{border-color:color-mix(in srgb,var(--tint) 75%,transparent);background:color-mix(in srgb,var(--tint) 22%,transparent)}
+.bio-wheel__seg.is-pinging .bio-wheel__label{animation:bio-nudge 1.3s cubic-bezier(.2,.7,.3,1)}
+.bio-wheel__seg.is-pinging .bio-wheel__label::after{animation:bio-ping 1.3s cubic-bezier(.2,.7,.3,1)}
+.bio-wheel__sector.is-pinging:not(.is-active) .bio-wheel__flare{animation:bio-sector-ping 1.3s ease-out}
+.bio-wheel__seg:active .bio-wheel__label{transform:scale(.94)}
 .bio-wheel__seg[aria-selected="true"] .bio-wheel__label{transform:scale(1.14)}
 .bio-wheel__seg[aria-selected="true"] svg.lucide{color:#fff;filter:drop-shadow(0 0 8px var(--tint)) drop-shadow(0 0 14px var(--tint))}
 .bio-wheel__seg:focus-visible{outline:2px solid #ffb4dc;outline-offset:2px}
@@ -213,3 +219,6 @@ body.bio-page{min-height:100svh}
 .bio-sound-dialog.is-leaving .portal-ambient{opacity:0;transition:opacity .4s}
 .bio-sound-dialog .portal-shade{background:rgba(3,2,4,.985)}
 .bio-sound-dialog .sound-yes:focus-visible{outline:1px solid #f3cf9a99;outline-offset:5px}
+@keyframes bio-ping{0%{opacity:.95;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes bio-nudge{0%,100%{transform:scale(1)}20%{transform:scale(1.1)}}
+@keyframes bio-sector-ping{0%{opacity:0}25%{opacity:.75}100%{opacity:0}}

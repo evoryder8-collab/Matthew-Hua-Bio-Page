@@ -180,11 +180,33 @@ function mountWheel(root,{onPick}){
     if(!destroyed&&visible&&!document.hidden&&!motion.matches)frame=requestAnimationFrame(tick);
   }
   const wake=()=>{if(destroyed||frame!==null||!visible||document.hidden||motion.matches)return;last=null;frame=requestAnimationFrame(tick);};
-  const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{visible=entries.some(entry=>entry.isIntersecting);wake();}):null;
+  // Until the first tap, a ring pings from each element in turn and its sector glows, so
+  // the labels read as things to press rather than decoration.
+  let hintTimer=0,hinted=false,hintIndex=0,active=-1;
+  function ping(){
+    hintTimer=0;
+    if(hinted||destroyed)return;
+    if(visible&&!document.hidden&&!motion.matches){
+      do{hintIndex=(hintIndex+1)%6;}while(hintIndex===active);
+      for(const node of [segments[hintIndex],sectors[hintIndex]])node.classList.remove('is-pinging');
+      void root.offsetWidth;
+      for(const node of [segments[hintIndex],sectors[hintIndex]])node.classList.add('is-pinging');
+    }
+    hintTimer=setTimeout(ping,1500);
+  }
+  function stopHint(){
+    if(hinted)return;hinted=true;clearTimeout(hintTimer);hintTimer=0;
+    [...segments,...sectors].forEach(node=>node.classList.remove('is-pinging'));
+  }
+  const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{
+    visible=entries.some(entry=>entry.isIntersecting);wake();
+    if(visible&&!hinted&&!hintTimer)hintTimer=setTimeout(ping,900);
+  }):null;
   observer?.observe(root);if(!observer)visible=true;
   document.addEventListener('visibilitychange',wake);
   root.addEventListener('pointerdown',event=>{down={x:event.clientX,y:event.clientY};},{passive:true});
   root.addEventListener('click',event=>{
+    stopHint();
     const segment=event.target.closest('.bio-wheel__seg');
     if(segment){onPick(Number(segment.dataset.element));return;}
     if(down&&Math.hypot(event.clientX-down.x,event.clientY-down.y)>10)return;
@@ -199,7 +221,7 @@ function mountWheel(root,{onPick}){
     const index=segments.indexOf(event.target.closest('.bio-wheel__seg'));if(index<0)return;
     const next={ArrowRight:index+1,ArrowDown:index+1,ArrowLeft:index-1,ArrowUp:index-1,Home:0,End:5}[event.key];
     if(next===undefined)return;
-    event.preventDefault();const wrapped=(next+6)%6;segments[wrapped].focus({preventScroll:true});onPick(wrapped);
+    stopHint();event.preventDefault();const wrapped=(next+6)%6;segments[wrapped].focus({preventScroll:true});onPick(wrapped);
   });
   apply();
   return {
@@ -209,11 +231,11 @@ function mountWheel(root,{onPick}){
       target=want+360*Math.ceil((theta+120-want)/360);holdUntil=0;wake();
     },
     setActive(index){
-      root.classList.add('has-active');
+      active=index;root.classList.add('has-active');
       segments.forEach((segment,i)=>{segment.setAttribute('aria-selected',String(i===index));segment.tabIndex=i===index?0:-1;});
       sectors.forEach((sector,i)=>sector.classList.toggle('is-active',i===index));
     },
-    destroy(){destroyed=true;observer?.disconnect();document.removeEventListener('visibilitychange',wake);if(frame!==null)cancelAnimationFrame(frame);}
+    destroy(){destroyed=true;clearTimeout(hintTimer);observer?.disconnect();document.removeEventListener('visibilitychange',wake);if(frame!==null)cancelAnimationFrame(frame);}
   };
 }
 
@@ -255,9 +277,9 @@ async function showStage(index,{instant=false}={}){
     if(over>0)scrollBy({top:Math.min(over,box.top-24),behavior:'smooth'});
   },reveal?260:120);
 }
-function selectElement(index,{quiet=false,instant=false}={}){
+function selectElement(index,{quiet=false,instant=false,spin=true}={}){
   index=Math.max(0,Math.min(5,Number(index)||0));
-  wheel?.spinTo(index,{instant});
+  if(spin)wheel?.spinTo(index,{instant});
   wheel?.setActive(index);
   if(!quiet){cue('wink');tabSparks?.burst();}
   const panel=document.getElementById('element-panel');
@@ -442,7 +464,8 @@ function render({hydrate=false}={}){
   if(tablist)tabSparks=mountTabSparks(tablist,{reducedMotion:motion});
   wheel=mountWheel(shell.querySelector('[data-bio-wheel]'),{onPick:index=>selectElement(index)});
   setupLinks();setupLanguage();setupMap();updateSoundButtons();
-  if(keep>=0)selectElement(keep,{quiet:true,instant:true});
+  // Mindset is chosen from the start (its game waits below); the wheel keeps cruising.
+  selectElement(keep>=0?keep:0,{quiet:true,instant:true,spin:false});
   document.documentElement.classList.add('ready');
   let asked=false;try{asked=!!sessionStorage.getItem('matthew-bio-asked');}catch{}
   if(resume||asked)film.start();else askSound();
