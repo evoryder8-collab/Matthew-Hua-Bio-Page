@@ -287,11 +287,11 @@ function createRenderers() {
         st.rings = st.rings.filter((start) => time - start < 3.4);
       });
       const bg = ctx.createLinearGradient(0, 0, w, 0);
-      bg.addColorStop(0, '#061419'); bg.addColorStop(0.47, '#0a1016'); bg.addColorStop(0.53, '#140b12'); bg.addColorStop(1, '#1e0b14');
+      bg.addColorStop(0, '#05182b'); bg.addColorStop(0.46, '#0a1220'); bg.addColorStop(0.54, '#1a0d0c'); bg.addColorStop(1, '#2a110b');
       ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
       ctx.globalCompositeOperation = 'lighter';
-      light(ctx, C.mint, w * 0.12, h * 0.55, w * 0.42, 0.16);
-      light(ctx, C.pink, w * 0.88, h * 0.75, w * 0.5, 0.32);
+      light(ctx, [120, 190, 255], w * 0.12, h * 0.5, w * 0.45, 0.24);
+      light(ctx, [255, 140, 90], w * 0.88, h * 0.75, w * 0.5, 0.3);
       light(ctx, C.ember, w * 0.8, h * 1.05, w * 0.4, 0.22);
       // Frost: hexagonal branches growing in, glinting as light passes along them.
       ctx.lineCap = 'round';
@@ -339,8 +339,8 @@ function createRenderers() {
         ctx.globalAlpha = Math.pow(1 - k, 2) * 0.32; ctx.strokeStyle = rgba(C.white, 1); ctx.lineWidth = 1.2;
         ctx.beginPath(); ctx.arc(cx, cy, r * (1.25 + k * 2.6), 0, TAU); ctx.stroke();
       }
-      light(ctx, C.mint, cx - r * 0.45, cy, r * 3.3, 0.4);
-      light(ctx, C.pink, cx + r * 0.45, cy, r * 3.3, 0.42);
+      light(ctx, [150, 205, 255], cx - r * 0.45, cy, r * 3.3, 0.42);
+      light(ctx, [255, 160, 110], cx + r * 0.45, cy, r * 3.3, 0.42);
       ctx.globalCompositeOperation = 'source-over';
       const core = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.35, r * 0.05, cx, cy, r);
       core.addColorStop(0, 'rgba(255,255,255,1)');
@@ -349,8 +349,8 @@ function createRenderers() {
       ctx.globalAlpha = 1; ctx.fillStyle = core;
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill();
       ctx.lineWidth = 1.5;
-      ctx.strokeStyle = rgba(C.mint, 0.8); ctx.beginPath(); ctx.arc(cx, cy, r + 1.5, Math.PI * 0.55, Math.PI * 1.45); ctx.stroke();
-      ctx.strokeStyle = rgba(C.pink, 0.8); ctx.beginPath(); ctx.arc(cx, cy, r + 1.5, -Math.PI * 0.45, Math.PI * 0.45); ctx.stroke();
+      ctx.strokeStyle = rgba([150, 205, 255], 0.85); ctx.beginPath(); ctx.arc(cx, cy, r + 1.5, Math.PI * 0.55, Math.PI * 1.45); ctx.stroke();
+      ctx.strokeStyle = rgba([255, 160, 110], 0.85); ctx.beginPath(); ctx.arc(cx, cy, r + 1.5, -Math.PI * 0.45, Math.PI * 0.45); ctx.stroke();
       ctx.globalAlpha = 1;
     },
   };
