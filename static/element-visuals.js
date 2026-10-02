@@ -380,7 +380,7 @@ function createRenderers() {
   const O2 = [150, 225, 255], O2_CORE = [235, 250, 255], CO2 = [255, 50, 60], CO2_CORE = [255, 140, 130];
   R.breath = {
     init(st, w, h) {
-      const S = Math.min(w * 0.5, h * 0.56), cx = w / 2, top = h * 0.05;
+      const S = Math.min(w * 0.56, h * 0.56), cx = w / 2, top = Math.max(h * 0.05, (h * 0.62 - S * 1.02) / 2);
       Object.assign(st, { S, cx, top, s: 0.25, sv: 0, o2: 0.3, red: 0, stars: [], co2: [], puffs: [], o2Clock: 0, co2Clock: 0 });
       st.fork = { x: cx, y: top + S * 0.3 };
       st.lungs = [-1, 1].map((side) => ({ side, medialX: cx + side * S * 0.075, apexY: top + S * 0.18, W: S * 0.47, H: S * 0.82, notch: side === 1 }));

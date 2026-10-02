@@ -257,7 +257,11 @@ function selectElement(index){
   if(index===0){
     panel.innerHTML='<div id="mindset-host"></div>';const host=document.getElementById('mindset-host');
     game=mountMindset(host,{copy:dict.game,asset,reducedMotion:motion.matches,onPhaseChange:phase=>spotlight?.syncPhase(phase),onSound:cue,onContinue:continueFromGame});
-    if(route==='home')spotlight=mountGameSpotlight(host,{game,copy:dict.game,common:dict.common,canOpen:()=>!document.hidden&&!portal&&!arrival&&!modal&&!navigating&&!document.body.classList.contains('menu-open'),icons,reducedMotion:motion,memory:gameMemory,onClose:()=>elementInvite?.refresh()});
+    if(route==='home')spotlight=mountGameSpotlight(host,{game,copy:dict.game,common:dict.common,canOpen:()=>!document.hidden&&!portal&&!arrival&&!modal&&!navigating&&!document.body.classList.contains('menu-open'),icons,reducedMotion:motion,memory:gameMemory,onClose:reason=>{
+      // Closed early with X: the elements still move on to Hot / Cold, as after the journey.
+      if(reason==='dismissed')queueMicrotask(()=>{selectElement(1);elementInvite?.nudge();});
+      elementInvite?.refresh();
+    }});
   }
   else {panel.innerHTML=renderElement(index,dict);elementVisual=mountElementVisual(document.getElementById('element-visual-host'),index,{reducedMotion:motion.matches});}
   icons();

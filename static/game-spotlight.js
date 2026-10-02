@@ -111,7 +111,7 @@ export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedM
     restore();
     const focus=previousFocus?.isConnected&&previousFocus!==document.body?previousFocus:expand;
     focus.focus({preventScroll:true});
-    onClose();
+    onClose('dismissed');
   }
 
   // "Let's continue": walk into the light; while the screen is white, the game returns
