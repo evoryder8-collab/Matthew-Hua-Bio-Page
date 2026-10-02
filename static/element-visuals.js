@@ -483,20 +483,35 @@ function createRenderers() {
   };
 
   /* BODY: a responsive surface like skin and fascia. Two open hands, each on its own
-     spring, lower, press, glide and lift in turns; the surface takes the print of palm
-     and fingertips and answers with travelling waves: a conversation through touch. */
+     spring, lower, press and hold, glide and lift in turns. Soft fingers relax into a
+     curl and flatten along the surface when they press; the surface takes the print of
+     palm and fingertips, bulges at the rim and answers with travelling waves. */
   const FINGERS = [{ x: -0.36, len: 0.62, a: -0.17 }, { x: -0.12, len: 0.8, a: -0.05 }, { x: 0.12, len: 0.86, a: 0.04 }, { x: 0.36, len: 0.74, a: 0.14 }];
   const PALM_CELLS = 4.6, LAYER_W = 92;
-  function fingertips(mirror, spread, curl) {
-    const tips = FINGERS.map((f) => {
-      const a = f.a * (1 + spread), L = f.len * (1 - curl * 0.18);
-      return [f.x * (1 + spread * 0.08) + Math.sin(a) * L, -0.4 - Math.cos(a) * L];
+  // Finger and thumb joints in palm-width units (fingers toward -y), for one right hand.
+  function handGeometry(contact, bends) {
+    const relax = 1 - contact, spread = contact * 0.32;
+    const digits = FINGERS.map((f, n) => {
+      const outward = f.x < 0 ? -1 : 1;
+      let x = f.x * (1 + spread * 0.08), y = -0.38, a = f.a * (1 + spread);
+      const pts = [[x, y]];
+      [0.46, 0.31, 0.23].forEach((part, j) => {
+        // Relaxed fingers arc softly inward and shorten (curl); pressed ones lie flat.
+        // Fingers never stand straight: each joint curves them a little inward, more when
+        // they press and knead (a soft cup that follows the hollow they make).
+        a += (bends[n] - outward * (0.06 + contact * 0.11) * (1 + j * 0.6)) * (j ? 1 : 0.4);
+        const L = part * f.len * (1 - relax * (0.05 + j * 0.09) - contact * j * 0.05);
+        x += Math.sin(a) * L; y -= Math.cos(a) * L; pts.push([x, y]);
+      });
+      return { pts, width: n === 0 ? 0.19 : 0.215 };
     });
-    const ta = 0.95 + spread * 0.25;
-    tips.push([0.42 + Math.sin(ta) * 0.56, 0.1 - Math.cos(ta) * 0.56]);
-    return tips.map(([x, y]) => [mirror ? -x : x, y]);
+    let x = 0.4, y = 0.1, a = 0.95 + spread * 0.3;
+    const thumb = [[x, y]];
+    [0.32, 0.27].forEach((part, j) => { a += bends[4] * (j ? 1 : 0.4) - relax * 0.12; x += Math.sin(a) * part; y -= Math.cos(a) * part; thumb.push([x, y]); });
+    digits.push({ pts: thumb, width: 0.245 });
+    return digits;
   }
-  function paintHand(layer, mirror, spread, curl, c, cb) {
+  function paintHand(layer, mirror, digits, contact, c, cb) {
     const g = layer.getContext('2d'), W = LAYER_W;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.clearRect(0, 0, layer.width, layer.height);
@@ -511,22 +526,24 @@ function createRenderers() {
     g.lineTo(-0.22 * W, 0.98 * W); g.lineTo(0.24 * W, 0.98 * W); g.lineTo(0.35 * W, 0.56 * W);
     g.quadraticCurveTo(0.56 * W, 0.26 * W, 0.46 * W, -0.38 * W);
     g.closePath(); g.fill();
-    FINGERS.forEach((f, n) => {
-      let x = f.x * (1 + spread * 0.08) * W, y = -0.38 * W, a = f.a * (1 + spread);
-      const parts = [0.46, 0.31, 0.23];
-      parts.forEach((part, j) => {
-        const L = part * f.len * W * (1 - curl * (0.1 + j * 0.12));
-        g.lineWidth = (0.22 - j * 0.025 - (n === 0 ? 0.02 : 0)) * W;
-        g.beginPath(); g.moveTo(x, y); x += Math.sin(a) * L; y -= Math.cos(a) * L; g.lineTo(x, y); g.stroke();
-      });
-    });
-    let x = 0.4 * W, y = 0.1 * W;
-    const ta = 0.95 + spread * 0.25;
-    [0.32, 0.26].forEach((part, j) => {
-      g.lineWidth = (0.25 - j * 0.03) * W;
-      g.beginPath(); g.moveTo(x, y); x += Math.sin(ta + j * 0.12) * part * W; y -= Math.cos(ta + j * 0.12) * part * W; g.lineTo(x, y); g.stroke();
-    });
-    // Tint it like light held in skin: bright through the palm, coloured at the edges.
+    for (const digit of digits) {
+      const p = digit.pts;
+      // A soft, tapering curve through the joints instead of straight sticks.
+      for (let j = 1; j < p.length; j++) {
+        g.lineWidth = digit.width * W * (1 - (j - 1) * 0.1);
+        g.beginPath();
+        const [x0, y0] = p[j - 1], [x1, y1] = p[j];
+        const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+        const prev = p[j - 2] || [x0 - (x1 - x0), y0 - (y1 - y0)];
+        g.moveTo(x0 * W, y0 * W);
+        g.quadraticCurveTo((mx + (x0 - prev[0]) * 0.15) * W, (my + (y0 - prev[1]) * 0.15) * W, x1 * W, y1 * W);
+        g.stroke();
+      }
+      // Soft knuckles at the joints, and pads that flatten slightly under pressure.
+      for (let j = 1; j < p.length - 1; j++) { g.beginPath(); g.arc(p[j][0] * W, p[j][1] * W, digit.width * W * (0.53 - j * 0.04), 0, TAU); g.fill(); }
+      const [tx, ty] = p[p.length - 1];
+      g.beginPath(); g.ellipse(tx * W, ty * W, digit.width * W * 0.42 * (1 + contact * 0.22), digit.width * W * 0.4, 0, 0, TAU); g.fill();
+    }
     g.shadowBlur = 0;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.globalCompositeOperation = 'source-atop';
@@ -539,7 +556,7 @@ function createRenderers() {
     init(st, w, h) {
       const cols = Math.round(clamp(w / 20, 26, 50)), rows = Math.round(cols * 0.5);
       Object.assign(st, { cols, rows, x0: w * 0.06, x1: w * 0.94, y0: h * 0.16, y1: h * 0.7, z: new Float32Array(cols * rows), v: new Float32Array(cols * rows) });
-      st.hands = [0, 1].map((i) => ({ i, lift: 1, vlift: 0, u: 0.5, v: 0.5, angle: 0, layer: Object.assign(document.createElement('canvas'), { width: 256, height: 300 }) }));
+      st.hands = [0, 1].map((i) => ({ i, lift: 1, vlift: 0, u: 0.5, v: 0.5, angle: 0, contact: 0, bend: new Float32Array(5), vbend: new Float32Array(5), layer: Object.assign(document.createElement('canvas'), { width: 256, height: 300 }) }));
     },
     // Massage rhythm per hand: lower 0.55 s, hold about 2 s with a slow glide, release.
     path(i, t) {
@@ -554,7 +571,7 @@ function createRenderers() {
     project(st, i, j, z, w) {
       const fj = clamp(j / (st.rows - 1), 0, 1), depth = 0.78 + 0.22 * fj;
       const x = w / 2 + ((st.x0 + (st.x1 - st.x0) * i / (st.cols - 1)) - w / 2) * depth;
-      const y = st.y0 + (st.y1 - st.y0) * Math.pow(fj, 1.15) - z * (28 + 32 * fj);
+      const y = st.y0 + (st.y1 - st.y0) * Math.pow(fj, 1.15) - z * (46 + 54 * fj);
       return [x, y, depth];
     },
     draw(ctx, w, h, t, st) {
@@ -562,13 +579,19 @@ function createRenderers() {
       advance(st, t, (dt, time) => {
         for (const hand of st.hands) {
           const p = this.path(hand.i, time);
-          const du = p.u - hand.u;
+          const du = (p.u - hand.u) / Math.max(dt, 1e-3);
           hand.u = p.u; hand.v = p.v;
-          // A hand has weight: it lowers onto a spring, settles a touch past contact, lifts away.
           hand.vlift += (40 * ((1 - 1.5 * p.press) - hand.lift) - 8.5 * hand.vlift) * dt;
           hand.lift += hand.vlift * dt;
-          hand.angle += ((hand.i ? -0.1 : 0.1) + clamp(du / Math.max(dt, 1e-3), -1, 1) * 0.25 - hand.angle) * clamp(dt * 3);
+          hand.angle += ((hand.i ? -0.1 : 0.1) + clamp(du, -1, 1) * 0.25 - hand.angle) * clamp(dt * 3);
           hand.contact = clamp((0.15 - hand.lift) / 0.45);
+          // Each finger is its own soft spring: it lags the hand's glide and settles.
+          for (let n = 0; n < 5; n++) {
+            const outward = n === 4 ? 1 : FINGERS[n].x < 0 ? -1 : 1;
+            const target = -clamp(du, -1.5, 1.5) * 0.14 + Math.sin(time * 0.8 + n * 1.3) * 0.03 * (1 - hand.contact * 0.5);
+            hand.vbend[n] += (55 * (target - hand.bend[n]) - 7 * hand.vbend[n]) * dt;
+            hand.bend[n] += hand.vbend[n] * dt;
+          }
         }
         const steps = 2, sdt = dt / steps;
         for (let s = 0; s < steps; s++) {
@@ -579,17 +602,21 @@ function createRenderers() {
           for (const hand of st.hands) {
             if (hand.contact <= 0) continue;
             const hi = hand.u * (cols - 1), hj = hand.v * (rows - 1), ca = Math.cos(hand.angle), sa = Math.sin(hand.angle);
-            // The hand pushes the surface toward a set depth, so a long hold gives a firm,
-            // stable dent (not an ever-deepening one) that rebounds in waves on release.
-            const press = (gi, gj, sigma, depth) => {
-              for (let j = Math.max(1, Math.floor(gj - 3 * sigma)); j < Math.min(rows - 1, gj + 3 * sigma); j++) for (let i = Math.max(1, Math.floor(gi - 3 * sigma)); i < Math.min(cols - 1, gi + 3 * sigma); i++) {
-                const n = j * cols + i, g = Math.exp(-((i - gi) ** 2 + (j - gj) ** 2) / (2 * sigma * sigma));
+            // The hand presses the surface toward a set depth: a firm, stable print that
+            // rebounds in waves on release; the displaced surface rises around the palm.
+            const shape = (gi, gj, sigma, depth, rim) => {
+              const reach = rim ? 3.4 * sigma : 3 * sigma;
+              for (let j = Math.max(1, Math.floor(gj - reach)); j < Math.min(rows - 1, gj + reach); j++) for (let i = Math.max(1, Math.floor(gi - reach)); i < Math.min(cols - 1, gi + reach); i++) {
+                const n = j * cols + i, d2 = (i - gi) ** 2 + (j - gj) ** 2, g = Math.exp(-d2 / (2 * sigma * sigma));
                 v[n] += 90 * hand.contact * g * (depth * hand.contact - z[n]) * sdt;
+                if (rim) { const r = Math.sqrt(d2) / sigma, ring = Math.exp(-((r - 2.3) ** 2) / 0.35); v[n] += 40 * hand.contact * ring * (0.22 * hand.contact - z[n]) * sdt; }
               }
             };
-            press(hi, hj + 0.3 * PALM_CELLS, 1.6, -0.55);   // heel and centre of the palm
-            for (const [x, y] of fingertips(hand.i === 1, hand.contact * 0.3, hand.contact)) {
-              press(hi + (x * ca - y * sa) * PALM_CELLS, hj + (x * sa + y * ca) * PALM_CELLS, 0.75, -0.4);
+            shape(hi, hj + 0.3 * PALM_CELLS, 1.7, -0.95, true);
+            for (const digit of handGeometry(hand.contact, hand.bend)) {
+              const [x0, y0] = digit.pts[digit.pts.length - 1];
+              const x = hand.i === 1 ? -x0 : x0;
+              shape(hi + (x * ca - y0 * sa) * PALM_CELLS, hj + (x * sa + y0 * ca) * PALM_CELLS, 0.8, -0.7, false);
             }
           }
           for (let n = 0; n < z.length; n++) z[n] += v[n] * sdt;
@@ -599,38 +626,54 @@ function createRenderers() {
       ctx.globalCompositeOperation = 'lighter';
       for (const hand of st.hands) {
         const [hx, hy] = this.project(st, hand.u * (cols - 1), hand.v * (rows - 1), 0, w);
-        light(ctx, hand.i ? C.mint : C.pink, hx, hy, Math.min(w, h) * 0.34, 0.08 + 0.14 * (hand.contact || 0));
+        light(ctx, hand.i ? C.mint : C.pink, hx, hy, Math.min(w, h) * 0.34, 0.08 + 0.14 * hand.contact);
       }
+      // Shading first: hollows darken, raised rims catch the light.
+      for (let j = 1; j < rows - 1; j++) for (let i = 1; i < cols - 1; i++) {
+        const value = z[j * cols + i];
+        if (Math.abs(value) < 0.04) continue;
+        const [x, y] = this.project(st, i, j, value, w);
+        if (value < 0) {
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.globalAlpha = Math.min(0.75, -value * 1.25);
+          ctx.drawImage(sprite([3, 1, 6]), x - 22, y - 14, 44, 28);
+        } else {
+          ctx.globalCompositeOperation = 'lighter';
+          light(ctx, C.mintB, x, y, 6 + value * 14, Math.min(0.5, value * 2.2));
+        }
+      }
+      ctx.globalCompositeOperation = 'lighter';
       ctx.lineWidth = 1;
       ctx.strokeStyle = rgba(C.white, 1);
       for (let j = 0; j < rows; j++) {
-        ctx.globalAlpha = 0.12 + 0.2 * (j / rows);
+        ctx.globalAlpha = 0.13 + 0.22 * (j / rows);
         ctx.beginPath();
         for (let i = 0; i < cols; i++) { const [x, y] = this.project(st, i, j, z[j * cols + i], w); if (!i) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
         ctx.stroke();
       }
       for (let i = 0; i < cols; i += 2) {
-        ctx.globalAlpha = 0.09; ctx.beginPath();
+        ctx.globalAlpha = 0.1; ctx.beginPath();
         for (let j = 0; j < rows; j++) { const [x, y] = this.project(st, i, j, z[j * cols + i], w); if (!j) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
         ctx.stroke();
       }
       for (let j = 1; j < rows - 1; j++) for (let i = 1; i < cols - 1; i++) {
         const value = z[j * cols + i];
-        if (Math.abs(value) < 0.05) continue;
+        if (value > -0.08) continue;
         const [x, y] = this.project(st, i, j, value, w);
-        light(ctx, value < 0 ? C.pinkB : C.mintB, x, y, 2 + Math.abs(value) * 10, Math.min(0.7, Math.abs(value) * 2.2));
+        light(ctx, C.pinkB, x, y, 2 + -value * 8, Math.min(0.6, -value * 1.4));
       }
-      // Hands, each with its shadow tightening beneath it as it comes down.
       const cellW = (st.x1 - st.x0) / (cols - 1), cellH = (st.y1 - st.y0) / (rows - 1);
       for (const hand of st.hands) {
         const c = hand.i ? C.mint : C.pink, cb = hand.i ? C.mintB : C.pinkB;
-        const lift = Math.max(0, hand.lift), contact = hand.contact || 0;
+        const lift = Math.max(0, hand.lift), contact = hand.contact;
         const hi = hand.u * (cols - 1), hj = hand.v * (rows - 1);
-        const [px, py, depth] = this.project(st, hi, hj, 0, w);
+        // Pressed hands sit down into their hollow.
+        const sink = z[Math.round(hj) * cols + Math.round(hi)] || 0;
+        const [px, py, depth] = this.project(st, hi, hj, sink * contact, w);
         ctx.globalCompositeOperation = 'source-over';
         ctx.globalAlpha = 0.5 * (1 - lift * 0.55);
         ctx.drawImage(sprite([6, 4, 10]), px - 70 * (1 + lift), py - 28 * (1 + lift) + 8, 140 * (1 + lift), 56 * (1 + lift));
-        paintHand(hand.layer, hand.i === 1, contact * 0.3, contact, c, cb);
+        paintHand(hand.layer, hand.i === 1, handGeometry(contact, hand.bend), contact, c, cb);
         const grow = 1 + lift * 0.12, sx = cellW * depth * PALM_CELLS / LAYER_W * grow, sy = cellH * PALM_CELLS / LAYER_W * grow * 1.15;
         ctx.save();
         ctx.translate(px, py - lift * 34);
@@ -645,7 +688,7 @@ function createRenderers() {
         if (contact > 0.05) {
           ctx.globalCompositeOperation = 'lighter';
           ctx.globalAlpha = contact * 0.35; ctx.strokeStyle = rgba(cb, 1); ctx.lineWidth = 1.2;
-          ctx.beginPath(); ctx.ellipse(px, py + 6, 46 + contact * 18, (46 + contact * 18) * 0.3, 0, 0, TAU); ctx.stroke();
+          ctx.beginPath(); ctx.ellipse(px, py + 6, 50 + contact * 22, (50 + contact * 22) * 0.3, 0, 0, TAU); ctx.stroke();
         }
       }
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
