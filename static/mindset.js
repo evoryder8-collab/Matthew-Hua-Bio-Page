@@ -26,7 +26,7 @@ function quarterOf(signal) {
 }
 
 /** Mount one self-contained experiment; the caller owns its locale and lifetime. */
-export function mountMindset(host, { copy, asset, reducedMotion = false }) {
+export function mountMindset(host, { copy, asset, reducedMotion = false, onPhaseChange = () => {} }) {
   const doc = host.ownerDocument;
   const win = doc.defaultView;
   const id = `mindset-${++instanceId}`;
@@ -34,6 +34,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false }) {
   let phase = 'intro';
   let answer = null;
   let destroyed = false;
+  let suspended = false;
   let timer = null;
   let remaining = MEMORIZE_MS;
   let runningSince = null;
@@ -206,7 +207,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false }) {
 
   function tick() {
     timer = null;
-    if (destroyed || phase !== 'memorize3seconds') return;
+    if (destroyed || suspended || phase !== 'memorize3seconds') return;
     consumeTime();
     if (doc.hidden) {
       stopTimer();
@@ -223,7 +224,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false }) {
   }
 
   function onVisibilityChange() {
-    if (destroyed || phase !== 'memorize3seconds') return;
+    if (destroyed || suspended || phase !== 'memorize3seconds') return;
     if (doc.hidden) {
       consumeTime();
       stopTimer();
@@ -283,9 +284,9 @@ export function mountMindset(host, { copy, asset, reducedMotion = false }) {
       renderMemorySummary();
       title.setAttribute('aria-describedby', memorySummary.id);
       remaining = MEMORIZE_MS;
-      runningSince = doc.hidden ? null : win.performance.now();
+      runningSince = doc.hidden || suspended ? null : win.performance.now();
       updateClock();
-      if (!doc.hidden) timer = win.setTimeout(tick, 100);
+      if (!doc.hidden && !suspended) timer = win.setTimeout(tick, 100);
     } else if (phase === 'recall3positions') {
       title.textContent = text('recall');
       paragraph('recallSub');
@@ -347,6 +348,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false }) {
       // Begin may have been below the fold; the timed field must be visible.
       field.scrollIntoView({ block: 'center', behavior: 'instant' });
     }
+    onPhaseChange(phase);
   }
 
   function onClick(event) {
@@ -375,6 +377,22 @@ export function mountMindset(host, { copy, asset, reducedMotion = false }) {
   setPhase('intro', false);
 
   return {
+    get phase() { return phase; },
+    replay() { setPhase('intro'); },
+    suspend() {
+      if (destroyed || suspended) return;
+      if (phase === 'memorize3seconds') consumeTime();
+      suspended = true;
+      stopTimer();
+    },
+    resume() {
+      if (destroyed || !suspended) return;
+      suspended = false;
+      if (phase === 'memorize3seconds' && !doc.hidden) {
+        runningSince = win.performance.now();
+        tick();
+      }
+    },
     destroy() {
       if (destroyed) return;
       destroyed = true;

@@ -36,7 +36,8 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
       const state=await page.locator('.arrival-player').evaluate(el=>({muted:el.querySelector('video').muted,source:el.querySelector('video').currentSrc,ratio:el.querySelector('.arrival-screen').clientHeight/innerHeight,controls:getComputedStyle(el.querySelector('.arrival-controls')).opacity,overflow:el.scrollHeight>el.clientHeight+1,canvas:el.contains(document.querySelector('#transition-canvas'))}));
       check(state.muted===!sound,`${name}: sound consent honoured`);
       check(state.source.includes('european-championship.mp4'),`${name}: correct arrival film`);
-      check(Math.abs(state.ratio-.7)<.002,`${name}: 70 percent video`);
+      check(Math.abs(state.ratio-.82)<.002,`${name}: larger arrival video stage`);
+      check(await page.locator('.arrival-player .dialog-ambient').count()===1,`${name}: warm sparkler video backdrop`);
       check(state.controls==='0',`${name}: controls initially hidden`);
       check(!state.overflow,`${name}: arrival fits viewport`);
       check(state.canvas,`${name}: transition remains above dialog`);
@@ -51,8 +52,12 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
       check(!await page.locator('.arrival-player video').evaluate(v=>v.paused),`${name}: resume works`);
       await page.locator(sound?'.arrival-close':'.arrival-enter').tap();
       await page.locator('.arrival-player').waitFor({state:'detached'});
+      check(await page.locator('.dialog-ambient').count()===0,`${name}: arrival ambient removed on close`);
       check(await page.locator('#transition-canvas').evaluate(c=>c.parentElement===document.body),`${name}: canvas restored after closing`);
       check(!await page.locator('#shell').evaluate(el=>el.inert),`${name}: homepage interactive`);
+      const portrait=await page.locator('#hero').evaluate(el=>({alive:el.classList.contains('portrait-alive'),gleam:getComputedStyle(el.querySelector('.portrait-gleam')).animationIterationCount,mark:el.ownerDocument.querySelector('.wordmark').textContent.trim()}));
+      check(portrait.alive&&portrait.gleam==='1',`${name}: floating portrait and one-time gleam`);
+      check(portrait.mark==='mh',`${name}: lowercase no-dot monogram`);
       await page.locator('.menu-trigger').tap();
       await page.locator('#mobile-nav [data-route=contact]').tap();
       await page.waitForFunction(()=>document.body.dataset.route==='contact');

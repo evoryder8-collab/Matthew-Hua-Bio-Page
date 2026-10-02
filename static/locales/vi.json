@@ -6,9 +6,9 @@
     "welcome": "Một khoảnh khắc cho riêng bạn.",
     "choose": "Chọn ngôn ngữ của bạn",
     "hint": "Cứ tự nhiên nhé.",
-    "auto": "Tiếp tục bằng {language} sau {seconds} giây",
+    "auto": "Ngôn ngữ được nhận diện: {language} · Tự động chọn sau {seconds}…",
     "detected": "Ngôn ngữ của bạn",
-    "pause": "Cứ thong thả",
+    "pause": "Tạm dừng lựa chọn tự động",
     "continue": "Tiếp tục",
     "sound": "Bật âm thanh?",
     "soundCopy": "Thêm chút âm thanh. Gần gũi hơn một chút.",
@@ -259,12 +259,27 @@
     "copy": "Ở đây, bạn có thể khóc. Không cần kìm nén mọi thứ, giải thích cảm xúc hay vội lấy lại bình tĩnh. Đôi khi, sức mạnh bắt đầu từ việc cho phép mình cảm nhận.",
     "note": "Theo nhịp của bạn. Theo sự thoải mái của bạn. Do bạn lựa chọn."
   },
+  "enquiry": {
+    "title": "Bắt đầu bằng một cuộc trò chuyện.",
+    "name": "Họ và tên",
+    "email": "Địa chỉ email",
+    "phone": "Số điện thoại (không bắt buộc)",
+    "message": "Lời nhắn của bạn",
+    "note": "Chỉ dành cho đặt lịch và câu hỏi chung. Vui lòng không gửi thông tin y tế hoặc dữ liệu nhạy cảm khác.",
+    "consent": "Tôi đồng ý gửi thông tin của mình cho Matthew qua FormSubmit.",
+    "send": "Gửi lời nhắn",
+    "received": "Lời nhắn đã được gửi. Matthew sẽ trực tiếp phản hồi bạn.",
+    "mapControls": "Điều khiển bản đồ",
+    "zoomIn": "Phóng to",
+    "zoomOut": "Thu nhỏ",
+    "routeView": "Xem lộ trình"
+  },
   "footer": {
     "line": "Chuyển hóa bắt đầu từ cơ thể.",
     "location": "Zurich, Switzerland",
     "rights": "Matthew Hua",
     "privacy": "Quyền riêng tư",
-    "privacyText": "Tùy chọn ngôn ngữ được lưu trong trình duyệt của bạn. Âm thanh chỉ bắt đầu khi bạn cho phép. Bản đồ trên trang Liên hệ tải các ô bản đồ từ OpenStreetMap; máy chủ của họ nhận dữ liệu kết nối thông thường khi bạn mở trang đó. Các liên kết email, WhatsApp và chỉ đường mở dịch vụ bên ngoài tương ứng. Không có yêu cầu tư vấn nào được gửi qua website này.",
+    "privacyText": "Lựa chọn ngôn ngữ được lưu trong trình duyệt. Âm thanh chỉ phát khi bạn đồng ý. Bản đồ tải dữ liệu từ OpenStreetMap và truyền thông tin kết nối. Thông tin trong biểu mẫu được gửi tới FormSubmit để lọc thư rác và chuyển qua email tới info@healwell.ch. Vui lòng không gửi thông tin y tế hay dữ liệu nhạy cảm. Liên kết email, WhatsApp và chỉ đường mở các dịch vụ bên ngoài.",
     "backTop": "Về đầu trang"
   },
   "arrival": {

@@ -6,9 +6,9 @@
     "welcome": "留一点时间给自己。",
     "choose": "选择您的语言",
     "hint": "在这里，请自在一些。",
-    "auto": "{seconds} 秒后将以{language}继续",
+    "auto": "检测到{language} · {seconds} 秒后自动选择…",
     "detected": "您的语言",
-    "pause": "慢慢来",
+    "pause": "暂停自动选择",
     "continue": "继续",
     "sound": "开启声音？",
     "soundCopy": "一点声音，让此刻更有温度。",
@@ -259,12 +259,27 @@
     "copy": "在这里，流泪也没关系。您不必压抑一切，不必解释自己的感受，也不必急着平复情绪。有时，力量就始于允许自己去感受。",
     "note": "按您的节奏，以您舒服的方式，由您选择。"
   },
+  "enquiry": {
+    "title": "从一次真诚的交流开始。",
+    "name": "姓名",
+    "email": "电子邮箱",
+    "phone": "电话号码（选填）",
+    "message": "留言",
+    "note": "仅用于预约和一般咨询，请勿填写医疗信息或其他敏感个人资料。",
+    "consent": "我同意通过 FormSubmit 将我的资料发送给 Matthew。",
+    "send": "发送咨询",
+    "received": "您的咨询已提交，Matthew 会亲自回复。",
+    "mapControls": "地图控制",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "routeView": "显示路线"
+  },
   "footer": {
     "line": "改变，从身体开始。",
     "location": "Zurich, Switzerland",
     "rights": "Matthew Hua",
     "privacy": "隐私",
-    "privacyText": "语言偏好会保存在您的浏览器中。只有获得您的许可，声音才会开启。联系页面的地图会加载 OpenStreetMap 的地图图块；打开该页面时，其服务器会接收常规连接数据。邮件、WhatsApp 和导航链接会打开相应的外部服务。本网站不会提交任何咨询信息。",
+    "privacyText": "语言偏好保存在您的浏览器中，声音仅在您同意后开启。地图从 OpenStreetMap 加载图块并传输连接数据。联系表单资料发送至 FormSubmit，进行垃圾信息筛查并通过邮件转送至 info@healwell.ch。请勿包含医疗信息或敏感资料。电子邮件、WhatsApp 和导航链接会打开外部服务。",
     "backTop": "返回顶部"
   },
   "arrival": {

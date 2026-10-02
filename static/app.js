@@ -4,6 +4,8 @@ import {createEffects,mountAmbientSparks} from './effects.js';
 import {mountMindset} from './mindset.js';
 import {mountTechnologyEffects} from './technology.js';
 import {mountElementVisual} from './element-visuals.js';
+import {mountDialogAtmosphere} from './dialog-atmosphere.js';
+import {mountGameSpotlight} from './game-spotlight.js';
 
 const base=new URL('../',import.meta.url);
 document.querySelector('link[rel="icon"]').href=new URL('static/favicon.svg',base).href;
@@ -16,7 +18,8 @@ const effects=createEffects({transitionCanvas,cursorCanvas:document.getElementBy
 const localeCache=new Map();
 let dict,locale,route,game,map,observer,portal,portalCleanup,heroVideo,elementVisual,technology,cleanupTilt=()=>{};
 let soundEnabled=false,navigating=false,pendingNavigation=null,selectedElement=0,archiveFilter='all',modal=null;
-let restoreFocus=null,arrival=null;
+let restoreFocus=null,arrival=null,modalCleanup=null,spotlight=null,mapRouteBounds=null;
+let portraitGleamed=false;
 const readStore=(store,key)=>{try{return store.getItem(key);}catch{return null;}};
 const writeStore=(store,key,value)=>{try{store.setItem(key,value);}catch{}};
 const availableStorage=name=>{try{return window[name];}catch{return null;}};
@@ -43,14 +46,14 @@ function setMetadata(){
   document.querySelector('link[rel="canonical"]').href=canonical;
   document.querySelector('meta[property="og:url"]').content=canonical;
 }
-function cleanPage(){game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;technology?.destroy();technology=null;map?.remove();map=null;observer?.disconnect();cleanupTilt();cleanupTilt=()=>{};if(heroVideo){heroVideo.pause();heroVideo=null;}}
+function cleanPage(){spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;technology?.destroy();technology=null;map?.remove();map=null;mapRouteBounds=null;observer?.disconnect();cleanupTilt();cleanupTilt=()=>{};if(heroVideo){heroVideo.pause();heroVideo=null;}}
 function renderSite({element=0}={}){
   cleanPage();document.body.dataset.route=route;document.body.classList.remove('menu-open');
   shell.innerHTML=renderHeader(dict,href,route)+`<main id="main">${renderPage(route,dict,asset,href)}</main>`+renderFooter(dict,href);
   setMetadata();icons();setupReveals();setupHero();updateSoundButtons();setupTilt();
   if(document.getElementById('element-panel'))selectElement(element);
   if(document.getElementById('technology'))technology=mountTechnologyEffects(document.getElementById('technology'));
-  if(route==='contact')setupMap();
+  if(route==='contact'){setupMap();setupEnquiry();}
   archiveFilter='all';selectedElement=element;
   document.documentElement.classList.add('ready');
 }
@@ -73,6 +76,7 @@ function setupTilt(){
   cleanupTilt=()=>removals.forEach(fn=>fn());
 }
 function setupHero(){
+  revealPortrait();
   heroVideo=document.getElementById('hero-film');if(!heroVideo)return;
   const video=heroVideo,hero=document.getElementById('hero');
   video.muted=!soundEnabled;
@@ -81,6 +85,12 @@ function setupHero(){
   video.addEventListener('ended',()=>{hero.classList.remove('is-playing','is-paused');updateVideoButtons();});
   video.addEventListener('error',()=>{hero.querySelector('.hero-error').hidden=false;hero.classList.remove('is-playing','is-paused');updateVideoButtons();});
   video.addEventListener('timeupdate',()=>{const time=hero.querySelector('.film-time');const remaining=Math.max(0,Math.ceil((video.duration||60)-video.currentTime));time.textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;});
+}
+function revealPortrait(){
+  if(route!=='home'||portal||arrival||navigating||!readStore(sessionStorage,'matthew-entered'))return;
+  const hero=document.getElementById('hero');if(!hero)return;
+  hero.classList.add('portrait-alive');
+  if(!portraitGleamed){portraitGleamed=true;hero.classList.add('portrait-arrived');}
 }
 function playHero(){
   const video=heroVideo;if(!video)return;
@@ -106,11 +116,11 @@ function setSound(value){soundEnabled=value;updateSoundButtons();}
 function prepareArrival(){
   if(arrival)return arrival;
   const dialog=document.createElement('dialog');
-  dialog.className='arrival-player';dialog.setAttribute('aria-label',dict.arrival.eyebrow);
-  dialog.innerHTML=`<div class="arrival-screen"><video playsinline preload="auto" poster="${e(asset('European Championship.webp'))}" src="${e(asset('films/european-championship.mp4'))}" aria-label="${e(dict.arrival.eyebrow)}"></video><button class="arrival-reveal" aria-label="${e(dict.arrival.reveal)}"></button><div class="arrival-controls"><button class="icon-button arrival-close" aria-label="${e(dict.common.close)}" title="${e(dict.common.close)}">${icon('x')}</button><div class="arrival-transport"><button class="icon-button arrival-play" aria-label="${e(dict.common.pause)}" title="${e(dict.common.pause)}">${icon('pause')}</button><span class="arrival-time" aria-hidden="true">00:28</span><button class="icon-button" data-action="sound" aria-label="${e(dict.nav.soundOff)}" title="${e(dict.nav.soundOff)}">${icon('volume-x')}</button></div></div><p class="arrival-error" hidden>${e(dict.common.mediaError)} <a href="${e(asset('films/european-championship.mp4'))}">${e(dict.common.openFilm)}</a></p></div><button class="arrival-enter"><span class="arrival-label">MATTHEW HUA · ${e(dict.arrival.eyebrow)}</span><span class="arrival-title">${e(dict.arrival.title)}</span><span class="arrival-link">${e(dict.arrival.enter)}${icon('arrow-down')}</span></button>`;
+  dialog.className='arrival-player atmospheric-dialog';dialog.setAttribute('aria-label',dict.arrival.eyebrow);
+  dialog.innerHTML=`<div class="arrival-screen"><div class="arrival-film-frame"><video playsinline preload="auto" poster="${e(asset('European Championship.webp'))}" src="${e(asset('films/european-championship.mp4'))}" aria-label="${e(dict.arrival.eyebrow)}"></video><button class="arrival-reveal" aria-label="${e(dict.arrival.reveal)}"></button><div class="arrival-controls"><button class="icon-button arrival-close" aria-label="${e(dict.common.close)}" title="${e(dict.common.close)}">${icon('x')}</button><div class="arrival-transport"><button class="icon-button arrival-play" aria-label="${e(dict.common.pause)}" title="${e(dict.common.pause)}">${icon('pause')}</button><span class="arrival-time" aria-hidden="true">00:28</span><button class="icon-button" data-action="sound" aria-label="${e(dict.nav.soundOff)}" title="${e(dict.nav.soundOff)}">${icon('volume-x')}</button></div></div><p class="arrival-error" hidden>${e(dict.common.mediaError)} <a href="${e(asset('films/european-championship.mp4'))}">${e(dict.common.openFilm)}</a></p></div></div><button class="arrival-enter"><span class="arrival-label">matthew hua · ${e(dict.arrival.eyebrow)}</span><span class="arrival-title">${e(dict.arrival.title)}</span><span class="arrival-link">${e(dict.arrival.enter)}${icon('arrow-down')}</span></button>`;
   overlayRoot.append(dialog);
   const video=dialog.querySelector('video'),play=dialog.querySelector('.arrival-play');
-  let hideTimer=0,closing=false;
+  let hideTimer=0,closing=false,stopAtmosphere=null;
   const showControls=()=>{
     dialog.classList.add('controls-visible');clearTimeout(hideTimer);
     if(!video.paused)hideTimer=setTimeout(()=>{if(!dialog.querySelector('.arrival-controls').contains(document.activeElement))dialog.classList.remove('controls-visible');},3200);
@@ -118,10 +128,13 @@ function prepareArrival(){
   const update=()=>{const label=video.paused?dict.common.play:dict.common.pause;play.innerHTML=icon(video.paused?'play':'pause');play.setAttribute('aria-label',label);play.title=label;icons();};
   const dismiss=()=>{
     if(closing)return;closing=true;video.pause();clearTimeout(hideTimer);
-    document.body.append(transitionCanvas);dialog.close();dialog.remove();arrival=null;
+    stopAtmosphere?.();stopAtmosphere=null;
+    if(dialog.contains(transitionCanvas))document.body.append(transitionCanvas);
+    dialog.close();dialog.remove();arrival=null;
     document.querySelector('main h1')?.focus({preventScroll:true});
+    revealPortrait();spotlight?.refresh();
   };
-  arrival={video,dialog,show(){dialog.showModal();dialog.append(transitionCanvas);dialog.querySelector('.arrival-enter').focus({preventScroll:true});},start(){if(closing)return;video.currentTime=0;video.play()?.catch(showControls);},dismiss};
+  arrival={video,dialog,show(){if(closing||!dialog.isConnected)return;dialog.showModal();stopAtmosphere=mountDialogAtmosphere(dialog);dialog.append(transitionCanvas);dialog.querySelector('.arrival-enter').focus({preventScroll:true});},start(){if(closing||!dialog.open)return;video.currentTime=0;video.play()?.catch(showControls);},dismiss};
   video.muted=!soundEnabled;updateSoundButtons();
   dialog.querySelector('.arrival-reveal').addEventListener('click',showControls);
   dialog.querySelector('.arrival-controls').addEventListener('focusin',showControls);
@@ -129,6 +142,7 @@ function prepareArrival(){
   dialog.querySelector('.arrival-close').addEventListener('click',dismiss);
   dialog.querySelector('.arrival-enter').addEventListener('click',dismiss);
   dialog.addEventListener('cancel',event=>{event.preventDefault();dismiss();});
+  dialog.addEventListener('click',event=>{if(event.target===dialog||event.target===dialog.querySelector('.arrival-screen'))dismiss();});
   video.addEventListener('play',update);video.addEventListener('pause',update);
   video.addEventListener('ended',update);
   video.addEventListener('timeupdate',()=>{const left=Math.ceil(Math.max(0,(video.duration||28)-video.currentTime));dialog.querySelector('.arrival-time').textContent=`00:${String(left).padStart(2,'0')}`;});
@@ -139,11 +153,15 @@ function prepareArrival(){
   return arrival;
 }
 function selectElement(index){
-  if(!document.getElementById('element-panel'))return;index=Math.max(0,Math.min(5,Number(index)||0));game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;
+  if(!document.getElementById('element-panel'))return;index=Math.max(0,Math.min(5,Number(index)||0));spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;
   selectedElement=index;const panel=document.getElementById('element-panel');
   document.querySelectorAll('[data-element-tab]').forEach((tab,i)=>{tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;});
   panel.setAttribute('aria-labelledby',`element-tab-${index}`);
-  if(index===0){panel.innerHTML='<div id="mindset-host"></div>';game=mountMindset(document.getElementById('mindset-host'),{copy:dict.game,asset,reducedMotion:motion.matches});}
+  if(index===0){
+    panel.innerHTML='<div id="mindset-host"></div>';const host=document.getElementById('mindset-host');
+    game=mountMindset(host,{copy:dict.game,asset,reducedMotion:motion.matches,onPhaseChange:phase=>spotlight?.syncPhase(phase)});
+    if(route==='home')spotlight=mountGameSpotlight(host,{game,copy:dict.game,common:dict.common,canOpen:()=>!document.hidden&&!portal&&!arrival&&!modal&&!navigating&&!document.body.classList.contains('menu-open'),icons,reducedMotion:motion});
+  }
   else {panel.innerHTML=renderElement(index,dict);elementVisual=mountElementVisual(document.getElementById('element-visual-host'),index,{reducedMotion:motion.matches});}
   icons();
 }
@@ -151,7 +169,7 @@ async function navigate(target,{push=true,element=0,url=null,animate=false}={}){
   if(!routes.includes(target))return;
   if(navigating){pendingNavigation={target,options:{push,element,url,animate}};return;}
   if(target===route&&push){setMenu(false);return;}
-  navigating=true;setMenu(false);closeModal();
+  navigating=true;setMenu(false);closeModal();arrival?.dismiss();
   try{
     const swap=()=>{
       route=target;
@@ -159,7 +177,7 @@ async function navigate(target,{push=true,element=0,url=null,animate=false}={}){
       renderSite({element});window.scrollTo({top:0,behavior:'instant'});document.querySelector('main h1')?.focus({preventScroll:true});
     };
     if(animate&&push)await effects.transition(swap);else swap();
-  }finally{navigating=false;if(pendingNavigation){const next=pendingNavigation;pendingNavigation=null;navigate(next.target,next.options);}}
+  }finally{navigating=false;revealPortrait();spotlight?.refresh();if(pendingNavigation){const next=pendingNavigation;pendingNavigation=null;navigate(next.target,next.options);}}
 }
 function setMenu(open){
   document.body.classList.toggle('menu-open',open);
@@ -167,13 +185,14 @@ function setMenu(open){
   menu.hidden=!open;button.setAttribute('aria-expanded',String(open));button.setAttribute('aria-label',open?dict.nav.closeMenu:dict.nav.menu);button.innerHTML=icon(open?'x':'menu');
   document.getElementById('main').inert=open;document.querySelector('.site-footer').inert=open;icons();
   if(open)menu.querySelector('a')?.focus();
+  else queueMicrotask(()=>spotlight?.refresh());
 }
-function closeModal(){if(!modal)return;const old=modal;modal=null;old.querySelectorAll('video').forEach(video=>video.pause());old.close();old.remove();restoreFocus?.isConnected&&restoreFocus.focus({preventScroll:true});}
+function closeModal(){if(!modal)return;const old=modal;modal=null;modalCleanup?.();modalCleanup=null;old.querySelectorAll('video').forEach(video=>video.pause());old.close();old.remove();restoreFocus?.isConnected&&restoreFocus.focus({preventScroll:true});queueMicrotask(()=>spotlight?.refresh());}
 function openModal(className,content){
-  closeModal();restoreFocus=document.activeElement;const dialog=document.createElement('dialog');dialog.className=className;dialog.innerHTML=`<button class="icon-button dialog-close" data-action="close-dialog" aria-label="${e(dict.common.close)}">${icon('x')}</button>`+content;
-  overlayRoot.append(dialog);modal=dialog;icons();dialog.showModal();dialog.querySelector('.dialog-close').focus();
+  closeModal();restoreFocus=document.activeElement;const dialog=document.createElement('dialog');dialog.className=className+' atmospheric-dialog';dialog.innerHTML=`<div class="modal-surface ${className.replace('-dialog','-surface')}"><button class="icon-button dialog-close" data-action="close-dialog" aria-label="${e(dict.common.close)}" title="${e(dict.common.close)}">${icon('x')}</button>${content}</div>`;
+  overlayRoot.append(dialog);modal=dialog;icons();dialog.showModal();modalCleanup=mountDialogAtmosphere(dialog);dialog.querySelector('.dialog-close').focus({preventScroll:true});
   dialog.addEventListener('cancel',event=>{event.preventDefault();closeModal();});
-  dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeModal();}});
+  dialog.addEventListener('click',event=>{if(event.target===dialog)closeModal();});
   return dialog;
 }
 function openMaps(){
@@ -184,21 +203,27 @@ function openMaps(){
 async function setupMap(){
   const host=document.getElementById('studio-map');if(!host)return;
   const L=window.L;if(!L){document.getElementById('map-fallback').hidden=false;return;}
-  const localMap=L.map(host,{scrollWheelZoom:false,zoomControl:true,attributionControl:true,fadeAnimation:!motion.matches,zoomAnimation:!motion.matches}).setView([47.3694,8.5303],14);map=localMap;
+  const localMap=L.map(host,{scrollWheelZoom:false,zoomControl:false,attributionControl:true,fadeAnimation:!motion.matches,zoomAnimation:!motion.matches}).setView([47.3694,8.5303],14);map=localMap;
   let tileSuccess=false;
   const layer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(localMap);
   layer.on('tileload',()=>{tileSuccess=true;if(host.isConnected)document.getElementById('map-fallback').hidden=true;});
   layer.on('tileerror',()=>{if(!tileSuccess&&host.isConnected)document.getElementById('map-fallback').hidden=false;});
-  L.marker([47.36079406738281,8.521052360534668],{icon:L.divIcon({className:'studio-pin',html:'<span class="studio-pin-core"></span>',iconSize:[40,40],iconAnchor:[20,20]}),title:'Matthew Hua · Rüdigerstrasse 7',keyboard:true}).addTo(localMap).bindTooltip('Matthew Hua · Healwell',{direction:'top',offset:[0,-24]});
+  L.marker([47.36079406738281,8.521052360534668],{icon:L.divIcon({className:'studio-pin',html:'<span class="studio-pin-beam"></span><span class="studio-pin-core"></span>',iconSize:[40,40],iconAnchor:[20,20]}),title:'Matthew Hua · Rüdigerstrasse 7',keyboard:true}).addTo(localMap).bindTooltip('matthew hua · healwell',{direction:'top',offset:[0,-24]});
   try{
     const response=await fetch(new URL('studio-route.json',import.meta.url));if(!response.ok)throw new Error('Route unavailable');
     const routeData=await response.json();if(map!==localMap||!host.isConnected)return;
     L.geoJSON(routeData,{style:{color:'#98804a',weight:5,opacity:.2,className:'map-route-glow'}}).addTo(localMap);
     const routeLine=L.geoJSON(routeData,{style:{color:'#967935',weight:2.5,opacity:.85}}).addTo(localMap);
     if(!motion.matches)L.geoJSON(routeData,{style:{color:'#ffefb9',weight:2,opacity:1,className:'map-route-motion'}}).addTo(localMap);
-    localMap.fitBounds(routeLine.getBounds(),{paddingTopLeft:[50,45],paddingBottomRight:[50,100],animate:false});
+    mapRouteBounds=routeLine.getBounds();
+    localMap.fitBounds(mapRouteBounds,{paddingTopLeft:[45,75],paddingBottomRight:[75,145],animate:false});
     requestAnimationFrame(()=>{if(map===localMap)localMap.invalidateSize();});
   }catch{ /* The destination and navigation links remain usable without the reference route. */ }
+}
+function setupEnquiry(){
+  const form=document.getElementById('contact-form');if(!form)return;
+  const next=new URL(href('contact'));next.searchParams.set('enquiry','received');form.elements._next.value=next.href;
+  document.getElementById('enquiry-status').hidden=new URL(location.href).searchParams.get('enquiry')!=='received';
 }
 function filterArchive(filter){
   archiveFilter=filter;
@@ -222,10 +247,10 @@ function openMedia(index){
   show(index);
 }
 async function applyLocale(next,isCurrent=()=>true){const nextDict=await getLocale(next);if(!isCurrent())return false;locale=next;dict=nextDict;writeStore(localStorage,'matthew-language',next);return true;}
-function dismissPortal(expected=portal){if(portal!==expected)return;portalCleanup?.();portalCleanup=null;if(!portal)return;if(portal.contains(transitionCanvas))document.body.append(transitionCanvas);portal.close();portal.remove();portal=null;shell.inert=false;}
+function dismissPortal(expected=portal){if(portal!==expected)return;portalCleanup?.();portalCleanup=null;if(!portal)return;if(portal.contains(transitionCanvas))document.body.append(transitionCanvas);portal.close();portal.remove();portal=null;shell.inert=false;queueMicrotask(()=>{revealPortrait();spotlight?.refresh();});}
 async function showPortal({settings=false}={}){
   if(portal||navigating)return;setMenu(false);closeModal();
-  restoreFocus=document.activeElement;const dialog=document.createElement('dialog');dialog.className='portal';dialog.setAttribute('aria-label',dict.portal.choose);dialog.innerHTML=`<div class="portal-scene"><div class="portal-brand"><span>Mh.</span>MATTHEW HUA</div><div class="portal-stage"><p class="portal-welcome">${e(dict.portal.welcome)}</p></div></div>`;
+  restoreFocus=document.activeElement;const dialog=document.createElement('dialog');dialog.className='portal';dialog.setAttribute('aria-label',dict.portal.choose);dialog.innerHTML=`<div class="portal-scene"><div class="portal-brand"><span class="mh-monogram">mh</span>matthew hua</div><div class="portal-stage"><p class="portal-welcome">${e(dict.portal.welcome)}</p></div></div>`;
   overlayRoot.append(dialog);portal=dialog;shell.inert=true;dialog.showModal();dialog.append(transitionCanvas);
   let exiting=false;
   const cancel=event=>{event.preventDefault();if(exiting)return;if(settings&&!dialog.querySelector('.portal-focus')){dismissPortal();restoreFocus?.isConnected&&restoreFocus.focus();}else showLanguages(false);};
@@ -271,33 +296,36 @@ async function showPortal({settings=false}={}){
     portalCleanup?.();let stopped=!auto||settings,start=performance.now(),elapsed=0,lastSecond=-1,frame=0,alive=true;
     dialog.classList.remove('revealing');dialog.setAttribute('aria-label',dict.portal.choose);
     stage().className='portal-stage is-in';
-    stage().innerHTML=`${settings?`<button class="icon-button portal-dismiss" data-portal-close aria-label="${e(dict.common.close)}">${icon('x')}</button>`:''}<h2 class="portal-title">${e(dict.portal.choose)}</h2><p class="portal-sub">${e(dict.portal.hint)}</p><div class="language-grid" role="group" aria-label="${e(dict.portal.choose)}">${languageTiles()}</div><p class="portal-countdown" aria-live="off"></p><div class="countdown-track" aria-hidden="true"><span></span></div><button class="portal-pause">${e(dict.portal.pause)}</button>`;
+    stage().innerHTML=`${settings?`<button class="icon-button portal-dismiss" data-portal-close aria-label="${e(dict.common.close)}">${icon('x')}</button>`:''}<h2 class="portal-title">${e(dict.portal.choose)}</h2><p class="portal-sub">${e(dict.portal.hint)}</p><div class="language-grid" role="group" aria-label="${e(dict.portal.choose)}">${languageTiles()}</div><p class="portal-countdown" aria-live="off"></p><div class="countdown-track" aria-hidden="true"><span></span></div><button class="portal-pause icon-button" aria-label="${e(dict.portal.pause)}" title="${e(dict.portal.pause)}">${icon('pause')}</button>`;
     icons();
     const countdown=stage().querySelector('.portal-countdown'),track=stage().querySelector('.countdown-track'),pauseButton=stage().querySelector('.portal-pause');
-    const stop=()=>{stopped=true;cancelAnimationFrame(frame);countdown.textContent=dict.portal.pause;track.hidden=true;pauseButton.hidden=true;};
+    const detected=stage().querySelector(locale==='gsw'||locale==='de'?'[data-language-family]':`[data-locale="${locale}"]`);
+    const stop=()=>{stopped=true;cancelAnimationFrame(frame);countdown.textContent=`${dict.portal.detected} · ${languages.find(l=>l.code===locale).name}`;track.hidden=true;pauseButton.hidden=true;detected?.classList.remove('auto-selecting','auto-committing');detected?.removeAttribute('data-countdown');};
     const key=event=>{if(['Tab','ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(event.key))stop();};
     const visibility=()=>{if(document.hidden){elapsed+=performance.now()-start;cancelAnimationFrame(frame);}else if(!stopped&&alive){start=performance.now();frame=requestAnimationFrame(tick);}};
-    const tick=now=>{if(!alive||stopped||document.hidden)return;const remaining=Math.max(0,5000-elapsed-(now-start));const second=Math.ceil(remaining/1000);if(second!==lastSecond){countdown.textContent=interpolate(dict.portal.auto,{language:languages.find(l=>l.code===locale).name,seconds:second});lastSecond=second;}track.firstElementChild.style.transform=`scaleX(${remaining/5000})`;if(remaining<=0){showSound();return;}frame=requestAnimationFrame(tick);};
+    const tick=now=>{if(!alive||stopped||document.hidden)return;const remaining=Math.max(0,5000-elapsed-(now-start));const second=Math.ceil(remaining/1000);if(second!==lastSecond){countdown.textContent=interpolate(dict.portal.auto,{language:languages.find(l=>l.code===locale).name,seconds:second});detected?.setAttribute('data-countdown',String(second));detected?.classList.toggle('auto-committing',second<=2);lastSecond=second;}detected?.style.setProperty('--commit-angle',`${360*(1-remaining/5000)}deg`);track.firstElementChild.style.transform=`scaleX(${remaining/5000})`;if(remaining<=0){showSound();return;}frame=requestAnimationFrame(tick);};
     pauseButton.addEventListener('click',stop);dialog.addEventListener('keydown',key);document.addEventListener('visibilitychange',visibility);
     stage().querySelectorAll('[data-locale]').forEach(button=>button.addEventListener('click',()=>{stop();chooseLanguage(button.dataset.locale,generation,countdown);}));
     stage().querySelector('[data-language-family]').addEventListener('click',()=>{stop();showGerman();});
     stage().querySelector('[data-portal-close]')?.addEventListener('click',()=>{dismissPortal();restoreFocus?.isConnected&&restoreFocus.focus();});
     portalCleanup=()=>{alive=false;cancelAnimationFrame(frame);dialog.removeEventListener('keydown',key);document.removeEventListener('visibilitychange',visibility);};
-    if(stopped)stop();else frame=requestAnimationFrame(tick);
+    if(stopped)stop();else{detected?.classList.add('auto-selecting');frame=requestAnimationFrame(tick);}
     stage().querySelector(locale==='gsw'||locale==='de'?'[data-language-family]':`[data-locale="${locale}"]`)?.focus({preventScroll:true});
   }
   async function leavePortal(swap=()=>{}){
     if(exiting||portal!==dialog)return;exiting=true;
     if(settings){swap();dismissPortal(dialog);document.querySelector('main h1')?.focus({preventScroll:true});return;}
     dialog.querySelectorAll('button').forEach(button=>button.disabled=true);
-    await effects.transition(()=>{portalCleanup?.();portalCleanup=null;swap();dialog.classList.add('revealing');dialog.querySelector('.portal-scene').style.visibility='hidden';document.documentElement.classList.add('ready');},{long:true});
-    dismissPortal(dialog);writeStore(sessionStorage,'matthew-entered','1');
+    try{
+      await effects.transition(()=>{if(portal!==dialog)return;portalCleanup?.();portalCleanup=null;swap();dialog.classList.add('revealing');dialog.querySelector('.portal-scene').style.visibility='hidden';document.documentElement.classList.add('ready');},{long:true});
+    }catch(error){arrival?.dismiss();console.warn('The entrance transition was unavailable.',error);}
+    finally{dismissPortal(dialog);writeStore(sessionStorage,'matthew-entered','1');}
     if(arrival){arrival.start();arrival.dialog.querySelector('.arrival-enter').focus({preventScroll:true});}else document.querySelector('main h1')?.focus({preventScroll:true});
   }
   function showSound(){
     ++localeRequest;languageBusy=false;writeStore(localStorage,'matthew-language',locale);
     const panel=focusPrompt(dict.portal.sound,`<div class="portal-focus-content sound-stage"><div class="sound-symbol">${icon('audio-lines')}</div><h2 class="portal-title">${e(dict.portal.sound)}</h2><p class="portal-sub">${e(dict.portal.soundCopy)}</p><div class="sound-choices"><button class="sound-yes"><span>${e(dict.portal.yes)}<small>${e(dict.portal.recommended)}</small></span>${icon('arrow-right')}</button><button class="sound-no">${e(dict.portal.no)}</button></div><button class="portal-back">${icon('arrow-left')}${e(dict.portal.change)}</button></div>`);
-    const enter=enabled=>{setSound(enabled);const player=route==='home'?prepareArrival():null;leavePortal(()=>player?.show());};
+    const enter=enabled=>{setSound(enabled);const player=route==='home'?prepareArrival():null;leavePortal(()=>{if(arrival===player&&route==='home')player?.show();});};
     panel.querySelector('.sound-yes').addEventListener('click',()=>enter(true),{once:true});
     panel.querySelector('.sound-no').addEventListener('click',()=>enter(false),{once:true});
     panel.querySelector('.portal-back').addEventListener('click',()=>showLanguages(false));panel.querySelector('.sound-yes').focus({preventScroll:true});
@@ -320,6 +348,9 @@ document.addEventListener('click',event=>{
     case 'hero-play':if(heroVideo?.paused)playHero();else heroVideo?.pause();break;
     case 'top':window.scrollTo({top:0,behavior:motion.matches?'instant':'smooth'});break;
     case 'maps':openMaps();break;
+    case 'zoom-in':map?.zoomIn();break;
+    case 'zoom-out':map?.zoomOut();break;
+    case 'map-reset':if(mapRouteBounds)map?.fitBounds(mapRouteBounds,{paddingTopLeft:[45,75],paddingBottomRight:[75,145],animate:!motion.matches});else map?.setView([47.36079,8.52105],16);break;
     case 'privacy':openModal('privacy-dialog',`<h2>${e(dict.footer.privacy)}</h2><p>${e(dict.footer.privacyText)}</p>`);break;
     case 'close-dialog':closeModal();break;
     case 'copy-address':{const address='Rüdigerstrasse 7, Ground Floor, 8045 Zürich, Switzerland';navigator.clipboard?.writeText(address).then(()=>{const span=button.querySelector('span');if(span){span.textContent=dict.contact.copied;setTimeout(()=>{if(span.isConnected)span.textContent=dict.contact.copyAddress;},2000);}}).catch(()=>{});break;}
@@ -336,7 +367,7 @@ document.addEventListener('keydown',event=>{
 addEventListener('scroll',()=>document.body.classList.toggle('scrolled',scrollY>35),{passive:true});
 addEventListener('popstate',async()=>{const wanted=resolveLocale([],(new URL(location.href)).searchParams.get('lang'),readStore(localStorage,'matthew-language'));if(wanted!==locale)await applyLocale(wanted);navigate(currentRoute(),{push:false});});
 addEventListener('resize',()=>{if(innerWidth>900&&document.body.classList.contains('menu-open'))setMenu(false);},{passive:true});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){heroVideo?.pause();arrival?.video.pause();modal?.querySelectorAll('video').forEach(video=>video.pause());}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){heroVideo?.pause();arrival?.video.pause();modal?.querySelectorAll('video').forEach(video=>video.pause());}else spotlight?.refresh();});
 motion.addEventListener('change',()=>{cleanupTilt();setupTilt();if(document.getElementById('element-panel'))selectElement(selectedElement);});
 
 async function init(){

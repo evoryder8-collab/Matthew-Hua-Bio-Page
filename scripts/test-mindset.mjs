@@ -233,6 +233,10 @@ async function photoPixels(page, viewport) {
 }
 
 async function navigate(page, route, mobile) {
+  if(await page.locator('.game-dialog[open]').count()) {
+    await page.keyboard.press('Escape');
+    await page.locator('.game-dialog').waitFor({state:'detached'});
+  }
   if (route === 'home') await page.locator('.wordmark[data-route="home"]').click();
   else if (mobile) {
     await page.locator('.menu-trigger').click();

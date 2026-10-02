@@ -6,9 +6,9 @@
     "welcome": "En Momänt für dich.",
     "choose": "Wähl dini Spraach",
     "hint": "Mach s dir gmüetlich.",
-    "auto": "Wiiter uf {language} i {seconds}s",
+    "auto": "Erkannt: {language} · Automatisch i {seconds}…",
     "detected": "Dini Spraach",
-    "pause": "Lah der Ziit",
+    "pause": "Automatischi Uswahl pausiere",
     "continue": "Wiiter",
     "sound": "Ton iischalte?",
     "soundCopy": "Es bitz Atmosphäre. Es bitz meh Nöchi.",
@@ -390,12 +390,27 @@
     "copy": "Träne sind da willkomme. Du muesch nüt zrugghalte, dini Gfühl nöd erkläre und dich nöd pressiere, zum wieder gfasst sii. Mängisch fangt Stärchi demit aa, dass mer üs erlaubt z fühle.",
     "note": "Dis Tempo. Dis Wohlbefinde. Dini Entscheidig."
   },
+  "enquiry": {
+    "title": "Lass üs rede.",
+    "name": "Din Name",
+    "email": "E-Mail-Adrässe",
+    "phone": "Telefonnummer (freiwillig)",
+    "message": "Dini Nachricht",
+    "note": "Für Termin und allgemeini Frage. Bitte kei medizinische oder andere sensible Date schicke.",
+    "consent": "Ich bi iiverstande, dass mini Date über FormSubmit a Matthew gönd.",
+    "send": "Nachricht schicke",
+    "received": "Dini Nachricht isch übermittelt. Matthew meldet sich persönlich bi dir.",
+    "mapControls": "Charte bediene",
+    "zoomIn": "Vergrössere",
+    "zoomOut": "Verchlinere",
+    "routeView": "Route aazeige"
+  },
   "footer": {
     "line": "Veränderig fangt im Körper aa.",
     "location": "Zurich, Schwiiz",
     "rights": "Matthew Hua",
     "privacy": "Dateschutz",
-    "privacyText": "Dini Spraachwahl wird i dim Browser gspeicheret. De Ton wird nur mit dim Iiverständnis iigschaltet. D Charte uf de Kontaktsiite ladet Chartekachle vo OpenStreetMap; die Server überchömed die übliche Verbindigsdate, wänn du die Siite ufmachsch. Links für E-Mail, WhatsApp und Navigation mached die jeweilige externe Dienscht uf. Über die Website werded kei Aafrage verschickt.",
+    "privacyText": "Dini Sprachuswahl wird im Browser gspeicheret. Ton startet nur mit dim Iiverständnis. D Charte ladet OpenStreetMap-Date; debi werde Verbindigsdate übermittelt. Date us em Kontaktformular gönd a FormSubmit für de Spamfilter und de Versand a info@healwell.ch. Bitte kei medizinische oder sensible Date schicke. E-Mail, WhatsApp und Charte-Links öffned externi Dienscht.",
     "backTop": "Zrugg nach obe"
   },
   "arrival": {

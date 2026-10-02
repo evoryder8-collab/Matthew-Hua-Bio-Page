@@ -6,9 +6,9 @@
     "welcome": "Un moment pour vous.",
     "choose": "Choisissez votre langue",
     "hint": "Prenez vos aises.",
-    "auto": "Suite en {language} dans {seconds}s",
+    "auto": "Langue détectée : {language} · Sélection automatique dans {seconds}…",
     "detected": "Votre langue",
-    "pause": "Prenez votre temps",
+    "pause": "Suspendre la sélection automatique",
     "continue": "Continuer",
     "sound": "Activer le son ?",
     "soundCopy": "Un peu d'atmosphère. Un lien plus proche.",
@@ -390,12 +390,27 @@
     "copy": "Les larmes sont les bienvenues ici. Vous n'avez pas à tout retenir, à expliquer ce que vous ressentez ni à vous hâter de reprendre contenance. Parfois, la force commence par la permission de ressentir.",
     "note": "Votre rythme. Votre confort. Votre choix."
   },
+  "enquiry": {
+    "title": "Une conversation personnelle.",
+    "name": "Votre nom",
+    "email": "Adresse e-mail",
+    "phone": "Téléphone (facultatif)",
+    "message": "Votre message",
+    "note": "Pour les rendez-vous et les questions générales uniquement. Merci de ne pas inclure de données médicales ou sensibles.",
+    "consent": "J’accepte que mes coordonnées soient transmises à Matthew via FormSubmit.",
+    "send": "Envoyer la demande",
+    "received": "Votre demande a été transmise. Matthew vous répondra personnellement.",
+    "mapControls": "Commandes de la carte",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "routeView": "Voir l’itinéraire"
+  },
   "footer": {
     "line": "La transformation commence dans le corps.",
     "location": "Zurich, Suisse",
     "rights": "Matthew Hua",
     "privacy": "Confidentialité",
-    "privacyText": "Votre préférence de langue est enregistrée dans votre navigateur. Le son ne démarre qu'avec votre accord. La carte de la page Contact charge des tuiles depuis OpenStreetMap ; ses serveurs reçoivent les données de connexion habituelles lorsque vous ouvrez cette page. Les liens de messagerie, WhatsApp et de navigation ouvrent les services externes correspondants. Aucune demande n'est transmise par ce site.",
+    "privacyText": "Votre langue est enregistrée dans votre navigateur. Le son ne démarre qu’avec votre accord. La carte charge des tuiles OpenStreetMap et transmet des données de connexion. Les données du formulaire sont envoyées à FormSubmit pour le filtrage antispam et la transmission par e-mail à info@healwell.ch. N’incluez pas de données médicales ou sensibles. Les liens e-mail, WhatsApp et de navigation ouvrent des services externes.",
     "backTop": "Retour en haut"
   },
   "arrival": {

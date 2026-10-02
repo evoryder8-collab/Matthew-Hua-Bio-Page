@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "node scripts/serve.mjs",
-    "check": "node --check static/app.js && node --check static/templates.js && node --check static/mindset.js && node --check static/effects.js",
+    "check": "node --check static/app.js && node --check static/templates.js && node --check static/mindset.js && node --check static/effects.js && node --check static/game-spotlight.js && node --check static/dialog-atmosphere.js",
     "test": "node scripts/test-content.mjs"
   }
 }

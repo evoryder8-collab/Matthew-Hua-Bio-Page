@@ -2,6 +2,8 @@
 // count is the desktop particle budget; fadeSpeed scales the decay rate.
 export const SPARK_TUNING = {
   sparkSize: 0.95,
+  coreSize: 7.5,
+  coreGlow: 58,
   count: 220,
   trailLength: 0.65,
   opacity: 0.94,
@@ -201,7 +203,7 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
     curtain.moveTo(tip.x - 90 * macroScale, tip.y + wireLength);
     curtain.lineTo(tip.x, tip.y);
     curtain.stroke();
-    const glowRadius = 105 * macroScale * size;
+    const glowRadius = setting('coreGlow',58,12,140) * macroScale * size;
     const halo = curtain.createRadialGradient(tip.x, tip.y - 20 * macroScale, 0, tip.x, tip.y - 20 * macroScale, glowRadius);
     halo.addColorStop(0, 'rgba(255,251,232,1)');
     halo.addColorStop(0.12, 'rgba(255,233,181,0.55)');
@@ -271,13 +273,14 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
 
     // An uneven burning edge keeps the white-hot head alive instead of forming
     // a fixed oval. The neighbouring light trails pick up its champagne bloom.
+    const coreSize = setting('coreSize',7.5,1,32);
     const edge = Array.from({ length: 24 }, (_, index) => {
       const angle = index / 24 * TAU;
-      const radius = (16 + Math.sin(index * 2.7 + time * 14) * 4 + Math.cos(index * 1.4 - time * 9) * 3) * macroScale * size;
+      const radius = coreSize * (1 + Math.sin(index * 2.7 + time * 14) * .24 + Math.cos(index * 1.4 - time * 9) * .16) * macroScale * size;
       return { x: tip.x + Math.cos(angle) * radius, y: tip.y - 12 * macroScale + Math.sin(angle) * radius * 1.3 };
     });
     curtain.shadowColor = '#ffdda0';
-    curtain.shadowBlur = 9 * macroScale;
+    curtain.shadowBlur = 3.5 * macroScale;
     curtain.fillStyle = '#fffdf5';
     curtain.globalAlpha = opacity;
     curtain.beginPath();

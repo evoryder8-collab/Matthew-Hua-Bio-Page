@@ -20,10 +20,16 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
       check(await page.locator('.language-grid > button').count()===9,`${name}: nine main tiles retain ten languages`);
       check(await page.locator('[data-language-family="german"] img').count()===2,`${name}: split tile includes both flag assets`);
       check(await page.locator('[data-language-family="german"]').getAttribute('aria-pressed')==='true',`${name}: detected Swiss language highlights shared tile`);
+      check(await page.locator('[data-language-family="german"]').getAttribute('data-countdown')==='5',`${name}: live countdown starts on detected tile`);
+      check((await page.locator('.portal-countdown').textContent()).includes('5'),`${name}: countdown visible below languages`);
       await page.locator('[data-language-family="german"]').tap();
       await page.locator('.german-options').waitFor();
       check(await page.locator('.portal-focus h2').textContent()==='Deutsch oder Schwiizertüütsch?',`${name}: native German prompt`);
       check(await page.locator('.german-options [data-locale]').count()===2,`${name}: two distinct German choices`);
+      check(await page.locator('.german-options [data-locale]').evaluateAll(buttons=>buttons.every(button=>{
+        const image=button.querySelector('img').getBoundingClientRect(),frame=button.getBoundingClientRect();
+        return image.width>=frame.width-3&&image.height>=frame.height-3;
+      })),`${name}: dialect flags fill their entire buttons`);
       check(await page.locator('.portal-scene').evaluate(el=>el.inert),`${name}: background choices inert`);
       check(await page.locator('.portal-frost').evaluate(el=>getComputedStyle(el).backdropFilter!=='none'),`${name}: background blurred`);
       await page.waitForTimeout(5400);

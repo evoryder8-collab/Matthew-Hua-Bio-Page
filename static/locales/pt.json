@@ -12,9 +12,9 @@
     "welcome": "Um momento só seu.",
     "choose": "Escolha o seu idioma",
     "hint": "Sinta-se em casa.",
-    "auto": "A continuar em {language} dentro de {seconds}s",
+    "auto": "Idioma detetado: {language} · Seleção automática em {seconds}…",
     "detected": "O seu idioma",
-    "pause": "Sem pressa",
+    "pause": "Pausar a seleção automática",
     "continue": "Continuar",
     "sound": "Ativar o som?",
     "soundCopy": "Um pouco de ambiente. Uma ligação mais próxima.",
@@ -396,12 +396,27 @@
     "copy": "As lágrimas têm lugar aqui. Não precisa de guardar tudo para si, explicar o que sente ou apressar-se a recompor-se. Por vezes, a força começa quando nos permitimos sentir.",
     "note": "Ao seu ritmo. Como se sentir à vontade. A escolha é sua."
   },
+  "enquiry": {
+    "title": "Uma conversa pessoal.",
+    "name": "O seu nome",
+    "email": "Endereço de email",
+    "phone": "Telefone (opcional)",
+    "message": "A sua mensagem",
+    "note": "Apenas para marcações e questões gerais. Não inclua informações médicas ou outros dados sensíveis.",
+    "consent": "Aceito que os meus dados sejam enviados a Matthew através do FormSubmit.",
+    "send": "Enviar mensagem",
+    "received": "A sua mensagem foi enviada. Matthew responderá pessoalmente.",
+    "mapControls": "Controlos do mapa",
+    "zoomIn": "Ampliar",
+    "zoomOut": "Reduzir",
+    "routeView": "Ver o percurso"
+  },
   "footer": {
     "line": "A transformação começa no corpo.",
     "location": "Zurich, Suíça",
     "rights": "Matthew Hua",
     "privacy": "Privacidade",
-    "privacyText": "As preferências de idioma são guardadas no seu navegador. O som só é ativado com a sua autorização. O mapa de contacto carrega imagens cartográficas do OpenStreetMap; os respetivos servidores recebem os dados habituais de ligação quando abre essa página. As ligações de email, WhatsApp e navegação abrem os serviços externos correspondentes. Não é enviado qualquer pedido de informação através deste site.",
+    "privacyText": "A preferência de idioma é guardada no navegador. O som só começa com a sua autorização. O mapa carrega imagens do OpenStreetMap e transmite dados de ligação. Os dados do formulário são enviados ao FormSubmit para filtragem de spam e entrega por email a info@healwell.ch. Não inclua dados médicos ou sensíveis. Os links de email, WhatsApp e navegação abrem serviços externos.",
     "backTop": "Voltar ao topo"
   },
   "seo": {

@@ -6,9 +6,9 @@
     "welcome": "Ein Moment für Sie.",
     "choose": "Wählen Sie Ihre Sprache",
     "hint": "Fühlen Sie sich willkommen.",
-    "auto": "Weiter auf {language} in {seconds}s",
+    "auto": "Erkannt: {language} · Automatische Auswahl in {seconds}…",
     "detected": "Ihre Sprache",
-    "pause": "Lassen Sie sich Zeit",
+    "pause": "Automatische Auswahl pausieren",
     "continue": "Weiter",
     "sound": "Ton einschalten?",
     "soundCopy": "Etwas Atmosphäre. Etwas mehr Nähe.",
@@ -390,12 +390,27 @@
     "copy": "Tränen sind hier willkommen. Sie müssen nichts zurückhalten, Ihre Gefühle nicht erklären und sich nicht beeilen, wieder gefasst zu sein. Manchmal beginnt Stärke damit, dass wir uns erlauben zu fühlen.",
     "note": "Ihr Tempo. Ihr Wohlbefinden. Ihre Entscheidung."
   },
+  "enquiry": {
+    "title": "Ein persönliches Gespräch.",
+    "name": "Ihr Name",
+    "email": "E-Mail-Adresse",
+    "phone": "Telefonnummer (optional)",
+    "message": "Ihre Nachricht",
+    "note": "Nur für Termin- und allgemeine Anfragen. Bitte keine medizinischen oder anderen sensiblen Angaben senden.",
+    "consent": "Ich stimme zu, dass meine Angaben über FormSubmit an Matthew gesendet werden.",
+    "send": "Anfrage senden",
+    "received": "Ihre Anfrage wurde übermittelt. Matthew wird persönlich antworten.",
+    "mapControls": "Kartensteuerung",
+    "zoomIn": "Vergrössern",
+    "zoomOut": "Verkleinern",
+    "routeView": "Route anzeigen"
+  },
   "footer": {
     "line": "Veränderung beginnt im Körper.",
     "location": "Zurich, Schweiz",
     "rights": "Matthew Hua",
     "privacy": "Datenschutz",
-    "privacyText": "Ihre Sprachwahl wird in Ihrem Browser gespeichert. Ton wird nur mit Ihrer Zustimmung eingeschaltet. Die Karte auf der Kontaktseite lädt Kartenkacheln von OpenStreetMap; dessen Server erhalten beim Öffnen dieser Seite die üblichen Verbindungsdaten. Links zu E-Mail, WhatsApp und Navigation öffnen die jeweiligen externen Dienste. Über diese Website werden keine Anfragen übermittelt.",
+    "privacyText": "Ihre Spracheinstellung wird im Browser gespeichert. Ton startet nur mit Ihrer Zustimmung. Die Karte lädt OpenStreetMap-Kacheln und übermittelt dabei Verbindungsdaten. Angaben aus dem Kontaktformular werden zur Spamprüfung und E-Mail-Zustellung an info@healwell.ch über FormSubmit verarbeitet. Bitte keine medizinischen oder sensiblen Angaben senden. E-Mail-, WhatsApp- und Navigationslinks öffnen externe Dienste.",
     "backTop": "Nach oben"
   },
   "arrival": {
