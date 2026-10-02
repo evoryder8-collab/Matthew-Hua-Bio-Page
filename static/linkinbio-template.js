@@ -104,9 +104,9 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
 <section class="bio-profile" aria-labelledby="bio-name">
   <figure class="bio-portrait"><img class="bio-portrait__aura" src="${e(asset(PORTRAIT))}" alt="" aria-hidden="true" decoding="async"><img class="bio-portrait__main" src="${e(asset(PORTRAIT))}" alt="${e(d.common.imageAlt)}" decoding="async" fetchpriority="high"></figure>
   <p class="eyebrow">${e(b.welcome)}</p>
-  <h1 id="bio-name"><span>Matthew Hua</span><em>${e(d.home.headline)}</em></h1>
-  <p class="bio-intro">${e(d.home.intro)}</p>
+  <h1 id="bio-name">Matthew Hua</h1>
   <p class="bio-role"><span class="bio-role__dot" aria-hidden="true"></span>${e(d.home.eyebrow)}</p>
+  <p class="bio-headline">${e(d.home.headline)}</p>
   <ul class="bio-honours" aria-label="${e(d.home.awardsLabel)}">${honours.map(x=>`<li>${icon('star')}${e(x)}</li>`).join('')}</ul>
 </section>
 <section class="bio-film" aria-label="${e(d.arrival.eyebrow)}">
