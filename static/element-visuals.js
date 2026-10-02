@@ -554,8 +554,13 @@ function createRenderers() {
   }
   R.body = {
     init(st, w, h) {
-      const cols = Math.round(clamp(w / 20, 26, 50)), rows = Math.round(cols * 0.5);
-      Object.assign(st, { cols, rows, x0: w * 0.06, x1: w * 0.94, y0: h * 0.16, y1: h * 0.7, z: new Float32Array(cols * rows), v: new Float32Array(cols * rows) });
+      // Rows follow the cell width so cells (and the hands' prints) keep the same
+      // foreshortened proportions on a narrow phone as on a wide desktop.
+      // On phones the copy covers more of the stage, so the surface sits higher.
+      const narrow = w < 600, y0 = h * (narrow ? 0.08 : 0.16), y1 = h * (narrow ? 0.5 : 0.7);
+      const cols = Math.round(clamp(w / 20, 26, 50)), cellW = w * 0.88 / (cols - 1);
+      const rows = Math.round(clamp((y1 - y0) / (cellW * 0.62), 12, 40)) + 1;
+      Object.assign(st, { cols, rows, x0: w * 0.06, x1: w * 0.94, y0, y1, z: new Float32Array(cols * rows), v: new Float32Array(cols * rows) });
       st.hands = [0, 1].map((i) => ({ i, lift: 1, vlift: 0, u: 0.5, v: 0.5, angle: 0, contact: 0, bend: new Float32Array(5), vbend: new Float32Array(5), layer: Object.assign(document.createElement('canvas'), { width: 256, height: 300 }) }));
     },
     // Massage rhythm per hand: lower 0.55 s, hold about 2 s with a slow glide, release.
@@ -662,7 +667,7 @@ function createRenderers() {
         const [x, y] = this.project(st, i, j, value, w);
         light(ctx, C.pinkB, x, y, 2 + -value * 8, Math.min(0.6, -value * 1.4));
       }
-      const cellW = (st.x1 - st.x0) / (cols - 1), cellH = (st.y1 - st.y0) / (rows - 1);
+      const cellW = (st.x1 - st.x0) / (cols - 1);
       for (const hand of st.hands) {
         const c = hand.i ? C.mint : C.pink, cb = hand.i ? C.mintB : C.pinkB;
         const lift = Math.max(0, hand.lift), contact = hand.contact;
@@ -674,7 +679,8 @@ function createRenderers() {
         ctx.globalAlpha = 0.5 * (1 - lift * 0.55);
         ctx.drawImage(sprite([6, 4, 10]), px - 70 * (1 + lift), py - 28 * (1 + lift) + 8, 140 * (1 + lift), 56 * (1 + lift));
         paintHand(hand.layer, hand.i === 1, handGeometry(contact, hand.bend), contact, c, cb);
-        const grow = 1 + lift * 0.12, sx = cellW * depth * PALM_CELLS / LAYER_W * grow, sy = cellH * PALM_CELLS / LAYER_W * grow * 1.15;
+        // A fixed, natural aspect (seen at an angle), whatever the screen's shape.
+        const grow = 1 + lift * 0.12, sx = cellW * depth * PALM_CELLS / LAYER_W * grow, sy = sx * 0.74;
         ctx.save();
         ctx.translate(px, py - lift * 34);
         ctx.scale(sx, sy);
