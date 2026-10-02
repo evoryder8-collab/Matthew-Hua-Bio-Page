@@ -214,7 +214,10 @@ async function checkHomeFlows(page, record) {
       const img = document.querySelector('.mindset-photo');
       return img?.complete && img.naturalWidth > 0;
     });
-    await page.locator('.mindset-game [data-action="replay"]').click();
+    // Inside the pop-up, Try again lives in its toolbar; inline it is a game button.
+    const toolbarReplay = page.locator('.game-replay');
+    if (await toolbarReplay.isVisible()) await toolbarReplay.click();
+    else await page.locator('.mindset-game [data-action="replay"]').click();
     await waitPhase('intro');
     record.gameCompleted = true;
   } catch (error) {

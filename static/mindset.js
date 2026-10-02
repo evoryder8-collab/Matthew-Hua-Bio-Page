@@ -61,7 +61,7 @@ function quarterOf(signal) {
 }
 
 /** Mount one self-contained experiment; the caller owns its locale and lifetime. */
-export function mountMindset(host, { copy, asset, reducedMotion = false, onPhaseChange = () => {}, onSound = () => {} }) {
+export function mountMindset(host, { copy, asset, reducedMotion = false, onPhaseChange = () => {}, onSound = () => {}, onContinue = null }) {
   // Named cues only; the page decides whether sound is allowed.
   const sound = (name) => { try { onSound(name); } catch { /* sound is decorative */ } };
   const doc = host.ownerDocument;
@@ -456,6 +456,9 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       field.removeAttribute('aria-describedby');
       field.setAttribute('aria-label', text('finalTitle'));
       renderPhoto();
+      // Onward is the main invitation; the inline replay is hidden inside the pop-up,
+      // whose toolbar already offers it.
+      if (onContinue) addButton(text('continueOn'), 'continue', 'mindset-continue');
       addButton(text('replay'), 'replay', 'mindset-replay');
       sound('conclusion');
     }
@@ -496,6 +499,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       return;
     }
     const action = button.dataset.action;
+    if (['begin', 'confirm', 'next', 'continue', 'replay'].includes(action)) sound('nav');
     if (action === 'begin' && phase === 'intro') setPhase('memorize3seconds');
     else if (action === 'confirm' && phase === 'recall3positions' && picks.size === 3) setPhase('red');
     else if (action === 'answer' && phase === 'red') {
@@ -504,6 +508,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
     } else if (action === 'next' && ['reveal', 'focusTitle', 'lessonTitle', 'integrationTitle'].includes(phase)) {
       setPhase(PHASES[PHASES.indexOf(phase) + 1]);
     } else if (action === 'replay' && phase === 'finalPhoto') setPhase('intro');
+    else if (action === 'continue' && phase === 'finalPhoto') onContinue?.(root.querySelector('.mindset-photo'));
   }
 
   root.addEventListener('click', onClick);

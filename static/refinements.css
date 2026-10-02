@@ -139,6 +139,21 @@ main h1[tabindex="-1"]:focus {outline:none}
 
 .about-story {padding-block:90px}
 
+/* The game's closing light: Matthew and Tony grow brighter until the screen is white. */
+.sun-journey {position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:hidden;outline:none;pointer-events:none}
+.sun-journey::backdrop {background:transparent}
+.sun-bloom {position:absolute;left:var(--sun-x,50%);top:var(--sun-y,50%);width:70vmax;height:70vmax;margin:-35vmax 0 0 -35vmax;border-radius:50%;background:radial-gradient(circle,#fff 0%,#fffdf6 22%,#fff3d8b8 42%,#ffe2b04d 60%,transparent 72%);opacity:0}
+.sun-figure {position:fixed;max-width:none;object-fit:contain;transform-origin:50% 45%}
+.sun-white {position:absolute;inset:0;background:#fff;opacity:0}
+.sun-hdr {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;dynamic-range-limit:no-limit}
+.game-window .mindset-replay {display:none}
+
+/* Release Cutter and Soleo: a soft coloured aura breathing behind each device. */
+.instrument-photo .instrument-aura {position:absolute;left:50%;top:50%;z-index:-1;translate:-50% -50%;opacity:.38;filter:brightness(0) invert(1) blur(14px) drop-shadow(0 0 22px var(--aura,#f29bc0));animation:instrument-aura 5.2s ease-in-out infinite}
+.instrument-photo {isolation:isolate}
+.instrument-zimmer .instrument-aura {--aura:#a9e8c2;animation-delay:-2.6s}
+@keyframes instrument-aura {0%,100%{opacity:.3;scale:1}50%{opacity:.78;scale:1.045}}
+
 /* Mobile menu: WhatsApp, call, email and the studio map, pinned to the bottom. */
 .mobile-nav:not([hidden]) {display:flex;flex-direction:column;padding-bottom:0}
 .mobile-nav-contact {position:sticky;bottom:0;z-index:1;pointer-events:none;display:flex;justify-content:space-around;gap:10px;margin-top:auto;padding:26px 0 calc(18px + env(safe-area-inset-bottom));background:linear-gradient(#f8f4f800,#f8f4f8f7 34%)}
@@ -219,7 +234,8 @@ main h1[tabindex="-1"]:focus {outline:none}
 .arrival-label {font-size:8px}
 .arrival-link {font-size:10px}
 .arrival-enter:focus-visible {outline:none}
-.arrival-enter:focus-visible .arrival-link {outline:2px solid #f7d59c;outline-offset:6px;border-radius:2px}
+.arrival-enter:focus-visible .arrival-link {outline:none}
+[data-input=keyboard] .arrival-enter:focus-visible .arrival-link {outline:2px solid #f7d59c;outline-offset:6px;border-radius:2px}
 .arrival-close {top:15px;right:15px}
 .arrival-transport {bottom:18px;gap:16px}
 
@@ -394,4 +410,5 @@ main h1[tabindex="-1"]:focus {outline:none}
   .header-actions .language-trigger:hover .language-orb,.header-actions .language-trigger:hover svg{transform:none}
   .element-tabs [data-element-tab],.element-tabs [data-element-tab]::before,.element-tabs [data-element-tab]::after,.element-tabs [data-element-tab] span{animation:none!important;transition:none}
   .menu-open .mobile-nav-contact a{animation:none}
+  .instrument-photo .instrument-aura{animation:none}
 }

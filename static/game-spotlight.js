@@ -1,5 +1,6 @@
 import {mountDialogAtmosphere} from './dialog-atmosphere.js';
 import {icon,escapeHTML as e} from './templates.js';
+import {playSunJourney} from './sun-journey.js';
 
 // The game "fires up" in its homepage slot, then lifts forward into the dialog.
 const IGNITE_MS=500,LIFT_MS=900,RETURN_MS=600;
@@ -113,6 +114,22 @@ export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedM
     onClose();
   }
 
+  // "Let's continue": walk into the light; while the screen is white, the game returns
+  // (reset) to its homepage slot and onArrive may move the page on (next element).
+  async function journey(image,hdrSrc,onArrive=()=>{}) {
+    if(!dialog||closing||destroyed)return;
+    closing=true;game.suspend();
+    await playSunJourney({image,hdrSrc,reducedMotion:reducedMotion.matches,onCovered:()=>{
+      if(destroyed)return;
+      restore();game.replay();
+      slot.scrollIntoView({block:'center',behavior:'instant'});
+      onArrive();
+    }});
+    if(destroyed)return;
+    expand.focus({preventScroll:true});
+    onClose();
+  }
+
   function maybeOpen() {
     if(intersects&&!memory.lifted&&!destroyed&&canOpen())open();
   }
@@ -126,6 +143,8 @@ export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedM
 
   return {
     syncPhase,
+    journey,
+    get isOpen(){return Boolean(dialog);},
     refresh:maybeOpen,
     destroy(){
       if(destroyed)return;destroyed=true;observer?.disconnect();

@@ -9,6 +9,7 @@ import {mountGameSpotlight} from './game-spotlight.js';
 import {mountTearsMoment} from './tears.js';
 import {createSoundEffects,createBackgroundMusic} from './sound.js';
 import {mountElementInvite} from './element-invite.js';
+import {playSunJourney} from './sun-journey.js';
 
 const base=new URL('../',import.meta.url);
 document.querySelector('link[rel="icon"]').href=new URL('static/favicon.svg',base).href;
@@ -31,10 +32,10 @@ let elementInvite=null;
 function markExplored(){document.querySelectorAll('[data-element-tab]').forEach(tab=>tab.toggleAttribute('data-explored',exploredElements.has(Number(tab.dataset.elementTab))));}
 const flagURL=code=>new URL('flags/'+code+'.png',import.meta.url).href;
 // Effects sound only after an explicit "sound on" (portal or header speaker) and never with reduced motion.
-const sfx=createSoundEffects({sizzle:asset('sfx/sparkler-sizzle.mp3'),drop:asset('sfx/tear-drop.mp3'),wink:asset('sfx/element-wink.mp3'),pick:asset('sfx/signal-pick.mp3'),twinkle:asset('sfx/red-twinkle.mp3'),conclusion:asset('sfx/conclusion-pop.mp3'),whoosh:asset('sfx/slide-whoosh.mp3')});
+const sfx=createSoundEffects({nav:asset('sfx/magic-wink.mp3'),sizzle:asset('sfx/sparkler-sizzle.mp3'),drop:asset('sfx/tear-drop.mp3'),wink:asset('sfx/element-wink.mp3'),pick:asset('sfx/signal-pick.mp3'),twinkle:asset('sfx/red-twinkle.mp3'),conclusion:asset('sfx/conclusion-pop.mp3'),whoosh:asset('sfx/slide-whoosh.mp3')});
 // Interface cues: [volume, delay ms]. The twinkle waits for the red signal to land; the
 // conclusion pop waits for its slide to arrive after the whoosh.
-const CUES={wink:[.5,0],pick:[.42,0],twinkle:[.62,480],conclusion:[.55,380],whoosh:[.6,0]};
+const CUES={nav:[.45,0],wink:[.5,0],pick:[.42,0],twinkle:[.62,480],conclusion:[.55,380],whoosh:[.6,0]};
 const cue=name=>{const [volume,delay]=CUES[name]||[];if(!soundEnabled||volume===undefined)return;const play=()=>{if(soundEnabled)sfx.play(name,{volume});};if(delay)setTimeout(play,delay);else play();};
 const sizzle=()=>{if(soundEnabled&&!motion.matches)sfx.play('sizzle',{volume:.72,fadeIn:.06});};
 const tearSound=strength=>{if(soundEnabled)sfx.play('drop',{volume:.62*strength+.08,rate:strength<1?1.18+(1-strength)*.4:1,maxLate:.12});};
@@ -211,6 +212,17 @@ function prepareArrival({holdMusic=false}={}){
   video.pause();
   return arrival;
 }
+// The game's closing "Let's continue": into the light, then on down the page.
+const hdrWhite=asset('films/hdr-white.mp4');
+// While the screen is white, the elements move on from Mindset to Hot / Cold.
+function arriveAtNextElement(){
+  selectElement(1);
+  document.querySelector('.method-console')?.scrollIntoView({block:'start',behavior:'instant'});
+}
+function continueFromGame(image){
+  if(spotlight?.isOpen){spotlight.journey(image,hdrWhite,arriveAtNextElement);return;}
+  playSunJourney({image,hdrSrc:hdrWhite,reducedMotion:motion.matches,onCovered:arriveAtNextElement});
+}
 function selectElement(index){
   if(!document.getElementById('element-panel'))return;index=Math.max(0,Math.min(5,Number(index)||0));spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;
   selectedElement=index;exploredElements.add(index);markExplored();const panel=document.getElementById('element-panel');
@@ -218,7 +230,7 @@ function selectElement(index){
   panel.setAttribute('aria-labelledby',`element-tab-${index}`);
   if(index===0){
     panel.innerHTML='<div id="mindset-host"></div>';const host=document.getElementById('mindset-host');
-    game=mountMindset(host,{copy:dict.game,asset,reducedMotion:motion.matches,onPhaseChange:phase=>spotlight?.syncPhase(phase),onSound:cue});
+    game=mountMindset(host,{copy:dict.game,asset,reducedMotion:motion.matches,onPhaseChange:phase=>spotlight?.syncPhase(phase),onSound:cue,onContinue:continueFromGame});
     if(route==='home')spotlight=mountGameSpotlight(host,{game,copy:dict.game,common:dict.common,canOpen:()=>!document.hidden&&!portal&&!arrival&&!modal&&!navigating&&!document.body.classList.contains('menu-open'),icons,reducedMotion:motion,memory:gameMemory,onClose:()=>elementInvite?.refresh()});
   }
   else {panel.innerHTML=renderElement(index,dict);elementVisual=mountElementVisual(document.getElementById('element-visual-host'),index,{reducedMotion:motion.matches});}
@@ -486,6 +498,10 @@ document.addEventListener('keydown',event=>{
   event.preventDefault();selectElement(next);document.getElementById(`element-tab-${next}`).focus();
 });
 addEventListener('scroll',()=>document.body.classList.toggle('scrolled',scrollY>35),{passive:true});
+// Keyboard focus rings only after keyboard use: programmatic focus (e.g. the arrival
+// film's "Enter" link on a phone) must not draw a rectangle.
+addEventListener('keydown',event=>{if(!event.metaKey&&!event.ctrlKey&&!event.altKey)document.documentElement.dataset.input='keyboard';},true);
+addEventListener('pointerdown',()=>{document.documentElement.dataset.input='pointer';},{capture:true,passive:true});
 addEventListener('popstate',async()=>{
   const wanted=resolveLocale([],(new URL(location.href)).searchParams.get('lang'),readStore(localStorage,'matthew-language'));
   // In-page links such as Discover only change the fragment. Keep the live page, its scroll
