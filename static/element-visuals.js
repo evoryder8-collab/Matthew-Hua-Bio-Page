@@ -701,78 +701,123 @@ function createRenderers() {
     },
   };
 
-  /* MOVEMENT: a figure of light flows through a mobility sequence (side reaches, soft
-     squats); faint afterimages of its last poses show the motion and the range of ease. */
+  /* MOVEMENT: a steel-mace 360. The mace is a heavy-headed pendulum on the hands:
+     gravity speeds the head as it drops behind the back and slows it as it climbs over
+     the other shoulder; the athlete drives through the bottom just enough to carry it
+     over, catches it upright in front, and swings the other way. */
+  const MACE_G = 14, MACE_TOP = 1.9, MACE_ENERGY = 0.5 * MACE_TOP * MACE_TOP + MACE_G + 3.2;
   R.movement = {
     init(st, w, h) {
-      st.S = h * 0.6; st.floor = h * 0.66; st.cx = w * 0.5;
+      Object.assign(st, { S: h * 0.5, floor: h * 0.7, cx: w * 0.5, phi: 0, omega: 0, dir: 1, mode: 'rest', timer: 0.6, trail: [] });
     },
-    pose(st, t) {
-      const S = st.S, w = 2 * Math.PI / 12;
-      const side = Math.sin(t * w), sq = ((1 - Math.cos(2 * t * w)) / 2) * 0.85;
-      const lean = side * 0.24;
+    step(st, dt) {
+      if (st.mode === 'rest') {
+        // Held upright in front, settling, before the next swing the other way.
+        st.omega += (-30 * st.phi - 9 * st.omega) * dt; st.phi += st.omega * dt; st.timer -= dt;
+        if (st.timer <= 0) { st.mode = 'swing'; st.omega = st.dir * 1.4; }
+        return;
+      }
+      const a = ((st.phi % TAU) + TAU) % TAU, rel = Math.abs(a - Math.PI);
+      let acc = MACE_G * Math.sin(st.phi);                                   // gravity
+      const energy = 0.5 * st.omega * st.omega + MACE_G * Math.cos(st.phi);
+      if (rel < 1.3) acc += st.dir * clamp(6 * (MACE_ENERGY - energy), -20, 20) * (1 - rel / 1.3);   // the drive
+      acc -= 0.2 * st.omega;                                                 // grip and air losses
+      st.omega += acc * dt; st.phi += st.omega * dt;
+      if (st.dir * st.phi >= TAU) { st.phi -= st.dir * TAU; st.mode = 'rest'; st.timer = 0.55; st.dir *= -1; }
+    },
+    pose(st) {
+      const S = st.S, phi = st.phi;
+      const behind = (1 - Math.cos(phi)) / 2;                               // 0 in front, 1 down the back
+      const sway = -Math.sin(phi) * 0.07, load = behind * 0.3;               // counterbalance, knees load
       const P = (x, y) => ({ x, y });
-      const pelvis = P(st.cx - side * S * 0.03, 0);
-      const chest = P(pelvis.x + Math.sin(lean) * S * 0.28, pelvis.y - Math.cos(lean) * S * 0.28);
-      const head = P(chest.x + Math.sin(lean * 1.3) * S * 0.11, chest.y - Math.cos(lean * 1.3) * S * 0.11);
-      const perp = [Math.cos(lean), Math.sin(lean)];
+      const pelvis = P(st.cx + Math.sin(phi) * S * 0.015, 0);
+      const chest = P(pelvis.x + Math.sin(sway) * S * 0.28, -Math.cos(sway) * S * 0.28);
+      const head = P(chest.x + Math.sin(sway * 1.2) * S * 0.11, chest.y - Math.cos(sway * 1.2) * S * 0.11);
+      const perp = [Math.cos(sway), Math.sin(sway)];
       const shL = P(chest.x - perp[0] * S * 0.11, chest.y - perp[1] * S * 0.11), shR = P(chest.x + perp[0] * S * 0.11, chest.y + perp[1] * S * 0.11);
-      const raiseL = smooth((side + 0.25) / 1.1), raiseR = smooth((-side + 0.25) / 1.1);
-      const aUL = Math.PI / 2 + 0.35 + raiseL * (Math.PI + 0.6), aUR = Math.PI / 2 - 0.35 - raiseR * (Math.PI + 0.6);
-      const limb = (o, a, L) => P(o.x + Math.cos(a) * L, o.y + Math.sin(a) * L);
-      const elL = limb(shL, aUL, S * 0.15), elR = limb(shR, aUR, S * 0.15);
-      const wrL = limb(elL, aUL - 0.3 * (1 - raiseL) - 0.08, S * 0.14), wrR = limb(elR, aUR + 0.3 * (1 - raiseR) + 0.08, S * 0.14);
-      const hipL = P(pelvis.x - S * 0.06, pelvis.y), hipR = P(pelvis.x + S * 0.06, pelvis.y);
-      const tL = Math.PI / 2 + 0.1 + sq * 0.34, tR = Math.PI / 2 - 0.1 - sq * 0.34;
+      // Grip: in front of the chest with the mace upright, rising overhead as it passes behind.
+      const grip = P(chest.x - Math.sin(phi) * S * 0.07, chest.y + S * 0.02 - behind * S * 0.3);
+      const axis = [Math.sin(phi), -Math.cos(phi)], L = S * 0.48;
+      const lower = P(grip.x - axis[0] * S * 0.025, grip.y - axis[1] * S * 0.025), upper = P(grip.x + axis[0] * S * 0.045, grip.y + axis[1] * S * 0.045);
+      const ik = (sh, target, out) => {                                    // two-bone arm, elbow outward
+        const a = S * 0.15, b = S * 0.14, dx = target.x - sh.x, dy = target.y - sh.y;
+        const d = clamp(Math.hypot(dx, dy), 1e-3, a + b - 0.5), base = Math.atan2(dy, dx);
+        const bend = Math.acos(clamp((a * a + d * d - b * b) / (2 * a * d), -1, 1));
+        // Of the two possible elbows, take the one hanging lower (weight pulls them down),
+        // nudged outward, like real arms under a heavy mace.
+        const options = [base + bend, base - bend].map((ang) => P(sh.x + Math.cos(ang) * a, sh.y + Math.sin(ang) * a));
+        const score = (e) => e.y + out * (sh.x - e.x) * -0.3;
+        const elbow = score(options[0]) >= score(options[1]) ? options[0] : options[1];
+        const reach = Math.atan2(target.y - elbow.y, target.x - elbow.x);
+        return [elbow, P(elbow.x + Math.cos(reach) * b, elbow.y + Math.sin(reach) * b)];
+      };
+      const [elL, wrL] = ik(shL, lower, 1), [elR, wrR] = ik(shR, upper, -1);
+      const hipL = P(pelvis.x - S * 0.07, pelvis.y), hipR = P(pelvis.x + S * 0.07, pelvis.y);
+      const limb = (o, an, len) => P(o.x + Math.cos(an) * len, o.y + Math.sin(an) * len);
+      const tL = Math.PI / 2 + 0.12 + load * 0.35, tR = Math.PI / 2 - 0.12 - load * 0.35;
       const knL = limb(hipL, tL, S * 0.24), knR = limb(hipR, tR, S * 0.24);
-      const ftL = limb(knL, tL - 0.12 - sq * 0.66, S * 0.23), ftR = limb(knR, tR + 0.12 + sq * 0.66, S * 0.23);
-      const joints = { pelvis, chest, head, shL, shR, elL, elR, wrL, wrR, hipL, hipR, knL, knR, ftL, ftR };
-      const drop = st.floor - Math.max(ftL.y, ftR.y);   // feet stay on the floor
-      for (const k in joints) joints[k].y += drop;
-      return { joints, aUL, aUR };
+      const ftL = limb(knL, tL - 0.14 - load * 0.7, S * 0.23), ftR = limb(knR, tR + 0.14 + load * 0.7, S * 0.23);
+      const J = { pelvis, chest, head, shL, shR, elL, elR, wrL, wrR, hipL, hipR, knL, knR, ftL, ftR };
+      const drop = st.floor - Math.max(ftL.y, ftR.y);
+      const handleEnd = P(grip.x - axis[0] * S * 0.06, grip.y - axis[1] * S * 0.06), ball = P(grip.x + axis[0] * L, grip.y + axis[1] * L);
+      for (const p of [...Object.values(J), handleEnd, ball, grip]) p.y += drop;
+      return { J, handleEnd, ball, behind: Math.cos(phi) < -0.12, depth: Math.cos(phi) };
     },
-    figure(ctx, J, S, alpha, glow) {
+    figure(ctx, J, S) {
       const unit = S / 100;
       const bone = (a, b, c, width) => {
-        if (glow) { ctx.globalAlpha = 0.12 * alpha; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = width * 4; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
-        ctx.globalAlpha = 0.9 * alpha; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = Math.max(1.2, width * 0.45);
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        ctx.globalAlpha = 0.12; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = width * 4; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        ctx.globalAlpha = 0.9; ctx.lineWidth = Math.max(1.2, width * 0.45); ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       };
-      if (glow) {
-        ctx.globalAlpha = 0.16 * alpha; ctx.fillStyle = rgba(C.white, 1);
-        ctx.beginPath(); ctx.moveTo(J.shL.x, J.shL.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.hipL.x, J.hipL.y); ctx.lineTo(J.hipR.x, J.hipR.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.shR.x, J.shR.y); ctx.closePath(); ctx.fill();
-      }
+      ctx.globalAlpha = 0.16; ctx.fillStyle = rgba(C.white, 1);
+      ctx.beginPath(); ctx.moveTo(J.shL.x, J.shL.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.hipL.x, J.hipL.y); ctx.lineTo(J.hipR.x, J.hipR.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.shR.x, J.shR.y); ctx.closePath(); ctx.fill();
       bone(J.pelvis, J.chest, C.white, 4.2 * unit); bone(J.shL, J.shR, C.white, 3.4 * unit); bone(J.hipL, J.hipR, C.white, 3.4 * unit);
-      bone(J.shL, J.elL, C.pink, 3.2 * unit); bone(J.elL, J.wrL, C.pink, 2.6 * unit);
-      bone(J.shR, J.elR, C.mint, 3.2 * unit); bone(J.elR, J.wrR, C.mint, 2.6 * unit);
       bone(J.hipL, J.knL, C.pink, 3.6 * unit); bone(J.knL, J.ftL, C.pink, 3 * unit);
       bone(J.hipR, J.knR, C.mint, 3.6 * unit); bone(J.knR, J.ftR, C.mint, 3 * unit);
-      light(ctx, C.white, J.head.x, J.head.y, S * 0.12, 0.7 * alpha);
-      if (!glow) return;
+      bone(J.shL, J.elL, C.pink, 3.2 * unit); bone(J.elL, J.wrL, C.pink, 2.6 * unit);
+      bone(J.shR, J.elR, C.mint, 3.2 * unit); bone(J.elR, J.wrR, C.mint, 2.6 * unit);
+      light(ctx, C.white, J.head.x, J.head.y, S * 0.12, 0.7);
       light(ctx, C.white, J.head.x, J.head.y, S * 0.04, 1);
       for (const [k, c] of [['shL', C.pinkB], ['elL', C.pinkB], ['wrL', C.pinkB], ['knL', C.pinkB], ['shR', C.mintB], ['elR', C.mintB], ['wrR', C.mintB], ['knR', C.mintB], ['pelvis', C.white], ['chest', C.white]]) { light(ctx, c, J[k].x, J[k].y, S * 0.045, 0.75); light(ctx, C.white, J[k].x, J[k].y, S * 0.012, 1); }
     },
+    mace(ctx, st, m, S) {
+      const dim = m.behind ? 0.42 : 1;
+      // The head's light trail, fading along the arc it has just travelled.
+      for (let i = 1; i < st.trail.length; i++) {
+        const a = st.trail[i - 1], b = st.trail[i], k = i / st.trail.length;
+        ctx.globalAlpha = k * k * 0.5 * (b.behind ? 0.45 : 1); ctx.strokeStyle = rgba(C.gold, 1); ctx.lineWidth = S * 0.012 + k * S * 0.03;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+      ctx.globalAlpha = 0.18 * dim; ctx.strokeStyle = rgba(C.gold, 1); ctx.lineWidth = S * 0.04;
+      ctx.beginPath(); ctx.moveTo(m.handleEnd.x, m.handleEnd.y); ctx.lineTo(m.ball.x, m.ball.y); ctx.stroke();
+      ctx.globalAlpha = 0.95 * dim; ctx.strokeStyle = rgba([255, 238, 205], 1); ctx.lineWidth = Math.max(1.6, S * 0.012);
+      ctx.beginPath(); ctx.moveTo(m.handleEnd.x, m.handleEnd.y); ctx.lineTo(m.ball.x, m.ball.y); ctx.stroke();
+      light(ctx, C.gold, m.ball.x, m.ball.y, S * 0.13, 0.55 * dim);
+      ctx.globalAlpha = dim;
+      const r = S * 0.042, ball = ctx.createRadialGradient(m.ball.x - r * 0.35, m.ball.y - r * 0.35, r * 0.1, m.ball.x, m.ball.y, r);
+      ball.addColorStop(0, '#fffaf0'); ball.addColorStop(0.6, '#ffd27a'); ball.addColorStop(1, '#c98a2e');
+      ctx.fillStyle = ball; ctx.beginPath(); ctx.arc(m.ball.x, m.ball.y, r, 0, TAU); ctx.fill();
+    },
     draw(ctx, w, h, t, st) {
+      advance(st, t, (dt) => {
+        const n = Math.max(1, Math.ceil(dt / (1 / 120)));
+        for (let i = 0; i < n; i++) this.step(st, dt / n);
+        const m = this.pose(st);
+        st.trail.push({ x: m.ball.x, y: m.ball.y, behind: m.behind });
+        if (st.trail.length > 16) st.trail.shift();
+      });
       backdrop(ctx, w, h, '#0b0d14', '#0a0b10');
-      const { joints: J, aUL, aUR } = this.pose(st, t);
-      const S = st.S;
+      const S = st.S, m = this.pose(st);
       ctx.globalCompositeOperation = 'lighter';
       light(ctx, C.pink, w * 0.3, h * 0.35, w * 0.35, 0.09);
       light(ctx, C.mint, w * 0.7, h * 0.35, w * 0.35, 0.09);
       ctx.globalAlpha = 0.14; ctx.strokeStyle = rgba(C.white, 1); ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(w * 0.15, st.floor + 2); ctx.lineTo(w * 0.85, st.floor + 2); ctx.stroke();
-      light(ctx, C.white, (J.ftL.x + J.ftR.x) / 2, st.floor + 2, S * 0.22, 0.08);
-      const rom = (o, from, to, now, c) => {
-        ctx.globalAlpha = 0.09; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = 1; ctx.setLineDash([2, 5]);
-        ctx.beginPath(); ctx.arc(o.x, o.y, S * 0.15, Math.min(from, to), Math.max(from, to)); ctx.stroke(); ctx.setLineDash([]);
-        ctx.globalAlpha = 0.45; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(o.x, o.y, S * 0.15, now - 0.18, now + 0.18); ctx.stroke();
-      };
-      rom(J.shL, Math.PI / 2 + 0.35, Math.PI / 2 + 0.35 + Math.PI + 0.6, aUL, C.pink);
-      rom(J.shR, Math.PI / 2 - 0.35 - Math.PI - 0.6, Math.PI / 2 - 0.35, aUR, C.mint);
+      light(ctx, C.white, (m.J.ftL.x + m.J.ftR.x) / 2, st.floor + 2, S * 0.22, 0.08);
       ctx.lineCap = 'round';
-      // Afterimages of the last moments of movement, fading into the present pose.
-      for (const [delay, alpha] of [[0.6, 0.1], [0.4, 0.16], [0.2, 0.24]]) this.figure(ctx, this.pose(st, Math.max(0, t - delay)).joints, S, alpha, false);
-      this.figure(ctx, J, S, 1, true);
+      if (m.behind) this.mace(ctx, st, m, S);      // down the back: behind the body
+      this.figure(ctx, m.J, S);
+      if (!m.behind) this.mace(ctx, st, m, S);
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     },
   };
