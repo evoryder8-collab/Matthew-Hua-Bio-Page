@@ -44,6 +44,7 @@ Generated `index.html` files are committed, so GitHub Pages does not need a buil
 - `assets/films/`: H.264/AAC derivatives for Safari/Chrome. Original uploads remain unchanged.
 - `assets/editorial/`: real photographs from the supplied biography; see `MEDIA-NOTES.md` for provenance and retained credits.
 - `static/studio-route.json`: illustrative Zurich HB driving route, not live traffic or user-location routing.
+- `static/linkinbio-template.js`, `static/linkinbio.js`, `static/linkinbio.css`: the native link-in-bio page at `/linkinbio/` (built into `linkinbio/index.html`; copy in each locale's `bio` block). `matthew-hua.vcf` is its downloadable contact card.
 
 ## Behaviour
 
@@ -62,6 +63,8 @@ On the homepage, reaching the game first "fires it up" in place (a 500ms traced 
 The six element tabs invite a tap once the game is closed: a spring wave with a sheen, a sideways peek on the scrolling mobile row, then a quiet shimmer until one is opened. Unopened elements keep a small breathing dot.
 
 Directly after the award ribbon, "No need to wipe the tears away." plays once in view: a wave of light runs to the full stop, which gathers, pinches off, falls and splashes onto "Tears are welcome here", rippling its words before the full stop re-forms. Reduced motion shows the plain text. The award ribbon clones itself to cover any viewport width. "A life across borders" now lives on About.
+
+`/linkinbio/` is the destination for social profiles. It follows the visitor's saved, URL or browser language, with its own flag menu. The European Championship film plays by itself inside a 9:16 frame of about 60% of a phone's height with a breathing pink/mint glow: audible where the browser allows it, otherwise muted with a "Tap for sound" chip; a previous "sound off" on that page is respected, reduced motion leaves it paused, and it rests while scrolled away. The tears moment sits beneath it with the same scroll brake. WhatsApp leads the platform-tinted glass links (contact card, phone, email, Instagram, Facebook, Threads, YouTube, LinkedIn, Google Maps), followed by the six elements on a slowly turning wheel: tapping a segment springs it to the pointer, sprays the selected label with sparks and blooms that element's visual open below (Mindset opens the game with all its sounds; its closing light lands on Hot / Cold). Website links, the studio map with the Google/Apple driving chooser, and the footer follow. Effects sound only once sound is on.
 
 Choosing sound also enables a quiet soundtrack and interface sounds: the sparkle sizzle, the tear's drop, a wink on each element tab, a note for every recall tap, a twinkle when a missed red signal is revealed, a fire whoosh for each teaching slide and a positive pop for the conclusion. The soundtrack waits only through the opening sequence (first sparkle and arrival film), then glides in and stays, sparkle transitions included; any film that actually plays (a replayed arrival film or a gallery film) lowers it to silence on an eased curve and hands it back when it stops. Effects always play on top. Declining sound keeps everything silent and the soundtrack is never loaded.
 

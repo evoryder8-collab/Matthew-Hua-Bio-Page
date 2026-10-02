@@ -1,5 +1,6 @@
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {renderPage,renderHeader,renderFooter,routes,escapeHTML as e} from '../static/templates.js';
+import {renderLinkInBio,SOCIAL} from '../static/linkinbio-template.js';
 const en=JSON.parse(await readFile(new URL('../static/locales/en.json',import.meta.url),'utf8'));
 const root=new URL('../',import.meta.url);
 for(const route of routes){
@@ -20,4 +21,25 @@ for(const route of routes){
 <body data-route="${route}"><div class="bg-aurora" aria-hidden="true"><span class="blob g1"></span><span class="blob p1"></span><span class="blob g2"></span><span class="blob p2"></span><span class="blob g3"></span><span class="blob p3"></span></div><div id="shell">${renderHeader(en,href,route,flag)}<main id="main">${renderPage(route,en,asset,href)}</main>${renderFooter(en,href)}</div><div id="overlay-root"></div><canvas id="transition-canvas" aria-hidden="true"></canvas><canvas id="sparkler-canvas" aria-hidden="true"></canvas><script defer src="${prefix}static/vendor/lucide.min.js"></script><script defer src="${prefix}static/vendor/leaflet.js"></script><script type="module" src="${prefix}static/app.js"></script></body></html>`;
   const dir=route==='home'?root:new URL(route+'/',root); await mkdir(dir,{recursive:true});await writeFile(new URL('index.html',dir),html);
 }
-console.log('Built six static pages with accessible English content and shared multilingual enhancement.');
+// The link-in-bio page has its own column layout and module (static/linkinbio.js).
+{
+  const prefix='../';
+  const asset=file=>prefix+'assets/'+file.split('/').map(encodeURIComponent).join('/');
+  const href=r=>prefix+(r==='home'?'':r+'/');
+  const file=path=>prefix+path;
+  const flag=code=>prefix+'static/flags/'+code+'.png';
+  const canonical='https://matthewhua.ch/linkinbio/';
+  const b=en.bio;
+  const person={'@context':'https://schema.org','@type':'Person',name:'Matthew Hua',url:'https://matthewhua.ch/',jobTitle:'Transformational Therapist',email:'info@healwell.ch',telephone:'+41765067488',sameAs:Object.values(SOCIAL),address:{'@type':'PostalAddress',streetAddress:'Rüdigerstrasse 7/Ground Floor',postalCode:'8045',addressLocality:'Zürich',addressCountry:'CH'},worksFor:{'@type':'Organization',name:'healwell'}};
+  const html=`<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="color-scheme" content="light"><title>${e(b.title)}</title>
+<meta name="description" content="${e(b.description)}"><meta name="author" content="Matthew Hua"><link rel="canonical" href="${canonical}"><meta name="theme-color" content="#f4ecf6">
+<meta property="og:type" content="profile"><meta property="og:site_name" content="Matthew Hua"><meta property="og:title" content="${e(b.title)}"><meta property="og:description" content="${e(b.description)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://matthewhua.ch/assets/matthew-hua-tony-share-v1.jpg"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="634"><meta property="og:image:alt" content="Matthew Hua with Tony Robbins. Transformation starts in the body."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${e(b.title)}"><meta name="twitter:description" content="${e(b.description)}"><meta name="twitter:image" content="https://matthewhua.ch/assets/matthew-hua-tony-share-v1.jpg">
+<link rel="icon" href="${prefix}static/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="${asset('matthew-tony-game-2400.webp')}" fetchpriority="high"><link rel="stylesheet" href="${prefix}static/vendor/leaflet.css"><link rel="stylesheet" href="${prefix}static/style.css"><link rel="stylesheet" href="${prefix}static/mindset.css"><link rel="stylesheet" href="${prefix}static/element-visuals.css"><link rel="stylesheet" href="${prefix}static/identity.css"><link rel="stylesheet" href="${prefix}static/refinements.css"><link rel="stylesheet" href="${prefix}static/linkinbio.css">
+<script>document.documentElement.classList.add('js');</script>
+<script type="application/ld+json">${JSON.stringify(person)}</script></head>
+<body class="bio-page" data-route="linkinbio"><div class="bg-aurora" aria-hidden="true"><span class="blob g1"></span><span class="blob p1"></span><span class="blob g2"></span><span class="blob p2"></span><span class="blob g3"></span><span class="blob p3"></span></div><div id="bio-shell" data-locale="en">${renderLinkInBio(en,{asset,href,file,flag})}</div><div id="overlay-root"></div><script defer src="${prefix}static/vendor/lucide.min.js"></script><script defer src="${prefix}static/vendor/leaflet.js"></script><script type="module" src="${prefix}static/linkinbio.js"></script></body></html>`;
+  const dir=new URL('linkinbio/',root);await mkdir(dir,{recursive:true});await writeFile(new URL('index.html',dir),html);
+}
+console.log('Built seven static pages (six site routes and /linkinbio) with accessible English content and shared multilingual enhancement.');

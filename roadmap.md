@@ -105,6 +105,7 @@ Status terms used below: **Implemented** means present in the source; **Verified
 | `/about/` | "A life across borders" introduction, biography chapters, real photographs, timeline, training foundation, Tony influence/encounter, Zurich practice connections. |
 | `/archive/` | Filterable photo/film archive with modal viewing and navigation. |
 | `/contact/` | Email, WhatsApp, phone, address, enquiry form, styled map, driving chooser, insurance information. |
+| `/linkinbio/` | Social-profile landing page: portrait, self-playing European Championship film (framed, breathing glow), tears moment with scroll brake, WhatsApp-first platform links and contact card, spinning six-element wheel revealing each element's visual and the game, studio map, footer. Standalone module; not part of the six-route navigation. |
 
 All six have independently addressable generated English HTML. Runtime localisation and navigation enhance them. New page ideas must deepen relevance, not duplicate existing pages to inflate page count.
 
@@ -177,6 +178,8 @@ All six have independently addressable generated English HTML. Runtime localisat
 | Portrait dismissal-triggered shine, continuous subtle aura/float, properly aligned contact icons | `f811195`; 144 focused browser assertions, 124 experience assertions and 60 content renders passed locally. |
 | Detailed roadmap and repair handoff | `9c56da3`. |
 | Tears moment, game ignition/X/crossfades/torch slides/red reveal, element invitation, language pill, dialect bloom, welcome hold, eased curtain, endless ribbon, consent-gated effects and soundtrack | `8837e16`, published; automation and live smoke verified (see repair notes); not device-verified. |
+
+| Native `/linkinbio/` page adapted from the LUMA link-in-bio pattern | Implemented and published; WebKit iPhone (440x956) and desktop checks; real Instagram in-app autoplay and the downloaded contact card on a device remain unverified. |
 
 Historical commits are context, not instructions to restore an entire old revision. Multiple later fixes depend on one another.
 

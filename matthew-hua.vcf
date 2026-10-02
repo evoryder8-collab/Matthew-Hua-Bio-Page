@@ -1,0 +1,17 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Hua;Matthew;;;
+FN:Matthew Hua
+ORG:healwell
+TITLE:Transformational Therapist
+TEL;TYPE=CELL,VOICE:+41 76 506 74 88
+EMAIL;TYPE=INTERNET,WORK:info@healwell.ch
+ADR;TYPE=WORK:;Ground Floor;Rüdigerstrasse 7;Zürich;;8045;Switzerland
+URL:https://matthewhua.ch/
+X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/healwell.ch/
+X-SOCIALPROFILE;TYPE=facebook:https://www.facebook.com/798396450196704
+X-SOCIALPROFILE;TYPE=threads:https://www.threads.com/@healwell.ch
+X-SOCIALPROFILE;TYPE=youtube:https://www.youtube.com/channel/UCv6wQL8NsjxnEzns6yOGzBA
+X-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/matthewhua/
+NOTE:Transformation starts in the body. Bodywork\, breathwork and precision technology in Zurich.
+END:VCARD
