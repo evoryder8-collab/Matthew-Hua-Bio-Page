@@ -4,7 +4,7 @@ Last updated: 2026-10-02, Europe/Zurich.
 
 This is the product and creative handoff for [matthewhua.ch](https://matthewhua.ch/). Read it with [repair-notes.md](repair-notes.md), which contains implementation details, regression history, verification and release procedures. [README.md](README.md) is the short operational guide; [MEDIA-NOTES.md](MEDIA-NOTES.md) records media provenance and encoding.
 
-The latest committed implementation is `f811195`, following `dd60047`. A further experience release (tears moment, game ignition/X/crossfades/red reveal, element invitation, language pill, dialect bloom, eased curtain, endless ribbon, consent-gated sound effects and soundtrack) is **implemented and automation-verified in the working tree but not yet committed or published**; see "This Release" in the repair notes.
+The latest implementation release is `8837e16` (published 2026-10-02): tears moment, game ignition/X/crossfades/torch slides/red reveal, element invitation, language pill, dialect bloom, welcome hold, eased curtain, endless ribbon, consent-gated sound effects and soundtrack. It follows `f811195`. See "This Release" in the repair notes.
 
 ## 1. Product Purpose
 
@@ -99,7 +99,7 @@ Status terms used below: **Implemented** means present in the source; **Verified
 
 | Route | Role And Current Contents |
 | --- | --- |
-| `/` | Matthew/Tony hero; endless recognition ribbon; "No need to wipe the tears away." tears moment; Six Elements and attention game; animated machine demonstrations; gallery; contact invitation. (The biography introduction moved to About in the working-tree release.) |
+| `/` | Matthew/Tony hero; endless recognition ribbon; "No need to wipe the tears away." tears moment; Six Elements and attention game; animated machine demonstrations; gallery; contact invitation. (The biography introduction moved to About in `8837e16`.) |
 | `/method/` | Six Elements, inline attention game, Release Cutter and Soleo SonoStim demonstrations, hands/instruments comparison. |
 | `/private-practice/` | Discretion, individual attention, first-visit process, practical FAQ, insurance and session-language context. |
 | `/about/` | "A life across borders" introduction, biography chapters, real photographs, timeline, training foundation, Tony influence/encounter, Zurich practice connections. |
@@ -110,12 +110,12 @@ All six have independently addressable generated English HTML. Runtime localisat
 
 ### Entrance And Language
 
-- Implemented: first visit in a tab opens the language portal after the opening sparkle animation. Working tree: "A moment for yourself" now holds a deliberate 1s after the sparkle and crossfades into the language choice (previously it could flash for under 200ms).
+- Implemented: first visit in a tab opens the language portal after the opening sparkle animation. Since `8837e16`: "A moment for yourself" now holds a deliberate 1s after the sparkle and crossfades into the language choice (previously it could flash for under 200ms).
 - Locale priority: valid `?lang=` selection, then saved language, then browser language, then English. `de-CH` and `gsw` map to Zurich Swiss German.
 - Languages: English (`en`), Swiss German (`gsw`), High German (`de`), Spanish (`es`), Portuguese (`pt`), French (`fr`), Italian (`it`), Mandarin (`zh`), Vietnamese (`vi`), Japanese (`ja`).
 - Nine main flag tiles represent ten languages. The German-family tile is a diagonally split Swiss/German flag. It opens "Deutsch oder Schwiizertüütsch?" with two full-bleed flag choices.
 - Detected/saved selection is highlighted with an animated progress treatment and active five-second countdown. Opening the dialect choice, choosing a language, navigating by keyboard or pressing Pause stops automatic commitment. Hidden-page time does not silently consume the choice.
-- Both the dialect choice and sound confirmation use a very dark blurred background with continuous warm sparks behind the focused content. Working tree: the darkness eases in/out; the DE tile blooms into the two flags, which float in counterpoint and glow in turn. The header language control is a pill with the current flag orb and code.
+- Both the dialect choice and sound confirmation use a very dark blurred background with continuous warm sparks behind the focused content. Since `8837e16`: the darkness eases in/out; the DE tile blooms into the two flags, which float in counterpoint and glow in turn. The header language control is a pill with the current flag orb and code.
 - Sound is a separate explicit choice, not an assumption based on language, previous visits or autoplay capability.
 - Reopening language selection from the header retains the entire sound-and-transition workflow. On Home it introduces the film again; on a subpage it preserves the current page.
 - First-entry state is tab-session scoped. Language is saved locally. Sound consent is not persisted.
@@ -133,16 +133,16 @@ All six have independently addressable generated English HTML. Runtime localisat
 
 ### Attention Experiment
 
-- Twelve stable signal positions; three blue signals are memorised during a three-second phase, then selected from memory. A red-signal question follows. Working tree: the memory clock starts after the 420ms slide fade; the recall question glows and floats; the answer slide always reveals the real red signal crisply above the blur (gold rim when found).
+- Twelve stable signal positions; three blue signals are memorised during a three-second phase, then selected from memory. A red-signal question follows. Since `8837e16`: the memory clock starts after the 420ms slide fade; the recall question glows and floats; the answer slide always reveals the real red signal crisply above the blur (gold rim when found).
 - Active field and instructions occupy separate layout regions. Every signal, including the lowest ones, remains visible and selectable.
 - Answer reveal, focus reflection, life lesson, integration and final Matthew/Tony image each wait for deliberate progression.
 - Reflection is framed as an invitation, not a diagnosis, test of intelligence or proof of a treatment outcome.
-- On Home, reaching the game lifts its existing live instance into a near-full-screen dialog over a dark, sparkling background. No reset or duplicate game is created. Working tree: a 500ms in-place ignition (ring of light, brightening field) precedes a 900ms lift with an eased backdrop; it lifts itself at most once per document; slides crossfade and teaching slides pass right to left like a torch; no focus rectangles.
-- A top-left X is available from the start (working tree; previously completion only) and a small replay control appears at completion. Outside tap and Escape can close at any stage. Retraction returns the same instance to its homepage position.
-- Working tree: the six element tabs show they open (spring wave and sheen once the game is closed, sideways peek on mobile, quiet shimmer until one is opened, breathing dot on unopened elements).
+- On Home, reaching the game lifts its existing live instance into a near-full-screen dialog over a dark, sparkling background. No reset or duplicate game is created. Since `8837e16`: a 500ms in-place ignition (ring of light, brightening field) precedes a 900ms lift with an eased backdrop; it lifts itself at most once per document; slides crossfade and teaching slides pass right to left like a torch; no focus rectangles.
+- A top-left X is available from the start (since `8837e16`; previously completion only) and a small replay control appears at completion. Outside tap and Escape can close at any stage. Retraction returns the same instance to its homepage position.
+- Since `8837e16`: the six element tabs show they open (spring wave and sheen once the game is closed, sideways peek on mobile, quiet shimmer until one is opened, breathing dot on unopened elements).
 - The memory timer pauses while the game is closed/hidden. The Method page retains the inline version.
 
-### Sound (working tree)
+### Sound (since `8837e16`)
 
 - Only after explicit consent (portal or header speaker); consent is never persisted. Declining loads no soundtrack and plays nothing.
 - Effects: sparkle sizzle, tear drop (plus softer beads), element-tab wink, recall-tap note, missed-red twinkle, teaching-slide fire whoosh, conclusion pop. Effects mix on top of the soundtrack.
@@ -176,7 +176,7 @@ All six have independently addressable generated English HTML. Runtime localisat
 | Complete reopened language -> sound -> transition -> arrival flow | `dd60047`. |
 | Portrait dismissal-triggered shine, continuous subtle aura/float, properly aligned contact icons | `f811195`; 144 focused browser assertions, 124 experience assertions and 60 content renders passed locally. |
 | Detailed roadmap and repair handoff | `9c56da3`. |
-| Tears moment, game ignition/X/crossfades/torch slides/red reveal, element invitation, language pill, dialect bloom, welcome hold, eased curtain, endless ribbon, consent-gated effects and soundtrack | Working tree on `codex/private-practice-experience`, not committed or published. Automation-verified (see repair notes); not device-verified. |
+| Tears moment, game ignition/X/crossfades/torch slides/red reveal, element invitation, language pill, dialect bloom, welcome hold, eased curtain, endless ribbon, consent-gated effects and soundtrack | `8837e16`, published; automation and live smoke verified (see repair notes); not device-verified. |
 
 Historical commits are context, not instructions to restore an entire old revision. Multiple later fixes depend on one another.
 
@@ -232,7 +232,7 @@ Refine form validation, submission progress, failure recovery and success wordin
 | P2-05 | Permissioned testimonials or an editorial recognition dossier. | Written publication consent and accurate award/event provenance; no implied Tony endorsement. Keep client discretion central. |
 | P2-06 | Stronger film accessibility: accurate captions/transcripts and thoughtful poster variants. | Review every spoken language, embedded text and media rights. Text remains useful when audio is declined. |
 | P2-07 | Search and sharing refinement: route-specific descriptions, verified structured data and a deliberate multilingual indexing strategy. | Current server-rendered HTML is English; runtime dictionaries alone are not static translated pages. Decide canonical/hreflang generation together rather than adding inconsistent tags. |
-| P2-08 | Implemented in the working tree at the user's request: consent-based effects and a soundtrack. Remaining: licence confirmation, device listening tests and level tuning on phone speakers. | No surprise audio; nothing before consent; no re-enabling audio after mute. |
+| P2-08 | Implemented in `8837e16` at the user's request: consent-based effects and a soundtrack. Remaining: licence confirmation, device listening tests and level tuning on phone speakers. | No surprise audio; nothing before consent; no re-enabling audio after mute. |
 | P2-09 | CSS cascade consolidation in small, visually tested sections. | Capture baselines first. Preserve specificity/layout contracts. Do not turn cleanup into a palette or component redesign. |
 | P2-10 | Privacy-aware performance/error monitoring and a lightweight release dashboard. | Define data minimisation, owner access, service costs and alert usefulness. Never record enquiry bodies or sensitive visitor input. |
 

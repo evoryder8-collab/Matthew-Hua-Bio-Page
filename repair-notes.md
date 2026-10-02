@@ -14,7 +14,7 @@ Read [roadmap.md](roadmap.md) for positioning, design constraints and prioritise
 | Local checkout for the working-tree release | `/Users/jaxoncorrey/Downloads/Matt Hua New Website` (same remote; path contains spaces) |
 | Working branch at handoff | `codex/private-practice-experience` |
 | Published branch / directory | `main` / repository root |
-| Latest implementation commit | `f8111957644496ce4d4d1278a0267243a0bb6c79` (the experience release below is uncommitted) |
+| Latest implementation commit | `8837e16` (experience release); previous `f8111957644496ce4d4d1278a0267243a0bb6c79` |
 | Prior implementation commit | `dd600475edc05034b68a7089474c11a1cc55b038` |
 | Pages result for implementation | `built`, no error; build updated 2026-10-02 09:03:42 UTC |
 | Custom domain / HTTPS | `matthewhua.ch`; HTTPS enforced, verified through GitHub Pages settings |
@@ -27,9 +27,9 @@ Read [roadmap.md](roadmap.md) for positioning, design constraints and prioritise
 
 The latest user request authorises portrait motion/shine, better contact icons and detailed handoff documents. Earlier requests authorised website implementation and publication. Future work should follow the new user's scope; the roadmap is not a command to implement every idea automatically.
 
-## 2. This Release (working tree, 2026-10-02, not committed or published)
+## 2. This Release (`8837e16`, published 2026-10-02)
 
-Requested in one session by the user; implemented on `codex/private-practice-experience` without a commit, push or Pages build. Everything below is **implemented** and **automation-verified** unless stated; nothing is device-verified.
+Requested in one session by the user and published as `8837e16` (pushed to `main`; Pages reported `built` for that SHA). Live smoke on https://matthewhua.ch/ in WebKit iPhone 14 emulation and desktop: new markup, language pill, tears moment ran to completion, audio assets served (200), no page errors. Not checked on physical devices.
 
 ### What Changed And Why
 
@@ -63,7 +63,7 @@ Requested in one session by the user; implemented on `codex/private-practice-exp
 
 ### Remaining
 
-Device listening (iOS silent switch, autoplay, Bluetooth delay, levels on phone speakers); audio licence confirmation; native review of the tears heading wrap in long locales; commit/publish and production smoke.
+Device listening (iOS silent switch, autoplay, Bluetooth delay, levels on phone speakers); audio licence confirmation; native review of the tears heading wrap in long locales; rerun of the corrected layout matrix.
 
 ## 2A. Previous Release (`f811195`)
 
