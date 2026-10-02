@@ -208,6 +208,10 @@ main h1[tabindex="-1"]:focus {outline:none}
 @keyframes element-number {30%{color:#c81d77;text-shadow:0 0 12px #ff8fc6aa}}
 @keyframes element-nudge {0%,12%,100%{transform:none}5%{transform:translate(calc(var(--pop-x) * .5),calc(var(--pop-y) * .5))}}
 @keyframes element-glint {0%{opacity:0;transform:translateX(-130%)}2%{opacity:1}11%{opacity:1;transform:translateX(130%)}12%,100%{opacity:0;transform:translateX(130%)}}
+/* The chosen element glows and sizzles (sparks drawn by tab-sparks.js). */
+.tab-sparks {position:fixed;inset:0;z-index:90;width:100%;height:100%;pointer-events:none}
+.element-tabs [data-element-tab][aria-selected=true] {border-color:#ffd27acc;box-shadow:0 0 0 1px #ffe2ab80,0 0 22px -4px #ffd27aaa,0 0 46px -10px #f7a8d499;animation:element-selected 2.6s ease-in-out infinite}
+@keyframes element-selected {0%,100%{box-shadow:0 0 0 1px #ffe2ab80,0 0 22px -4px #ffd27aaa,0 0 46px -10px #f7a8d499}50%{box-shadow:0 0 0 1px #fff1cfcc,0 0 30px -2px #ffd27ad0,0 0 64px -8px #f7a8d4bb}}
 @keyframes element-dot {0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.35);opacity:1;box-shadow:0 0 0 5px #c81d7712,0 0 14px #ff8fc6}}
 @media(max-width:899px){
   .element-tabs [data-element-tab] {--pop-x:0px;--pop-y:-3px}
@@ -433,6 +437,7 @@ main h1[tabindex="-1"]:focus {outline:none}
   .header-actions .language-trigger:hover .language-orb,.header-actions .language-trigger:hover svg{transform:none}
   .element-tabs [data-element-tab],.element-tabs [data-element-tab]::before,.element-tabs [data-element-tab]::after,.element-tabs [data-element-tab] span{animation:none!important;transition:none}
   .menu-open .mobile-nav-contact a{animation:none}
+  .element-tabs [data-element-tab][aria-selected=true]{animation:none}
   .instrument-photo .instrument-aura{animation:none}
   .arrival-enter .arrival-link,.arrival-enter .arrival-link::before,.arrival-enter .arrival-link svg{animation:none}
 }

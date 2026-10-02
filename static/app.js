@@ -9,6 +9,7 @@ import {mountGameSpotlight} from './game-spotlight.js';
 import {mountTearsMoment} from './tears.js';
 import {createSoundEffects,createBackgroundMusic} from './sound.js';
 import {mountElementInvite} from './element-invite.js';
+import {mountTabSparks} from './tab-sparks.js';
 import {playSunJourney} from './sun-journey.js';
 import {preparePortraitLanding} from './portrait-landing.js';
 
@@ -29,7 +30,7 @@ let portraitGleamed=false,portraitGleamPending=false,tears=null,cleanupRecogniti
 const gameMemory={lifted:false};
 // Elements opened during this visit; the rest keep their small "there is more" dot.
 const exploredElements=new Set([0]);
-let elementInvite=null,landing=null;
+let elementInvite=null,landing=null,tabSparks=null;
 function markExplored(){document.querySelectorAll('[data-element-tab]').forEach(tab=>tab.toggleAttribute('data-explored',exploredElements.has(Number(tab.dataset.elementTab))));}
 const flagURL=code=>new URL('flags/'+code+'.png',import.meta.url).href;
 // Effects sound only after an explicit "sound on" (portal or header speaker) and never with reduced motion.
@@ -75,7 +76,7 @@ function setMetadata(){
   document.querySelector('link[rel="canonical"]').href=canonical;
   document.querySelector('meta[property="og:url"]').content=canonical;
 }
-function cleanPage(){landing?.cancel();landing=null;elementInvite?.destroy();elementInvite=null;spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;technology?.destroy();technology=null;tears?.destroy();tears=null;cleanupRecognition();cleanupRecognition=()=>{};map?.remove();map=null;mapRouteBounds=null;observer?.disconnect();cleanupTilt();cleanupTilt=()=>{};if(heroVideo){heroVideo.pause();heroVideo=null;}}
+function cleanPage(){landing?.cancel();landing=null;tabSparks?.destroy();tabSparks=null;elementInvite?.destroy();elementInvite=null;spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;technology?.destroy();technology=null;tears?.destroy();tears=null;cleanupRecognition();cleanupRecognition=()=>{};map?.remove();map=null;mapRouteBounds=null;observer?.disconnect();cleanupTilt();cleanupTilt=()=>{};if(heroVideo){heroVideo.pause();heroVideo=null;}}
 function renderSite({element=0}={}){
   cleanPage();document.body.dataset.route=route;document.body.classList.remove('menu-open');
   shell.innerHTML=renderHeader(dict,href,route,flagURL)+`<main id="main">${renderPage(route,dict,asset,href)}</main>`+renderFooter(dict,href);
@@ -84,6 +85,7 @@ function renderSite({element=0}={}){
   if(tearsSection)tears=mountTearsMoment(tearsSection,{reducedMotion:motion,onImpact:tearSound});
   if(document.getElementById('element-panel'))selectElement(element);
   const tablist=document.querySelector('.element-tabs');
+  if(tablist)tabSparks=mountTabSparks(tablist,{reducedMotion:motion});
   if(tablist)elementInvite=mountElementInvite(tablist,{reducedMotion:motion,isBlocked:()=>!!portal||!!arrival||!!modal||!!document.querySelector('.game-dialog,.game-home-slot.is-igniting')});
   if(document.getElementById('technology'))technology=mountTechnologyEffects(document.getElementById('technology'));
   if(route==='contact'){setupMap();setupEnquiry();}
@@ -492,7 +494,7 @@ async function showPortal({settings=false}={}){
 document.addEventListener('click',event=>{
   const link=event.target.closest('a[data-route]');
   if(link&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&event.button===0){event.preventDefault();const target=link.dataset.route;navigate(target,{element:Number(link.dataset.element)||0,url:link.href,animate:!!link.closest('.desktop-nav,.mobile-nav')});return;}
-  const tab=event.target.closest('[data-element-tab]');if(tab){cue('wink');selectElement(tab.dataset.elementTab);return;}
+  const tab=event.target.closest('[data-element-tab]');if(tab){cue('wink');selectElement(tab.dataset.elementTab);tabSparks?.burst();return;}
   const filter=event.target.closest('[data-filter]');if(filter){filterArchive(filter.dataset.filter);return;}
   const card=event.target.closest('[data-media]');if(card){openMedia(Number(card.dataset.media));return;}
   const button=event.target.closest('[data-action]');if(!button)return;
