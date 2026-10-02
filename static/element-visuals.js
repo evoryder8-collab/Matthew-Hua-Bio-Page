@@ -492,14 +492,14 @@ function createRenderers() {
   function handGeometry(contact, bends) {
     const relax = 1 - contact, spread = contact * 0.32;
     const digits = FINGERS.map((f, n) => {
-      const outward = f.x < 0 ? -1 : 1;
       let x = f.x * (1 + spread * 0.08), y = -0.38, a = f.a * (1 + spread);
       const pts = [[x, y]];
       [0.46, 0.31, 0.23].forEach((part, j) => {
         // Relaxed fingers arc softly inward and shorten (curl); pressed ones lie flat.
         // Fingers never stand straight: each joint curves them a little inward, more when
         // they press and knead (a soft cup that follows the hollow they make).
-        a += (bends[n] - outward * (0.06 + contact * 0.11) * (1 + j * 0.6)) * (j ? 1 : 0.4);
+        // (scaled by distance from the hand's centre, so the middle fingers never cross).
+        a += (bends[n] - (f.x / 0.36) * (0.05 + contact * 0.08) * (1 + j * 0.5)) * (j ? 1 : 0.4);
         const L = part * f.len * (1 - relax * (0.05 + j * 0.09) - contact * j * 0.05);
         x += Math.sin(a) * L; y -= Math.cos(a) * L; pts.push([x, y]);
       });
