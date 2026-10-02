@@ -4,6 +4,10 @@ Live: [matthewhua.ch](https://matthewhua.ch/)
 
 Static GitHub Pages website. The original pink/mint identity, Comfortaa/Fraunces typography, rounded controls and Matthew/Tony hero are retained. The attention game, animated element and machine demonstrations, gallery, philosophy and contact remain on the homepage. New pages add detail without removing the interactive homepage.
 
+## Project Handoff
+
+Read [roadmap.md](roadmap.md) for brand positioning, protected design decisions, the implemented experience and prioritised future refinements. Read [repair-notes.md](repair-notes.md) for the current release, regression history, architecture, verification evidence and deployment procedure. [AGENTS.md](AGENTS.md) provides a short entry point for future coding agents.
+
 ## Development
 
 Node.js 20 or later. No production npm dependencies.
@@ -64,6 +68,7 @@ node scripts/test-returning-portal.mjs
 node scripts/test-language-family.mjs
 node scripts/test-mindset.mjs
 node scripts/test-refinements.mjs
+node scripts/test-portrait-contact.mjs
 node scripts/test-popup-lifecycle.mjs
 node scripts/test-layout.mjs
 ```
