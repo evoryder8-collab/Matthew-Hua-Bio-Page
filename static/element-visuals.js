@@ -373,140 +373,233 @@ function createRenderers() {
     },
   };
 
-  /* BREATHWORK: a living membrane follows an inhale - hold - exhale guide on a spring,
-     drawing air in and releasing it; colour turns cool on the way in, warm on the way out. */
+  /* BREATHWORK: two soft lungs with a branching bronchial tree. On the inhale light runs
+     from the windpipe out to every tip and air is drawn in; on the exhale warm light
+     retreats and the breath leaves. Inhale 4 s, hold 1.5 s, exhale 5.5 s. */
   R.breath = {
     init(st, w, h) {
-      st.cx = w / 2; st.cy = h * 0.36; st.base = Math.min(w, h) * 0.22; st.s = 0.3; st.sv = 0; st.tone = 1;
-      st.reach = Math.hypot(w, h) * 0.55;
-      st.air = Array.from({ length: Math.round(120 * clamp(w / 900, 0.6, 1.2)) }, () => this.spawn(st, true));
-    },
-    spawn(st, anywhere) {
-      const a = Math.random() * TAU, d = anywhere ? st.base * (1 + Math.random() * 3) : st.reach * (0.7 + Math.random() * 0.3);
-      return { x: st.cx + Math.cos(a) * d, y: st.cy + Math.sin(a) * d * 0.8, vx: 0, vy: 0, life: Math.random() };
+      const S = Math.min(w * 0.42, h * 0.62);
+      Object.assign(st, { cx: w / 2, top: h * 0.07, S, s: 0.25, sv: 0, tone: 1, air: [], flow: [], airClock: 0 });
+      const fork = { x: st.cx, y: st.top + S * 0.36 };
+      const segs = [{ x1: st.cx, y1: st.top, x2: fork.x, y2: fork.y, depth: 0, parent: -1 }];
+      const grow = (x, y, a, len, depth, parent) => {
+        if (depth > 6) return;
+        const x2 = x + Math.cos(a) * len, y2 = y + Math.sin(a) * len;
+        const index = segs.push({ x1: x, y1: y, x2, y2, depth, parent }) - 1;
+        const spread = 0.42 - depth * 0.025;
+        grow(x2, y2, a - spread * (0.75 + Math.random() * 0.5), len * (0.7 + Math.random() * 0.08), depth + 1, index);
+        grow(x2, y2, a + spread * (0.75 + Math.random() * 0.5), len * (0.7 + Math.random() * 0.08), depth + 1, index);
+      };
+      grow(fork.x, fork.y, Math.PI / 2 + 0.78, S * 0.3, 1, 0);
+      grow(fork.x, fork.y, Math.PI / 2 - 0.78, S * 0.3, 1, 0);
+      st.segs = segs;
+      st.fork = fork;
+      // Every leaf's route from the windpipe, for the air that travels through the tree.
+      st.routes = segs.map((s, i) => i).filter((i) => segs[i].depth === 6).map((leaf) => {
+        const chain = [];
+        for (let i = leaf; i >= 0; i = segs[i].parent) chain.unshift(segs[i]);
+        return chain;
+      });
+      st.flow = Array.from({ length: 46 }, () => ({ route: Math.floor(Math.random() * st.routes.length), u: Math.random() }));
     },
     guide(t) {
-      const T = 11, p = t % T;
-      if (p < 4) return { stage: 'in', v: smooth(p / 4), p: p / T };
-      if (p < 5.5) return { stage: 'hold', v: 1, p: p / T };
-      return { stage: 'out', v: 1 - smooth((p - 5.5) / 5.5), p: p / T };
+      const p = t % 11;
+      if (p < 4) return { stage: 'in', v: smooth(p / 4) };
+      if (p < 5.5) return { stage: 'hold', v: 1 };
+      return { stage: 'out', v: 1 - smooth((p - 5.5) / 5.5) };
+    },
+    at(st, x, y) {   // the whole tree swells about the fork as the lungs fill
+      const k = 0.86 + 0.16 * st.s;
+      return [st.fork.x + (x - st.fork.x) * k, st.fork.y + (y - st.fork.y) * k];
     },
     draw(ctx, w, h, t, st) {
-      const { cx, cy } = st;
+      const { cx, top, S } = st;
       let g = this.guide(t);
       advance(st, t, (dt, time) => {
         g = this.guide(time);
-        const a = 24 * (g.v - st.s) - 8 * st.sv;   // organic lag, gentle overshoot
-        st.sv += a * dt; st.s += st.sv * dt;
-        st.tone += ((g.stage === 'out' ? 0 : 1) - st.tone) * clamp(dt * 1.4);
-        const radius = st.base * (0.55 + 0.45 * st.s);
-        for (const p of st.air) {
-          const dx = cx - p.x, dy = cy - p.y, d = Math.hypot(dx, dy) || 1, nx = dx / d, ny = dy / d;
-          const pull = g.stage === 'in' ? 150 : g.stage === 'out' ? -70 : 6;
-          p.vx += (nx * pull - ny * 46) * dt;
-          p.vy += (ny * pull + nx * 46) * dt;
-          p.vx *= 1 - 1.5 * dt; p.vy *= 1 - 1.5 * dt;
+        st.sv += (26 * (g.v - st.s) - 8 * st.sv) * dt;
+        st.s += st.sv * dt;
+        st.tone += ((g.stage === 'out' ? 0 : 1) - st.tone) * clamp(dt * 1.6);
+        const dir = g.stage === 'in' ? 1 : g.stage === 'out' ? -1 : 0;
+        for (const f of st.flow) {
+          f.u += dir * (0.35 + 0.2 * Math.random()) * dt;
+          if (f.u > 1 || f.u < 0) { f.route = Math.floor(Math.random() * st.routes.length); f.u = dir > 0 ? 0 : 1; }
+        }
+        // Air at the opening: drawn in from above, or released upward and away.
+        st.airClock += dt * (dir ? 26 : 4);
+        while (st.airClock >= 1) {
+          st.airClock--;
+          if (dir >= 0) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.6, d = S * (0.25 + Math.random() * 0.25); st.air.push({ x: cx + Math.cos(a) * d, y: top + Math.sin(a) * d * 0.6, vx: 0, vy: 0, life: 0, max: 1.4, mode: 'in' }); }
+          else st.air.push({ x: cx + (Math.random() - 0.5) * 4, y: top, vx: (Math.random() - 0.5) * 40, vy: -30 - Math.random() * 30, life: 0, max: 1.8, mode: 'out' });
+        }
+        for (let i = st.air.length - 1; i >= 0; i--) {
+          const p = st.air[i];
+          p.life += dt;
+          if (p.mode === 'in') { p.vx += (cx - p.x) * 6 * dt; p.vy += (top - p.y) * 6 * dt; p.vx *= 1 - 2.2 * dt; p.vy *= 1 - 2.2 * dt; }
+          else { p.vx *= 1 - 0.6 * dt; p.vy *= 1 - 0.4 * dt; p.vx += Math.sin(time * 2 + i) * 6 * dt; }
           p.x += p.vx * dt; p.y += p.vy * dt;
-          p.life = Math.min(1, p.life + dt * 0.8);
-          if (g.stage !== 'out' && d < radius * 0.9) Object.assign(p, this.spawn(st, false), { life: 0 });
-          else if (d > st.reach) {
-            if (g.stage === 'out') { const an = Math.random() * TAU, sp = 60 + Math.random() * 70; Object.assign(p, { x: cx + Math.cos(an) * radius, y: cy + Math.sin(an) * radius, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, life: 0 }); }
-            else Object.assign(p, this.spawn(st, false), { life: 0 });
-          }
+          if (p.life > p.max || (p.mode === 'in' && Math.hypot(cx - p.x, top - p.y) < 3)) st.air.splice(i, 1);
         }
+        if (st.air.length > 70) st.air.splice(0, st.air.length - 70);
       });
-      const col = mix(C.pink, C.mint, st.tone), colB = mix(C.pinkB, C.mintB, st.tone);
-      backdrop(ctx, w, h, '#0b0b14', '#0a0910');
-      const radius = st.base * (0.55 + 0.45 * st.s);
+      const cool = [180, 240, 220], warm = C.pinkB;
+      const col = mix(warm, cool, st.tone), deep = mix(C.pink, C.mint, st.tone);
+      backdrop(ctx, w, h, '#0b0b14', '#09090f');
       ctx.globalCompositeOperation = 'lighter';
-      light(ctx, col, cx, cy, radius * 3.2, 0.22 + 0.18 * st.s);
+      light(ctx, deep, cx, top + S * 0.7, S * 1.3, 0.12 + 0.12 * st.s);
+      // Lobes: soft volumes that fill and empty.
+      for (const side of [-1, 1]) {
+        const k = 0.86 + 0.16 * st.s;
+        const lx = cx + side * S * 0.42 * k, ly = top + S * 0.74, rx = S * 0.46 * k, ry = S * 0.56 * k;
+        const fill = ctx.createRadialGradient(lx, ly - ry * 0.2, rx * 0.1, lx, ly, ry);
+        fill.addColorStop(0, rgba(col, 0.16 + 0.12 * st.s)); fill.addColorStop(1, rgba(deep, 0.02));
+        ctx.globalAlpha = 1; ctx.fillStyle = fill;
+        ctx.beginPath(); ctx.ellipse(lx, ly, rx, ry, side * -0.12, 0, TAU); ctx.fill();
+        ctx.strokeStyle = rgba(col, 0.18 + 0.12 * st.s); ctx.lineWidth = 1; ctx.stroke();
+      }
+      // The tree: lit from the windpipe outward as far as the breath has reached.
+      const front = 0.4 + st.s * 6.8;
+      ctx.lineCap = 'round';
+      for (const s of st.segs) {
+        const lit = clamp(front - s.depth);
+        const [x1, y1] = this.at(st, s.x1, s.y1), [x2, y2] = this.at(st, s.x2, s.y2);
+        ctx.globalAlpha = 0.12 + 0.6 * lit;
+        ctx.strokeStyle = rgba(lit > 0.02 ? col : C.white, 1);
+        ctx.lineWidth = Math.max(0.6, (3.4 - s.depth * 0.45) * (S / 300));
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        if (s.depth === 6 && lit > 0.05) light(ctx, col, x2, y2, (5 + 6 * lit) * (S / 300), 0.55 * lit);
+      }
+      for (const f of st.flow) {
+        const chain = st.routes[f.route], pos = f.u * chain.length, i = Math.min(chain.length - 1, Math.floor(pos)), k = pos - i, s = chain[i];
+        const [x, y] = this.at(st, s.x1 + (s.x2 - s.x1) * k, s.y1 + (s.y2 - s.y1) * k);
+        light(ctx, col, x, y, 4 * (S / 300), g.stage === 'hold' ? 0.25 : 0.85);
+      }
       for (const p of st.air) {
-        const sp = Math.hypot(p.vx, p.vy);
-        if (sp < 2) { light(ctx, colB, p.x, p.y, 2, 0.25 * p.life); continue; }
-        const len = Math.min(26, sp * 0.12);
-        ctx.globalAlpha = 0.45 * p.life; ctx.strokeStyle = rgba(colB, 1); ctx.lineWidth = 1.2;
-        ctx.beginPath(); ctx.moveTo(p.x - p.vx / sp * len, p.y - p.vy / sp * len); ctx.lineTo(p.x, p.y); ctx.stroke();
+        const a = Math.sin(Math.PI * clamp(p.life / p.max)) * 0.8;
+        light(ctx, p.mode === 'in' ? cool : C.pinkB, p.x, p.y, 3, a);
       }
-      // The membrane: a soft, slightly irregular form, layered like breath within breath.
-      for (let layer = 0; layer < 3; layer++) {
-        const rr = radius * (1 - layer * 0.26);
-        ctx.beginPath();
-        for (let i = 0; i <= 72; i++) {
-          const a = i / 72 * TAU;
-          const wob = 1 + 0.035 * Math.sin(3 * a + t * 0.7 + layer) + 0.022 * Math.sin(5 * a - t * 1.1);
-          const x = cx + Math.cos(a) * rr * wob, y = cy + Math.sin(a) * rr * wob;
-          if (!i) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        const fill = ctx.createRadialGradient(cx, cy - rr * 0.3, rr * 0.1, cx, cy, rr);
-        fill.addColorStop(0, rgba(colB, 0.34 - layer * 0.06));
-        fill.addColorStop(1, rgba(col, 0.06));
-        ctx.globalAlpha = 1; ctx.fillStyle = fill; ctx.fill();
-        ctx.strokeStyle = rgba(colB, 0.55 - layer * 0.15); ctx.lineWidth = 1.4 - layer * 0.3; ctx.stroke();
-      }
-      light(ctx, C.white, cx, cy - radius * 0.2, radius * 0.6, 0.18 + 0.2 * st.s);
-      // The guide: inhale (cool), hold (white), exhale (warm), and where we are now.
-      const ringR = st.base * 1.32;
-      const arc = (from, to, c, a) => { ctx.globalAlpha = a; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, ringR, -Math.PI / 2 + from * TAU, -Math.PI / 2 + to * TAU); ctx.stroke(); };
-      arc(0, 4 / 11, C.mint, 0.22); arc(4 / 11, 5.5 / 11, C.white, 0.22); arc(5.5 / 11, 1, C.pink, 0.22);
-      arc(Math.max(0, g.p - 0.06), g.p, colB, 0.75);
-      const ma = -Math.PI / 2 + g.p * TAU;
-      light(ctx, colB, cx + Math.cos(ma) * ringR, cy + Math.sin(ma) * ringR, 9, 0.95);
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     },
   };
 
-  /* BODY: a responsive surface like skin and fascia. Two hands take turns to press and
-     glide; the surface answers with travelling waves, a conversation through touch. */
+  /* BODY: a responsive surface like skin and fascia. Two open hands, each on its own
+     spring, lower, press, glide and lift in turns; the surface takes the print of palm
+     and fingertips and answers with travelling waves: a conversation through touch. */
+  const FINGERS = [{ x: -0.36, len: 0.62, a: -0.17 }, { x: -0.12, len: 0.8, a: -0.05 }, { x: 0.12, len: 0.86, a: 0.04 }, { x: 0.36, len: 0.74, a: 0.14 }];
+  const PALM_CELLS = 4.6, LAYER_W = 92;
+  function fingertips(mirror, spread, curl) {
+    const tips = FINGERS.map((f) => {
+      const a = f.a * (1 + spread), L = f.len * (1 - curl * 0.18);
+      return [f.x * (1 + spread * 0.08) + Math.sin(a) * L, -0.4 - Math.cos(a) * L];
+    });
+    const ta = 0.95 + spread * 0.25;
+    tips.push([0.42 + Math.sin(ta) * 0.56, 0.1 - Math.cos(ta) * 0.56]);
+    return tips.map(([x, y]) => [mirror ? -x : x, y]);
+  }
+  function paintHand(layer, mirror, spread, curl, c, cb) {
+    const g = layer.getContext('2d'), W = LAYER_W;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, layer.width, layer.height);
+    g.translate(128, 150);
+    g.scale(mirror ? -1 : 1, 1);
+    g.fillStyle = g.strokeStyle = '#fff';
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    g.shadowColor = rgba(c, 0.9); g.shadowBlur = 18;
+    g.beginPath();
+    g.moveTo(-0.46 * W, -0.38 * W);
+    g.quadraticCurveTo(-0.53 * W, 0.18 * W, -0.33 * W, 0.62 * W);
+    g.lineTo(-0.22 * W, 0.98 * W); g.lineTo(0.24 * W, 0.98 * W); g.lineTo(0.35 * W, 0.56 * W);
+    g.quadraticCurveTo(0.56 * W, 0.26 * W, 0.46 * W, -0.38 * W);
+    g.closePath(); g.fill();
+    FINGERS.forEach((f, n) => {
+      let x = f.x * (1 + spread * 0.08) * W, y = -0.38 * W, a = f.a * (1 + spread);
+      const parts = [0.46, 0.31, 0.23];
+      parts.forEach((part, j) => {
+        const L = part * f.len * W * (1 - curl * (0.1 + j * 0.12));
+        g.lineWidth = (0.22 - j * 0.025 - (n === 0 ? 0.02 : 0)) * W;
+        g.beginPath(); g.moveTo(x, y); x += Math.sin(a) * L; y -= Math.cos(a) * L; g.lineTo(x, y); g.stroke();
+      });
+    });
+    let x = 0.4 * W, y = 0.1 * W;
+    const ta = 0.95 + spread * 0.25;
+    [0.32, 0.26].forEach((part, j) => {
+      g.lineWidth = (0.25 - j * 0.03) * W;
+      g.beginPath(); g.moveTo(x, y); x += Math.sin(ta + j * 0.12) * part * W; y -= Math.cos(ta + j * 0.12) * part * W; g.lineTo(x, y); g.stroke();
+    });
+    // Tint it like light held in skin: bright through the palm, coloured at the edges.
+    g.shadowBlur = 0;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalCompositeOperation = 'source-atop';
+    const tint = g.createRadialGradient(128, 160, 10, 128, 140, 150);
+    tint.addColorStop(0, rgba(C.white, 1)); tint.addColorStop(0.45, rgba(cb, 1)); tint.addColorStop(1, rgba(c, 1));
+    g.fillStyle = tint; g.fillRect(0, 0, layer.width, layer.height);
+    g.globalCompositeOperation = 'source-over';
+  }
   R.body = {
     init(st, w, h) {
       const cols = Math.round(clamp(w / 20, 26, 50)), rows = Math.round(cols * 0.5);
-      Object.assign(st, { cols, rows, x0: w * 0.06, x1: w * 0.94, y0: h * 0.14, y1: h * 0.68, z: new Float32Array(cols * rows), v: new Float32Array(cols * rows) });
+      Object.assign(st, { cols, rows, x0: w * 0.06, x1: w * 0.94, y0: h * 0.16, y1: h * 0.7, z: new Float32Array(cols * rows), v: new Float32Array(cols * rows) });
+      st.hands = [0, 1].map((i) => ({ i, lift: 1, vlift: 0, u: 0.5, v: 0.5, angle: 0, layer: Object.assign(document.createElement('canvas'), { width: 256, height: 300 }) }));
     },
-    hand(i, t) {
-      // Each hand strokes along its own slow path; they alternate presses (call, answer).
-      const turn = Math.floor(t / 1.8), active = turn % 2 === i, k = (t % 1.8) / 1.1;
-      const press = active && k < 1 ? Math.pow(Math.sin(Math.PI * k), 2) : 0;
-      return { u: 0.5 + 0.27 * Math.sin(t * 0.33 + i * 2.4) + (i ? 0.06 : -0.06), v: 0.48 + 0.2 * Math.sin(t * 0.47 + i * 1.7), press };
+    path(i, t) {
+      const turn = Math.floor(t / 1.9), active = turn % 2 === i, k = (t % 1.9) / 1.35;
+      return {
+        u: 0.5 + 0.13 * Math.sin(t * 0.34 + i * 2.4) + (i ? 0.21 : -0.21),
+        v: 0.6 + 0.12 * Math.sin(t * 0.5 + i * 1.7),
+        press: active && k < 1 ? Math.pow(Math.sin(Math.PI * k), 1.5) : 0,
+      };
     },
     project(st, i, j, z, w) {
-      const fj = j / (st.rows - 1), depth = 0.78 + 0.22 * fj;            // nearer rows are wider
+      const fj = clamp(j / (st.rows - 1), 0, 1), depth = 0.78 + 0.22 * fj;
       const x = w / 2 + ((st.x0 + (st.x1 - st.x0) * i / (st.cols - 1)) - w / 2) * depth;
       const y = st.y0 + (st.y1 - st.y0) * Math.pow(fj, 1.15) - z * (28 + 32 * fj);
-      return [x, y];
+      return [x, y, depth];
     },
     draw(ctx, w, h, t, st) {
       const { cols, rows, z, v } = st;
       advance(st, t, (dt, time) => {
-        const hands = [this.hand(0, time), this.hand(1, time)];
+        for (const hand of st.hands) {
+          const p = this.path(hand.i, time);
+          const du = p.u - hand.u;
+          hand.u = p.u; hand.v = p.v;
+          // A hand has weight: it lowers onto a spring, settles a touch past contact, lifts away.
+          hand.vlift += (40 * ((1 - 1.3 * p.press) - hand.lift) - 8.5 * hand.vlift) * dt;
+          hand.lift += hand.vlift * dt;
+          hand.angle += ((hand.i ? -0.1 : 0.1) + clamp(du / Math.max(dt, 1e-3), -1, 1) * 0.25 - hand.angle) * clamp(dt * 3);
+          hand.contact = clamp((0.15 - hand.lift) / 0.45);
+        }
         const steps = 2, sdt = dt / steps;
         for (let s = 0; s < steps; s++) {
           for (let j = 1; j < rows - 1; j++) for (let i = 1; i < cols - 1; i++) {
-            const n = j * cols + i;
-            const lap = z[n - 1] + z[n + 1] + z[n - cols] + z[n + cols] - 4 * z[n];
+            const n = j * cols + i, lap = z[n - 1] + z[n + 1] + z[n - cols] + z[n + cols] - 4 * z[n];
             v[n] += (520 * lap - 2.6 * v[n] - 3 * z[n]) * sdt;
           }
-          for (const hand of hands) {
-            if (hand.press <= 0) continue;
-            const hi = hand.u * (cols - 1), hj = hand.v * (rows - 1);
-            for (let j = Math.max(1, Math.floor(hj - 5)); j < Math.min(rows - 1, hj + 5); j++) for (let i = Math.max(1, Math.floor(hi - 5)); i < Math.min(cols - 1, hi + 5); i++) {
-              const g = Math.exp(-((i - hi) ** 2 + (j - hj) ** 2) / 5);
-              v[j * cols + i] -= 46 * hand.press * g * sdt;
+          for (const hand of st.hands) {
+            if (hand.contact <= 0) continue;
+            const hi = hand.u * (cols - 1), hj = hand.v * (rows - 1), ca = Math.cos(hand.angle), sa = Math.sin(hand.angle);
+            const press = (gi, gj, sigma, f) => {
+              for (let j = Math.max(1, Math.floor(gj - 3 * sigma)); j < Math.min(rows - 1, gj + 3 * sigma); j++) for (let i = Math.max(1, Math.floor(gi - 3 * sigma)); i < Math.min(cols - 1, gi + 3 * sigma); i++) {
+                v[j * cols + i] -= f * hand.contact * Math.exp(-((i - gi) ** 2 + (j - gj) ** 2) / (2 * sigma * sigma)) * sdt;
+              }
+            };
+            press(hi, hj + 0.3 * PALM_CELLS, 1.6, 34);   // heel and centre of the palm
+            for (const [x, y] of fingertips(hand.i === 1, hand.contact * 0.3, hand.contact)) {
+              press(hi + (x * ca - y * sa) * PALM_CELLS, hj + (x * sa + y * ca) * PALM_CELLS, 0.75, 26);
             }
           }
           for (let n = 0; n < z.length; n++) z[n] += v[n] * sdt;
         }
       });
       backdrop(ctx, w, h, '#0c0a12', '#0b0a10');
-      const hands = [this.hand(0, t), this.hand(1, t)];
       ctx.globalCompositeOperation = 'lighter';
-      for (let i = 0; i < 2; i++) {
-        const [hx, hy] = this.project(st, hands[i].u * (cols - 1), hands[i].v * (rows - 1), 0, w);
-        light(ctx, i ? C.mint : C.pink, hx, hy, Math.min(w, h) * 0.32, 0.1 + 0.12 * hands[i].press);
+      for (const hand of st.hands) {
+        const [hx, hy] = this.project(st, hand.u * (cols - 1), hand.v * (rows - 1), 0, w);
+        light(ctx, hand.i ? C.mint : C.pink, hx, hy, Math.min(w, h) * 0.34, 0.08 + 0.14 * (hand.contact || 0));
       }
       ctx.lineWidth = 1;
+      ctx.strokeStyle = rgba(C.white, 1);
       for (let j = 0; j < rows; j++) {
         ctx.globalAlpha = 0.12 + 0.2 * (j / rows);
-        ctx.strokeStyle = rgba(C.white, 1);
         ctx.beginPath();
         for (let i = 0; i < cols; i++) { const [x, y] = this.project(st, i, j, z[j * cols + i], w); if (!i) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
         ctx.stroke();
@@ -520,37 +613,45 @@ function createRenderers() {
         const value = z[j * cols + i];
         if (Math.abs(value) < 0.05) continue;
         const [x, y] = this.project(st, i, j, value, w);
-        light(ctx, value < 0 ? C.pinkB : C.mintB, x, y, 2 + Math.abs(value) * 10, Math.min(0.75, Math.abs(value) * 2.4));
+        light(ctx, value < 0 ? C.pinkB : C.mintB, x, y, 2 + Math.abs(value) * 10, Math.min(0.7, Math.abs(value) * 2.2));
       }
-      // The hands: a soft palm with four fingertips that lower and brighten as they press.
-      for (let i = 0; i < 2; i++) {
-        const hand = hands[i], c = i ? C.mint : C.pink, cb = i ? C.mintB : C.pinkB;
+      // Hands, each with its shadow tightening beneath it as it comes down.
+      const cellW = (st.x1 - st.x0) / (cols - 1), cellH = (st.y1 - st.y0) / (rows - 1);
+      for (const hand of st.hands) {
+        const c = hand.i ? C.mint : C.pink, cb = hand.i ? C.mintB : C.pinkB;
+        const lift = Math.max(0, hand.lift), contact = hand.contact || 0;
         const hi = hand.u * (cols - 1), hj = hand.v * (rows - 1);
-        const zi = z[Math.round(hj) * cols + Math.round(hi)] || 0;
-        const [px, py] = this.project(st, hi, hj, zi, w);
-        const lift = (1 - hand.press) * 22 + 6;
-        light(ctx, c, px, py - lift, 46, 0.4 + 0.45 * hand.press);
-        for (let f = 0; f < 4; f++) {
-          const a = -Math.PI / 2 + (f - 1.5) * 0.38 + (i ? 0.15 : -0.15);
-          light(ctx, cb, px + Math.cos(a) * 28, py - lift + Math.sin(a) * 20 + 10, 8 + hand.press * 4, 0.7 + 0.3 * hand.press);
-          light(ctx, C.white, px + Math.cos(a) * 28, py - lift + Math.sin(a) * 20 + 10, 2.2, 0.9);
-        }
-        if (hand.press > 0.05) {
-          ctx.globalAlpha = hand.press * 0.35; ctx.strokeStyle = rgba(cb, 1); ctx.lineWidth = 1.2;
-          ctx.beginPath(); ctx.ellipse(px, py, 26 + hand.press * 14, (26 + hand.press * 14) * 0.32, 0, 0, TAU); ctx.stroke();
+        const [px, py, depth] = this.project(st, hi, hj, 0, w);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 0.5 * (1 - lift * 0.55);
+        ctx.drawImage(sprite([6, 4, 10]), px - 70 * (1 + lift), py - 28 * (1 + lift) + 8, 140 * (1 + lift), 56 * (1 + lift));
+        paintHand(hand.layer, hand.i === 1, contact * 0.3, contact, c, cb);
+        const grow = 1 + lift * 0.12, sx = cellW * depth * PALM_CELLS / LAYER_W * grow, sy = cellH * PALM_CELLS / LAYER_W * grow * 1.15;
+        ctx.save();
+        ctx.translate(px, py - lift * 34);
+        ctx.scale(sx, sy);
+        ctx.rotate(hand.angle);
+        ctx.globalAlpha = 0.72 + 0.2 * contact;
+        ctx.drawImage(hand.layer, -128, -150);
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.25 + 0.45 * contact;
+        ctx.drawImage(hand.layer, -128, -150);
+        ctx.restore();
+        if (contact > 0.05) {
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.globalAlpha = contact * 0.35; ctx.strokeStyle = rgba(cb, 1); ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.ellipse(px, py + 6, 46 + contact * 18, (46 + contact * 18) * 0.3, 0, 0, TAU); ctx.stroke();
         }
       }
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     },
   };
 
-  /* MOVEMENT: a figure flows through a mobility sequence (side reaches, soft squats);
-     silk ribbons trail from the wrists and each shoulder shows its range of motion. */
+  /* MOVEMENT: a figure of light flows through a mobility sequence (side reaches, soft
+     squats); faint afterimages of its last poses show the motion and the range of ease. */
   R.movement = {
     init(st, w, h) {
       st.S = h * 0.6; st.floor = h * 0.66; st.cx = w * 0.5;
-      const rope = () => ({ pts: Array.from({ length: 30 }, () => ({ x: st.cx, y: h * 0.3, px: st.cx, py: h * 0.3 })), seg: st.S * 0.017 });
-      st.ropes = [rope(), rope()];
     },
     pose(st, t) {
       const S = st.S, w = 2 * Math.PI / 12;
@@ -574,40 +675,39 @@ function createRenderers() {
       const joints = { pelvis, chest, head, shL, shR, elL, elR, wrL, wrR, hipL, hipR, knL, knR, ftL, ftR };
       const drop = st.floor - Math.max(ftL.y, ftR.y);   // feet stay on the floor
       for (const k in joints) joints[k].y += drop;
-      return { joints, aUL, aUR, raiseL, raiseR };
+      return { joints, aUL, aUR };
+    },
+    figure(ctx, J, S, alpha, glow) {
+      const unit = S / 100;
+      const bone = (a, b, c, width) => {
+        if (glow) { ctx.globalAlpha = 0.12 * alpha; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = width * 4; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+        ctx.globalAlpha = 0.9 * alpha; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = Math.max(1.2, width * 0.45);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      };
+      if (glow) {
+        ctx.globalAlpha = 0.16 * alpha; ctx.fillStyle = rgba(C.white, 1);
+        ctx.beginPath(); ctx.moveTo(J.shL.x, J.shL.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.hipL.x, J.hipL.y); ctx.lineTo(J.hipR.x, J.hipR.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.shR.x, J.shR.y); ctx.closePath(); ctx.fill();
+      }
+      bone(J.pelvis, J.chest, C.white, 4.2 * unit); bone(J.shL, J.shR, C.white, 3.4 * unit); bone(J.hipL, J.hipR, C.white, 3.4 * unit);
+      bone(J.shL, J.elL, C.pink, 3.2 * unit); bone(J.elL, J.wrL, C.pink, 2.6 * unit);
+      bone(J.shR, J.elR, C.mint, 3.2 * unit); bone(J.elR, J.wrR, C.mint, 2.6 * unit);
+      bone(J.hipL, J.knL, C.pink, 3.6 * unit); bone(J.knL, J.ftL, C.pink, 3 * unit);
+      bone(J.hipR, J.knR, C.mint, 3.6 * unit); bone(J.knR, J.ftR, C.mint, 3 * unit);
+      light(ctx, C.white, J.head.x, J.head.y, S * 0.12, 0.7 * alpha);
+      if (!glow) return;
+      light(ctx, C.white, J.head.x, J.head.y, S * 0.04, 1);
+      for (const [k, c] of [['shL', C.pinkB], ['elL', C.pinkB], ['wrL', C.pinkB], ['knL', C.pinkB], ['shR', C.mintB], ['elR', C.mintB], ['wrR', C.mintB], ['knR', C.mintB], ['pelvis', C.white], ['chest', C.white]]) { light(ctx, c, J[k].x, J[k].y, S * 0.045, 0.75); light(ctx, C.white, J[k].x, J[k].y, S * 0.012, 1); }
     },
     draw(ctx, w, h, t, st) {
-      advance(st, t, (dt, time) => {
-        const { joints } = this.pose(st, time);
-        const steps = Math.max(1, Math.round(dt * 120));
-        const sdt = dt / steps;
-        st.ropes.forEach((rope, r) => {
-          const anchor = r ? joints.wrR : joints.wrL;
-          for (let s = 0; s < steps; s++) {
-            const pts = rope.pts;
-            pts[0].px = pts[0].x; pts[0].py = pts[0].y; pts[0].x = anchor.x; pts[0].y = anchor.y;
-            for (let i = 1; i < pts.length; i++) {
-              const p = pts[i], vx = (p.x - p.px) * 0.985, vy = (p.y - p.py) * 0.985;
-              p.px = p.x; p.py = p.y; p.x += vx + Math.sin(time * 1.3 + i * 0.3) * 0.02; p.y += vy + 240 * sdt * sdt;
-            }
-            for (let k = 0; k < 4; k++) for (let i = 1; i < pts.length; i++) {
-              const a = pts[i - 1], b = pts[i], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1, diff = (d - rope.seg) / d;
-              if (i === 1) { b.x -= dx * diff; b.y -= dy * diff; } else { a.x += dx * diff * 0.5; a.y += dy * diff * 0.5; b.x -= dx * diff * 0.5; b.y -= dy * diff * 0.5; }
-            }
-          }
-        });
-      });
       backdrop(ctx, w, h, '#0b0d14', '#0a0b10');
       const { joints: J, aUL, aUR } = this.pose(st, t);
       const S = st.S;
       ctx.globalCompositeOperation = 'lighter';
       light(ctx, C.pink, w * 0.3, h * 0.35, w * 0.35, 0.09);
       light(ctx, C.mint, w * 0.7, h * 0.35, w * 0.35, 0.09);
-      // Floor and soft contact shadow.
       ctx.globalAlpha = 0.14; ctx.strokeStyle = rgba(C.white, 1); ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(w * 0.15, st.floor + 2); ctx.lineTo(w * 0.85, st.floor + 2); ctx.stroke();
       light(ctx, C.white, (J.ftL.x + J.ftR.x) / 2, st.floor + 2, S * 0.22, 0.08);
-      // Range of motion: the shoulders' arcs, lit where the arm is now.
       const rom = (o, from, to, now, c) => {
         ctx.globalAlpha = 0.09; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = 1; ctx.setLineDash([2, 5]);
         ctx.beginPath(); ctx.arc(o.x, o.y, S * 0.15, Math.min(from, to), Math.max(from, to)); ctx.stroke(); ctx.setLineDash([]);
@@ -615,98 +715,81 @@ function createRenderers() {
       };
       rom(J.shL, Math.PI / 2 + 0.35, Math.PI / 2 + 0.35 + Math.PI + 0.6, aUL, C.pink);
       rom(J.shR, Math.PI / 2 - 0.35 - Math.PI - 0.6, Math.PI / 2 - 0.35, aUR, C.mint);
-      // Ribbons: tapered silk with a fading gradient, the motion made visible.
-      st.ropes.forEach((rope, r) => {
-        const c = r ? C.mintB : C.pinkB, pts = rope.pts;
-        for (let i = 1; i < pts.length; i++) {
-          const k = i / pts.length;
-          ctx.globalAlpha = (1 - k) * 0.7; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = (1 - k) * 4 + 0.4;
-          ctx.beginPath(); ctx.moveTo(pts[i - 1].x, pts[i - 1].y); ctx.lineTo(pts[i].x, pts[i].y); ctx.stroke();
-        }
-      });
-      // The body: luminous limbs, cooler on one side and warmer on the other.
       ctx.lineCap = 'round';
-      const bone = (a, b, c, width) => {
-        ctx.globalAlpha = 0.12; ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = width * 4;
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-        ctx.globalAlpha = 0.9; ctx.lineWidth = Math.max(1.2, width * 0.45);
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-      };
-      const unit = S / 100;
-      // A soft torso gives the figure body and weight beneath its lines of light.
-      ctx.globalAlpha = 0.16; ctx.fillStyle = rgba(C.white, 1);
-      ctx.beginPath(); ctx.moveTo(J.shL.x, J.shL.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.hipL.x, J.hipL.y); ctx.lineTo(J.hipR.x, J.hipR.y); ctx.quadraticCurveTo(J.chest.x, J.chest.y + S * 0.12, J.shR.x, J.shR.y); ctx.closePath(); ctx.fill();
-      bone(J.pelvis, J.chest, C.white, 4.2 * unit);
-      bone(J.shL, J.shR, C.white, 3.4 * unit);
-      bone(J.hipL, J.hipR, C.white, 3.4 * unit);
-      bone(J.shL, J.elL, C.pink, 3.2 * unit); bone(J.elL, J.wrL, C.pink, 2.6 * unit);
-      bone(J.shR, J.elR, C.mint, 3.2 * unit); bone(J.elR, J.wrR, C.mint, 2.6 * unit);
-      bone(J.hipL, J.knL, C.pink, 3.6 * unit); bone(J.knL, J.ftL, C.pink, 3 * unit);
-      bone(J.hipR, J.knR, C.mint, 3.6 * unit); bone(J.knR, J.ftR, C.mint, 3 * unit);
-      light(ctx, C.white, J.head.x, J.head.y, S * 0.12, 0.7);
-      light(ctx, C.white, J.head.x, J.head.y, S * 0.04, 1);
-      for (const [k, c] of [['shL', C.pinkB], ['elL', C.pinkB], ['wrL', C.pinkB], ['knL', C.pinkB], ['shR', C.mintB], ['elR', C.mintB], ['wrR', C.mintB], ['knR', C.mintB], ['pelvis', C.white], ['chest', C.white]]) { light(ctx, c, J[k].x, J[k].y, S * 0.045, 0.75); light(ctx, C.white, J[k].x, J[k].y, S * 0.012, 1); }
+      // Afterimages of the last moments of movement, fading into the present pose.
+      for (const [delay, alpha] of [[0.6, 0.1], [0.4, 0.16], [0.2, 0.24]]) this.figure(ctx, this.pose(st, Math.max(0, t - delay)).joints, S, alpha, false);
+      this.figure(ctx, J, S, 1, true);
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     },
   };
 
-  /* COMMUNITY: lights arrive one by one and are welcomed into a circle; their pulses
-     fall into step (coupled oscillators) and the shared centre glows as they do. */
+  /* COMMUNITY: Matthew's light at the centre keeps a steady rhythm. People arrive, are
+     welcomed into the circle and gradually fall into step with him and each other
+     (coupled oscillators); a flower with a petal for each person opens as they do. */
   R.community = {
     init(st, w, h) {
-      Object.assign(st, { cx: w * 0.5, cy: h * 0.36, unit: Math.min(w, h), members: [], order: [], ripples: [], nextArrival: 0.6, spin: 0 });
+      Object.assign(st, { cx: w * 0.5, cy: h * 0.36, unit: Math.min(w, h), members: [], order: [], ripples: [], nextArrival: 0.6, spin: 0, guide: 0, sync: 0 });
       for (let i = 0; i < 5; i++) this.add(st, w, h, true);
     },
     add(st, w, h, seated) {
-      const a = Math.random() * TAU;
-      const far = Math.hypot(w, h) * 0.6;
-      const member = { x: seated ? st.cx : st.cx + Math.cos(a) * far, y: seated ? st.cy : st.cy + Math.sin(a) * far, vx: 0, vy: 0, th: Math.random() * TAU, w: 1.6 + Math.random() * 0.5, joined: seated ? 1 : 0 };
+      const a = Math.random() * TAU, far = Math.hypot(w, h) * 0.6;
+      const member = { x: seated ? st.cx : st.cx + Math.cos(a) * far, y: seated ? st.cy : st.cy + Math.sin(a) * far, vx: 0, vy: 0, th: Math.random() * TAU, w: 1.5 + Math.random() * 0.6, joined: seated ? 1 : 0, seat: 0 };
       st.members.push(member);
-      // A newcomer takes the place in the circle nearest to where they arrive from.
       const n = st.order.length + 1;
       const at = seated ? st.order.length : Math.round((((a - st.spin) % TAU + TAU) % TAU) / TAU * n) % n;
       st.order.splice(at, 0, member);
     },
     draw(ctx, w, h, t, st) {
-      const ring = () => st.unit * (0.13 + 0.011 * st.members.length);
+      const ring = () => st.unit * (0.14 + 0.011 * st.members.length);
       advance(st, t, (dt, time) => {
         if (time >= st.nextArrival && st.members.length < 14) { st.nextArrival = time + 3.4; this.add(st, w, h, false); }
-        st.spin += dt * 0.07;
-        // Seats are kept, and shared evenly; the circle widens a little for each arrival.
+        st.spin += dt * 0.06;
+        st.guide += 1.8 * dt;                                   // the steady rhythm at the centre
         const radius = ring(), N = st.members.length;
         st.order.forEach((m, k) => { m.seat = k / N * TAU + st.spin; });
         let sx = 0, sy = 0;
         for (const m of st.members) { sx += Math.cos(m.th); sy += Math.sin(m.th); }
         const mean = Math.atan2(sy, sx), order1 = Math.hypot(sx, sy) / N;
-        st.sync = order1; st.mean = mean;
+        st.sync += (order1 - st.sync) * clamp(dt * 2);
         for (const m of st.members) {
           const tx = st.cx + Math.cos(m.seat) * radius * 1.25, ty = st.cy + Math.sin(m.seat) * radius;
           const k = m.joined ? 7 : 2.2, damp = m.joined ? 4.6 : 2.4;
           m.vx += ((tx - m.x) * k - m.vx * damp) * dt; m.vy += ((ty - m.y) * k - m.vy * damp) * dt;
           m.x += m.vx * dt; m.y += m.vy * dt;
           if (!m.joined && Math.hypot(tx - m.x, ty - m.y) < 8) { m.joined = 1; st.ripples.push({ x: m.x, y: m.y, at: time }); }
-          const coupling = m.joined ? 1.5 : 0.25;
-          m.th += (m.w + coupling * order1 * Math.sin(mean - m.th)) * dt;
+          const toGuide = m.joined ? 0.9 : 0.15, toGroup = m.joined ? 0.8 : 0.1;
+          m.th += (m.w + toGuide * Math.sin(st.guide - m.th) + toGroup * order1 * Math.sin(mean - m.th)) * dt;
         }
         st.ripples = st.ripples.filter((r) => time - r.at < 1.6);
       });
       backdrop(ctx, w, h, '#0a110e', '#0a0d0c');
-      const { cx, cy } = st;
+      const { cx, cy } = st, radius = ring();
+      const beat = Math.pow((1 + Math.sin(st.guide)) / 2, 3);
       const pulseOf = (m) => Math.pow((1 + Math.sin(m.th)) / 2, 4);
-      const shared = Math.pow((1 + Math.sin(st.mean || 0)) / 2, 3) * (st.sync || 0);
       ctx.globalCompositeOperation = 'lighter';
-      light(ctx, mix(C.mint, C.pink, shared), cx, cy, ring() * (2.3 + shared * 0.8), 0.12 + 0.3 * shared);
-      light(ctx, C.white, cx, cy, ring() * 0.5, 0.05 + 0.25 * shared);
-      // Threads between neighbours, brighter as they move together.
+      light(ctx, mix(C.mint, C.pink, beat), cx, cy, radius * (2.2 + st.sync * 0.9), 0.1 + 0.25 * st.sync);
+      // The shared flower: one petal toward each seated person, opening as they align.
       const seated = st.order.filter((m) => m.joined);
+      const open = st.sync * (0.75 + 0.25 * beat);
+      for (const m of seated) {
+        const a = Math.atan2(m.y - cy, m.x - cx), len = radius * 0.85 * open, wid = Math.min(0.42, 2.6 / Math.max(3, seated.length));
+        if (len < 2) continue;
+        ctx.globalAlpha = 0.14 + 0.2 * open;
+        ctx.fillStyle = rgba(mix(C.mintB, C.pinkB, beat), 1);
+        ctx.beginPath(); ctx.moveTo(cx, cy);
+        ctx.quadraticCurveTo(cx + Math.cos(a - wid) * len * 0.7, cy + Math.sin(a - wid) * len * 0.7, cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+        ctx.quadraticCurveTo(cx + Math.cos(a + wid) * len * 0.7, cy + Math.sin(a + wid) * len * 0.7, cx, cy);
+        ctx.fill();
+      }
       for (let i = 0; i < seated.length; i++) {
         const a = seated[i], b = seated[(i + 1) % seated.length];
         if (seated.length < 2) break;
         const together = (Math.cos(a.th - b.th) + 1) / 2;
         ctx.globalAlpha = 0.06 + 0.3 * together * together; ctx.strokeStyle = rgba(mix(C.mint, C.pink, together), 1); ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo((a.x + b.x) / 2 + (cx - (a.x + b.x) / 2) * 0.15, (a.y + b.y) / 2 + (cy - (a.y + b.y) / 2) * 0.15, b.x, b.y); ctx.stroke();
-        const p = pulseOf(a);
-        if (p > 0.3) { ctx.globalAlpha = (p - 0.3) * 0.22; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(cx, cy); ctx.stroke(); }
+        const aligned = (Math.cos(a.th - st.guide) + 1) / 2;
+        ctx.globalAlpha = 0.04 + 0.22 * Math.pow(aligned, 3); ctx.strokeStyle = rgba(C.gold, 1);
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(a.x, a.y); ctx.stroke();
       }
       for (const r of st.ripples) {
         const k = (t - r.at) / 1.6;
@@ -722,6 +805,9 @@ function createRenderers() {
         light(ctx, c, m.x, m.y, 10 + p * 18, 0.45 + 0.5 * p);
         light(ctx, C.white, m.x, m.y, 3 + p * 2.5, 0.9);
       }
+      // Matthew: the guiding light whose rhythm the circle finds.
+      light(ctx, C.gold, cx, cy, 26 + beat * 22, 0.5 + 0.4 * beat);
+      light(ctx, C.white, cx, cy, 6 + beat * 3, 1);
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     },
   };
