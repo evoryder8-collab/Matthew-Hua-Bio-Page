@@ -284,7 +284,7 @@ function createRenderers() {
         }
         if (st.steam.length > 90) st.steam.splice(0, st.steam.length - 90);
         // Sparkler: sparks spray from the head, slowed by air and pulled down by gravity.
-        const unit = Math.min(w, h) / 500;
+        const unit = Math.min(w, h) / 500 * 1.2;   // sparkler scale (+20%)
         st.sparkClock += dt * 150;
         while (st.sparkClock >= 1) {
           st.sparkClock--;
@@ -345,7 +345,7 @@ function createRenderers() {
       for (let y = 0; y <= h; y += 6) { const x = w * 0.5 + Math.sin(y * 0.03 + t * 1.4) * 5; if (!y) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
       ctx.stroke();
       // At the centre, a sparkler burns upright on its wire, as in the page transitions.
-      const unit = Math.min(w, h) / 500;
+      const unit = Math.min(w, h) / 500 * 1.2;   // sparkler scale (+20%)
       const wire = ctx.createLinearGradient(cx, h, cx, cy);
       wire.addColorStop(0, 'rgba(108,79,60,0)'); wire.addColorStop(0.7, 'rgba(145,103,70,0.25)'); wire.addColorStop(1, '#f2b971');
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
