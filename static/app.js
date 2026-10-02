@@ -33,7 +33,7 @@ let elementInvite=null,landing=null;
 function markExplored(){document.querySelectorAll('[data-element-tab]').forEach(tab=>tab.toggleAttribute('data-explored',exploredElements.has(Number(tab.dataset.elementTab))));}
 const flagURL=code=>new URL('flags/'+code+'.png',import.meta.url).href;
 // Effects sound only after an explicit "sound on" (portal or header speaker) and never with reduced motion.
-const sfx=createSoundEffects({nav:asset('sfx/magic-wink.mp3'),sizzle:asset('sfx/sparkler-sizzle.mp3'),drop:asset('sfx/tear-drop.mp3'),wink:asset('sfx/element-wink.mp3'),pick:asset('sfx/signal-pick.mp3'),twinkle:asset('sfx/red-twinkle.mp3'),conclusion:asset('sfx/conclusion-pop.mp3'),whoosh:asset('sfx/slide-whoosh.mp3')});
+const sfx=createSoundEffects({nav:asset('sfx/button-pop.mp3'),sizzle:asset('sfx/sparkler-sizzle.mp3'),drop:asset('sfx/tear-drop.mp3'),wink:asset('sfx/element-wink.mp3'),pick:asset('sfx/signal-pick.mp3'),twinkle:asset('sfx/red-twinkle.mp3'),conclusion:asset('sfx/conclusion-pop.mp3'),whoosh:asset('sfx/slide-whoosh.mp3')});
 // Interface cues: [volume, delay ms]. The twinkle waits for the red signal to land; the
 // conclusion pop waits for its slide to arrive after the whoosh.
 const CUES={nav:[.45,0],wink:[.5,0],pick:[.42,0],twinkle:[.62,480],conclusion:[.55,380],whoosh:[.6,0]};

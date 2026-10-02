@@ -499,7 +499,8 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       return;
     }
     const action = button.dataset.action;
-    if (['begin', 'confirm', 'next', 'continue', 'replay'].includes(action)) sound('nav');
+    // A soft pop for the game's opening steps; from the answer onward the whoosh speaks alone.
+    if (['begin', 'confirm'].includes(action)) sound('nav');
     if (action === 'begin' && phase === 'intro') setPhase('memorize3seconds');
     else if (action === 'confirm' && phase === 'recall3positions' && picks.size === 3) setPhase('red');
     else if (action === 'answer' && phase === 'red') {
