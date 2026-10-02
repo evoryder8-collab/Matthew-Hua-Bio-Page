@@ -37,6 +37,9 @@ Generated `index.html` files are committed, so GitHub Pages does not need a buil
 - `static/tears.js`: the homepage "No need to wipe the tears away." moment: letter wave, canvas teardrop physics, splash and word ripple.
 - `static/sound.js`: consent-gated Web Audio effects (sizzle, tear drop) and the background soundtrack, which glides to silence under films.
 - `static/element-invite.js`: spring wave, sideways peek and idle shimmer that show the six element tabs open.
+- `static/tab-sparks.js`: sparkler sparks around the selected element tab.
+- `static/portrait-landing.js`, `static/sun-journey.js`: the portrait's arrival after the film and the game's closing light.
+- `static/element-visuals.js`: the five element animations (Hot/Cold, Breathwork, Body, Movement, Community).
 - `assets/sfx/`, `assets/audio/`: web derivatives of the supplied sound effects and soundtrack; provenance in `MEDIA-NOTES.md`.
 - `assets/films/`: H.264/AAC derivatives for Safari/Chrome. Original uploads remain unchanged.
 - `assets/editorial/`: real photographs from the supplied biography; see `MEDIA-NOTES.md` for provenance and retained credits.
