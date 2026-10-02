@@ -172,3 +172,7 @@ The Opus source was transcoded because Safari does not reliably play Opus inside
 ```sh
 ffmpeg -f lavfi -i color=c=white:s=96x96:r=30:d=2 -pix_fmt yuv420p10le -c:v libx265 -tag:v hvc1 -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -x265-params "colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc:range=limited:hdr10=1:master-display=G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,1):max-cll=1000,400" -movflags +faststart -an hdr-white.mp4
 ```
+
+## Game portrait derivative (2026-10-02)
+
+`assets/matthew-tony-game-2400.webp` (148,186 bytes, 2400 x 2400 RGBA, SHA-256 `41bb29d1e3a0cdc23e7c8e794459eaa0522cbe60a69887cf1b66628292cf6147`) is a Lanczos downscale of the unchanged V3 original (`assets/v3 mat x tonyPHOTO-2026-03-16-21-22-09-2.webp`, 6696 x 6696), WebP quality 88 via Pillow 11.3. Same canvas and transparent framing, so the game's existing crop/zoom applies unchanged. Used only by the attention game's final slide (and its "Let's continue" light), where decoding the 45-megapixel original stalled the slide transition. The homepage hero and About still use the original.

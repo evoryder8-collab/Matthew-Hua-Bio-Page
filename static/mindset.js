@@ -17,7 +17,8 @@ const PHASES = [
   'intro', 'memorize3seconds', 'recall3positions', 'red', 'reveal',
   'focusTitle', 'lessonTitle', 'integrationTitle', 'finalPhoto',
 ];
-const PHOTO = 'v3 mat x tonyPHOTO-2026-03-16-21-22-09-2.webp';
+// A 2400px copy of the 6696px original: same framing, about 8x less to decode on phones.
+const PHOTO = 'matthew-tony-game-2400.webp';
 const MEMORIZE_MS = 3000;
 // Slides crossfade instead of cutting; the memory clock waits for the fade to clear.
 const PHASE_FADE_MS = 420;
@@ -229,13 +230,23 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
     truth.hidden = false;
   }
 
+  // Decode the closing photograph during the teaching slides, so its slide never waits.
+  let warmed = null;
+  function warmPhoto() {
+    if (warmed) return;
+    warmed = new win.Image();
+    warmed.decoding = 'async';
+    warmed.src = asset(PHOTO);
+    warmed.decode?.().catch(() => {});
+  }
+
   function renderPhoto() {
     const wrapper = element('div', 'mindset-photo-frame');
     const photo = element('img', 'mindset-photo');
     photo.src = asset(PHOTO);
     photo.alt = text('photoAlt') || 'Matthew Hua, Tony Robbins';
-    photo.width = 6696;
-    photo.height = 6696;
+    photo.width = 2400;
+    photo.height = 2400;
     photo.decoding = 'async';
     wrapper.append(photo);
     field.append(wrapper);
@@ -434,6 +445,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       paragraph('revealCopy');
       renderSignals(true);
       renderTruth(caught);
+      warmPhoto();
       if (!caught) sound('twinkle');
       renderMemorySummary();
       addButton(text('next'), 'next');
