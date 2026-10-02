@@ -29,7 +29,8 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
         await page.locator('.language-trigger').click();
         await page.locator('.language-grid').waitFor();
         if(locale==='gsw')await page.locator('[data-language-family=german]').click();
-        await page.locator(`[data-locale=${locale}]`).click();
+        // The two dialect flags float on purpose; force skips Playwright's still-element wait.
+        await page.locator(`[data-locale=${locale}]`).click({force:locale==='gsw'});
         await page.locator('.sound-yes').waitFor({timeout:2000}).catch(()=>{});
         check(await page.locator('.sound-yes').count()===1,`${label}: selecting language must still ask for sound`);
         check(await page.locator('.sound-no').count()===1,`${label}: declining sound remains available`);

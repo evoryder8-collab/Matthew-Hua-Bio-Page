@@ -19,14 +19,51 @@ const PHASES = [
 ];
 const PHOTO = 'v3 mat x tonyPHOTO-2026-03-16-21-22-09-2.webp';
 const MEMORIZE_MS = 3000;
+// Slides crossfade instead of cutting; the memory clock waits for the fade to clear.
+const PHASE_FADE_MS = 420;
+// The philosophy slides after the answer travel right to left like a passing torch.
+const WHOOSH_MS = 720;
+const TEACHING = ['reveal', 'focusTitle', 'lessonTitle', 'integrationTitle'];
 let instanceId = 0;
+
+let ghostSheet;
+/**
+ * The page's own game rules, rebuilt once for the shadow-root copy used in crossfades.
+ * Dialog-scoped rules (.game-window ...) are re-pointed at the copy's wrapper.
+ * Browsers without constructable stylesheets simply skip the crossfade.
+ */
+function ghostStyles(doc) {
+  if (ghostSheet !== undefined) return ghostSheet;
+  ghostSheet = null;
+  const Sheet = doc.defaultView?.CSSStyleSheet;
+  if (!Sheet || !('adoptedStyleSheets' in doc)) return null;
+  try {
+    const rules = [];
+    for (const styleSheet of doc.styleSheets) {
+      let list;
+      try { list = styleSheet.cssRules; } catch { continue; }
+      for (const rule of list) {
+        if (rule.cssText.includes('mindset')) rules.push(rule.cssText.replaceAll('.game-window', '.ghost-window'));
+      }
+    }
+    if (!rules.length) return null;
+    const sheet = new Sheet();
+    sheet.replaceSync(`:host{display:block;overflow:hidden}${rules.join('\n')}
+      *,*::before,*::after{animation:none!important;transition:none!important}
+      .ghost-clear .mindset-game,.ghost-clear .mindset-field{background:transparent!important;background-image:none!important;box-shadow:none!important}`);
+    ghostSheet = sheet;
+  } catch { ghostSheet = null; }
+  return ghostSheet;
+}
 
 function quarterOf(signal) {
   return `${signal.y < 50 ? 't' : 'b'}${signal.x < 50 ? 'l' : 'r'}`;
 }
 
 /** Mount one self-contained experiment; the caller owns its locale and lifetime. */
-export function mountMindset(host, { copy, asset, reducedMotion = false, onPhaseChange = () => {} }) {
+export function mountMindset(host, { copy, asset, reducedMotion = false, onPhaseChange = () => {}, onSound = () => {} }) {
+  // Named cues only; the page decides whether sound is allowed.
+  const sound = (name) => { try { onSound(name); } catch { /* sound is decorative */ } };
   const doc = host.ownerDocument;
   const win = doc.defaultView;
   const id = `mindset-${++instanceId}`;
@@ -38,6 +75,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
   let timer = null;
   let remaining = MEMORIZE_MS;
   let runningSince = null;
+  let graceUntil = 0;
   let confirmButton = null;
 
   function element(tag, className, text) {
@@ -100,7 +138,11 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
   feedback.append(status, countdown);
   const controls = element('div', 'mindset-controls');
   content.append(meta, title, description, memorySummary, feedback, controls);
-  root.append(field, content);
+  // Above the blurred answer field: where the red signal really was.
+  const truth = element('div', 'mindset-truth');
+  truth.setAttribute('aria-hidden', 'true');
+  truth.hidden = true;
+  root.append(field, content, truth);
   host.append(root);
 
   function addButton(label, action, className = '') {
@@ -174,6 +216,19 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
     field.append(list);
   }
 
+  /** Reveal the red signal crisply, whether the visitor found it or not. */
+  function renderTruth(caught) {
+    const red = SIGNALS.find((signal) => signal.color === 'red');
+    const marker = element('span', 'mindset-truth-signal');
+    marker.style.setProperty('--mindset-x', `${red.x}%`);
+    marker.style.setProperty('--mindset-y', `${red.y}%`);
+    marker.style.setProperty('--mindset-mobile-x', `${red.mobileX ?? red.x}%`);
+    for (const part of ['glow', 'pulse', 'pulse', 'ring', 'core']) marker.append(element('span', `mindset-truth-${part}`));
+    truth.toggleAttribute('data-caught', caught);
+    truth.replaceChildren(marker);
+    truth.hidden = false;
+  }
+
   function renderPhoto() {
     const wrapper = element('div', 'mindset-photo-frame');
     const photo = element('img', 'mindset-photo');
@@ -201,8 +256,67 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
   function consumeTime() {
     if (runningSince === null) return;
     const now = win.performance.now();
-    remaining = Math.max(0, remaining - (now - runningSince));
+    const from = Math.max(runningSince, graceUntil);
+    if (now > from) remaining = Math.max(0, remaining - (now - from));
     runningSince = now;
+  }
+
+  function animated() {
+    return !reducedMotion && !win.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      && root.isConnected && root.getClientRects().length > 0 && typeof root.animate === 'function';
+  }
+
+  /**
+   * Leave a still copy of the outgoing slide over the new one and fade it away.
+   * The copy lives in a closed shadow root, so it adds no duplicate ids, buttons or
+   * headings to the page, and it never takes input. Leaving the memory phase, its
+   * signals are removed and it turns transparent: no blue signal lingers and every
+   * choice is visible at once.
+   */
+  function crossfade(from, whoosh = false) {
+    const height = root.offsetHeight;
+    const sheet = ghostStyles(doc);
+    root.querySelectorAll(':scope > .mindset-ghost').forEach((node) => node.remove());
+    if (!sheet) return height;
+    const border = parseFloat(win.getComputedStyle(root).borderTopWidth) || 0;
+    const copy = root.cloneNode(true);
+    copy.querySelectorAll('.mindset-ghost').forEach((node) => node.remove());
+    copy.classList.remove('mindset-entering', 'mindset-whooshing');
+    const frame = doc.createElement('div');
+    frame.classList.toggle('ghost-window', Boolean(root.closest('.game-window')));
+    if (from === 'memorize3seconds') {
+      frame.classList.add('ghost-clear');
+      copy.querySelector('.mindset-field')?.replaceChildren();
+    }
+    frame.append(copy);
+    const ghost = doc.createElement('div');
+    ghost.className = 'mindset-ghost';
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.inert = true;
+    Object.assign(ghost.style, { top: `${-border}px`, left: `${-border}px`, right: `${-border}px`, height: `${height}px` });
+    const shadow = ghost.attachShadow({ mode: 'closed' });
+    shadow.adoptedStyleSheets = [sheet];
+    shadow.append(frame);
+    root.append(ghost);
+    const fade = whoosh
+      ? ghost.animate([
+        { transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' },
+        { transform: 'translateX(-5%)', opacity: 0.92, filter: 'blur(1px)', offset: 0.28 },
+        { transform: 'translateX(-24%)', opacity: 0, filter: 'blur(12px)' },
+      ], { duration: WHOOSH_MS, easing: 'cubic-bezier(.62,0,.32,1)', fill: 'forwards' })
+      : ghost.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: PHASE_FADE_MS, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards',
+      });
+    fade.finished.catch(() => {}).then(() => ghost.remove());
+    return height;
+  }
+
+  function settleHeight(from) {
+    const to = root.offsetHeight;
+    if (Math.abs(to - from) < 3) return;
+    root.animate([{ height: `${from}px` }, { height: `${to}px` }], {
+      duration: PHASE_FADE_MS + 120, easing: 'cubic-bezier(.22,1,.36,1)',
+    });
   }
 
   function tick() {
@@ -245,9 +359,13 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
     confirmButton.disabled = picks.size !== 3;
   }
 
-  function setPhase(next, focus = true) {
+  function setPhase(next, focus = true, initial = false) {
     if (destroyed) return;
     stopTimer();
+    const smooth = !initial && animated();
+    const whoosh = !initial && TEACHING.includes(phase) && next !== 'intro';
+    const previousHeight = smooth ? crossfade(phase, whoosh) : 0;
+    if (whoosh) sound('whoosh');
     phase = next;
     root.dataset.phase = phase;
     const meaning = ['reveal', 'focusTitle', 'lessonTitle', 'integrationTitle'].includes(phase);
@@ -263,6 +381,8 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
     title.removeAttribute('aria-describedby');
     status.textContent = '';
     countdown.hidden = phase !== 'memorize3seconds';
+    truth.hidden = true;
+    truth.replaceChildren();
     controls.replaceChildren();
     controls.classList.toggle('mindset-controls-quarters', phase === 'red');
     confirmButton = null;
@@ -284,6 +404,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       renderMemorySummary();
       title.setAttribute('aria-describedby', memorySummary.id);
       remaining = MEMORIZE_MS;
+      graceUntil = win.performance.now() + (smooth ? PHASE_FADE_MS : 0);
       runningSince = doc.hidden || suspended ? null : win.performance.now();
       updateClock();
       if (!doc.hidden && !suspended) timer = win.setTimeout(tick, 100);
@@ -306,11 +427,14 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       unknown.dataset.quarter = 'unknown';
     } else if (phase === 'reveal') {
       const red = SIGNALS.find((signal) => signal.color === 'red');
-      title.textContent = text(answer === quarterOf(red) ? 'caught' : 'missed');
+      const caught = answer === quarterOf(red);
+      title.textContent = text(caught ? 'caught' : 'missed');
       const score = [...picks].filter((index) => SIGNALS[index].color === 'blue').length;
       description.append(element('p', 'mindset-score', text('score', { count: score })));
       paragraph('revealCopy');
       renderSignals(true);
+      renderTruth(caught);
+      if (!caught) sound('twinkle');
       renderMemorySummary();
       addButton(text('next'), 'next');
     } else if (phase === 'focusTitle') {
@@ -333,9 +457,18 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       field.setAttribute('aria-label', text('finalTitle'));
       renderPhoto();
       addButton(text('replay'), 'replay', 'mindset-replay');
+      sound('conclusion');
     }
 
     feedback.hidden = !['memorize3seconds', 'recall3positions'].includes(phase);
+    // The entrance runs once and holds its end state; no timer is needed (or allowed)
+    // while the game waits for input. The next slide resets it.
+    root.classList.remove('mindset-entering', 'mindset-whooshing');
+    if (smooth) {
+      void root.offsetWidth;
+      root.classList.add(whoosh ? 'mindset-whooshing' : 'mindset-entering');
+      settleHeight(previousHeight);
+    }
     if (meaning) {
       field.setAttribute('aria-hidden', 'true');
       field.removeAttribute('aria-describedby');
@@ -358,6 +491,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       const position = Number(button.dataset.position);
       if (picks.has(position)) picks.delete(position);
       else if (picks.size < 3) picks.add(position);
+      sound('pick');
       updatePicks();
       return;
     }
@@ -374,7 +508,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
 
   root.addEventListener('click', onClick);
   doc.addEventListener('visibilitychange', onVisibilityChange);
-  setPhase('intro', false);
+  setPhase('intro', false, true);
 
   return {
     get phase() { return phase; },

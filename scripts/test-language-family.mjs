@@ -39,7 +39,8 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
         const first=sample();await new Promise(resolve=>setTimeout(resolve,180));return [first,sample()];
       });
       check(frames.some(Boolean)&&frames[0]!==frames[1],`${name}: ambient sparks remain animated beyond countdown`);
-      await page.locator(`.german-options [data-locale="${choice}"]`).tap();
+      // The two dialect flags float on purpose; force skips Playwright's still-element wait.
+      await page.locator(`.german-options [data-locale="${choice}"]`).tap({force:true});
       await page.locator('.sound-no').waitFor();
       check(await page.locator('html').getAttribute('lang')===(choice==='de'?'de':'gsw-CH'),`${name}: explicit dialect applied`);
       check(await page.locator('.portal-ambient').count()===1,`${name}: sound prompt retains one ambient effect`);

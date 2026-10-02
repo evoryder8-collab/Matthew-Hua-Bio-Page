@@ -1,7 +1,14 @@
 import {mountDialogAtmosphere} from './dialog-atmosphere.js';
 import {icon,escapeHTML as e} from './templates.js';
 
-export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedMotion}) {
+// The game "fires up" in its homepage slot, then lifts forward into the dialog.
+const IGNITE_MS=500,LIFT_MS=900,RETURN_MS=600;
+
+/**
+ * memory is owned by the page document: once the game has lifted (automatically or
+ * by request) it never lifts itself again during that visit, even after a re-render.
+ */
+export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedMotion,memory={lifted:false},onClose=()=>{}}) {
   const slot=document.createElement('div');
   slot.className='game-home-slot';
   host.before(slot);
@@ -13,44 +20,57 @@ export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedM
   expand.innerHTML=icon('maximize-2');
   slot.prepend(expand);
   icons();
-  let dialog=null,panel=null,stopAtmosphere=null,animation=null;
-  let visited=false,intersects=false,closing=false,destroyed=false;
+  let dialog=null,panel=null,stopAtmosphere=null,animation=null,igniteTimer=0;
+  let intersects=false,closing=false,destroyed=false,igniting=false;
   let previousFocus=null;
 
   function syncPhase(phase=game.phase) {
     if(!dialog)return;
-    const complete=phase==='finalPhoto';
-    dialog.querySelector('.game-close').hidden=!complete;
-    dialog.querySelector('.game-replay').hidden=!complete;
-    dialog.querySelector('.game-window-label').hidden=complete;
+    dialog.querySelector('.game-replay').hidden=phase!=='finalPhoto';
   }
 
   function transformBetween(from,to) {
     return `translate(${from.left-to.left}px,${from.top-to.top}px) scale(${from.width/to.width},${from.height/to.height})`;
   }
 
-  function runAnimation(frames,duration) {
+  function runAnimation(frames,duration,easing='cubic-bezier(.22,1,.36,1)') {
     animation?.cancel();
     if(reducedMotion.matches||!panel.animate)return Promise.resolve();
-    animation=panel.animate(frames,{duration,easing:'cubic-bezier(.22,1,.36,1)'});
+    animation=panel.animate(frames,{duration,easing});
     return animation.finished.catch(()=>{});
   }
 
+  function ignite() {
+    if(reducedMotion.matches)return Promise.resolve(true);
+    igniting=true;slot.classList.add('is-igniting');
+    return new Promise(resolve=>{igniteTimer=setTimeout(()=>{
+      igniteTimer=0;igniting=false;slot.classList.remove('is-igniting');
+      resolve(!destroyed&&!dialog&&canOpen());
+    },IGNITE_MS);});
+  }
+
   async function open() {
-    if(destroyed||dialog||!canOpen())return;
-    visited=true;previousFocus=document.activeElement;
+    if(destroyed||dialog||igniting||!canOpen())return;
+    // Suspend before any await so a click on Begin cannot start the memory timer early.
+    // An interrupted ignition leaves it paused, exactly like a game closed mid-round.
+    game.suspend();
+    previousFocus=document.activeElement;
+    if(!await ignite())return;
+    memory.lifted=true;
     const origin=host.getBoundingClientRect();
     slot.style.minHeight=`${slot.getBoundingClientRect().height}px`;
-    game.suspend();
     dialog=document.createElement('dialog');
     const current=dialog;
     current.className='game-dialog atmospheric-dialog';
     current.setAttribute('aria-label',copy.title);
-    current.innerHTML=`<div class="game-window modal-surface"><div class="game-window-toolbar"><button class="icon-button game-close" aria-label="${e(common.close)}" title="${e(common.close)}" hidden>${icon('x')}</button><span class="game-window-label">${e(copy.eyebrow)}</span><button class="game-replay" hidden>${icon('rotate-ccw')}<span>${e(copy.replay)}</span></button></div><div class="game-scroll"></div></div>`;
+    current.innerHTML=`<div class="game-window modal-surface"><div class="game-window-toolbar"><button class="icon-button game-close" aria-label="${e(common.close)}" title="${e(common.close)}">${icon('x')}</button><span class="game-window-label">${e(copy.eyebrow)}</span><button class="game-replay" hidden>${icon('rotate-ccw')}<span>${e(copy.replay)}</span></button></div><div class="game-scroll"></div></div>`;
     document.getElementById('overlay-root').append(current);
     panel=current.querySelector('.game-window');
     current.querySelector('.game-scroll').append(host);
     icons();current.showModal();
+    // showModal() would focus the X and flash its keyboard ring mid-flight; rest focus on
+    // the (outline-free) heading instead. Keyboard users still reach the X with Tab.
+    host.querySelector('.mindset-title')?.focus({preventScroll:true});
     stopAtmosphere=mountDialogAtmosphere(current);
     syncPhase();
     current.querySelector('.game-close').addEventListener('click',()=>close());
@@ -60,7 +80,12 @@ export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedM
     current.addEventListener('cancel',event=>{event.preventDefault();close();});
     current.addEventListener('click',event=>{if(event.target===current)close();});
     const destination=panel.getBoundingClientRect();
-    await runAnimation([{transform:transformBetween(origin,destination),opacity:.75},{transform:'none',opacity:1}],650);
+    panel.classList.add('is-launching');
+    await runAnimation([
+      {transform:transformBetween(origin,destination),opacity:.8},
+      {transform:'none',opacity:1}
+    ],LIFT_MS,'cubic-bezier(.16,1,.3,1)');
+    panel?.classList.remove('is-launching');
     if(dialog!==current||closing||destroyed)return;
     game.resume();
     host.querySelector('.mindset-title')?.focus({preventScroll:true});
@@ -80,15 +105,16 @@ export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedM
     const target=slot.getBoundingClientRect();
     const to={left:target.left,top:target.top+48,width:target.width,height:Math.max(1,target.height-48)};
     current.classList.add('returning');
-    await runAnimation([{transform:'none',opacity:1},{transform:transformBetween(to,from),opacity:.82}],520);
+    await runAnimation([{transform:'none',opacity:1},{transform:transformBetween(to,from),opacity:.82}],RETURN_MS);
     if(dialog!==current||destroyed)return;
     restore();
     const focus=previousFocus?.isConnected&&previousFocus!==document.body?previousFocus:expand;
     focus.focus({preventScroll:true});
+    onClose();
   }
 
   function maybeOpen() {
-    if(intersects&&!visited&&!destroyed&&canOpen())open();
+    if(intersects&&!memory.lifted&&!destroyed&&canOpen())open();
   }
   const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{
     intersects=entries.some(entry=>entry.isIntersecting);maybeOpen();
@@ -103,6 +129,7 @@ export function mountGameSpotlight(host,{game,copy,common,canOpen,icons,reducedM
     refresh:maybeOpen,
     destroy(){
       if(destroyed)return;destroyed=true;observer?.disconnect();
+      clearTimeout(igniteTimer);igniting=false;slot.classList.remove('is-igniting');
       host.removeEventListener('click',liftOnInteraction,true);
       expand.removeEventListener('click',open);
       if(dialog)restore();

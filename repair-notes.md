@@ -10,10 +10,11 @@ Read [roadmap.md](roadmap.md) for positioning, design constraints and prioritise
 | --- | --- |
 | Site | https://matthewhua.ch/ |
 | Repository | `evoryder8-collab/Matthew-Hua-Bio-Page` |
-| Local checkout used for this release | `/Users/jaxoncorrey/Desktop/my-video/matthew-hua-site` |
+| Local checkout used for `f811195` | `/Users/jaxoncorrey/Desktop/my-video/matthew-hua-site` |
+| Local checkout for the working-tree release | `/Users/jaxoncorrey/Downloads/Matt Hua New Website` (same remote; path contains spaces) |
 | Working branch at handoff | `codex/private-practice-experience` |
 | Published branch / directory | `main` / repository root |
-| Latest implementation commit | `f8111957644496ce4d4d1278a0267243a0bb6c79` |
+| Latest implementation commit | `f8111957644496ce4d4d1278a0267243a0bb6c79` (the experience release below is uncommitted) |
 | Prior implementation commit | `dd600475edc05034b68a7089474c11a1cc55b038` |
 | Pages result for implementation | `built`, no error; build updated 2026-10-02 09:03:42 UTC |
 | Custom domain / HTTPS | `matthewhua.ch`; HTTPS enforced, verified through GitHub Pages settings |
@@ -26,7 +27,45 @@ Read [roadmap.md](roadmap.md) for positioning, design constraints and prioritise
 
 The latest user request authorises portrait motion/shine, better contact icons and detailed handoff documents. Earlier requests authorised website implementation and publication. Future work should follow the new user's scope; the roadmap is not a command to implement every idea automatically.
 
-## 2. This Release
+## 2. This Release (working tree, 2026-10-02, not committed or published)
+
+Requested in one session by the user; implemented on `codex/private-practice-experience` without a commit, push or Pages build. Everything below is **implemented** and **automation-verified** unless stated; nothing is device-verified.
+
+### What Changed And Why
+
+| Request | Implementation | Main files |
+| --- | --- | --- |
+| Cheap-looking header language icon | Pill with the current flag as a lit orb, code and chevron; flag URL passed into `renderHeader` (build and runtime). | `templates.js`, `build.mjs`, `app.js`, `refinements.css` |
+| Game pop-up needs an X, a slower lift with a "firing up" glow, and must not re-pop after finishing | X visible top-left from the start. 500ms in-slot ignition (traced conic ring on `#mindset-host::before`, glow, brightened field), then 900ms lift, eased `::backdrop`, launch glow. Auto-lift memory is document-scoped (`gameMemory`). **Root cause of re-pops found:** in-page hash links (Discover) fire `popstate`, which re-rendered the whole page and rebuilt the game and spotlight. Same-route/same-locale `popstate` now keeps the live page (still closing media and cancelling a pending arrival). | `game-spotlight.js`, `app.js`, `refinements.css` |
+| Outline rectangle on "An experiment in attention" | Programmatic focus on the title/field no longer draws an outline; `showModal()` focus is moved to the title so the X's keyboard ring never flashes mid-lift. | `mindset.css`, `game-spotlight.js` |
+| Smooth slides; recall question should glow/float | Synchronous state, visual crossfade: the outgoing slide is cloned into a **closed shadow root** (styles rebuilt from the page's own `mindset` rules) so no duplicate ids/buttons/headings exist; height glides; content rises. Leaving the memory phase removes the copy's signals so no blue lingers. Memory clock starts after the 420ms fade. Recall title floats and glows. No timers are scheduled during input phases (the Mindset suite enforces this). | `mindset.js`, `mindset.css` |
+| Reveal the red spot | Answer slide always shows a crisp red marker above the blur (gold rim when found); narrow layouts top-align the text so it never overlaps. | `mindset.js`, `mindset.css` |
+| Teaching slides like a torch whoosh | Reveal -> focus -> lesson -> integration -> final: outgoing copy streaks left with motion blur, a warm streak sweeps right to left, new content flies in from the right. | `mindset.js`, `mindset.css` |
+| "A life across borders" belongs on About | Moved after the About lead; Home goes ribbon -> tears moment -> method. `#philosophy` id retained. | `templates.js`, `refinements.css` |
+| Tears moment | Heading split into letters (intact `.tears-sr` copy, visual `aria-hidden`); a light wave reaches the full stop, which is measured from font metrics, swells with a neck, pinches off (satellite droplet), falls under gravity onto the paragraph's first line, splashes (crown droplets, Worthington jet, rings) and ripples nearby words; the stop re-forms. Canvas is allocated only while animating. Reduced motion: plain text. | `tears.js`, `templates.js`, `refinements.css` |
+| German choice hard cut; prompts in general | Prompt darkness eases in/out; replacing one prompt with another swaps instantly under steady darkness (no duplicate controls); DE tile blooms into the two flags, which float in counterpoint and glow in turn. Tests click those flags with `force` because the float is intentional. | `app.js`, `refinements.css` |
+| Black curtain hard cut | Curtain eases in (560ms) and out (620ms) on a quintic curve; sparkler keeps its original envelope. | `effects.js` |
+| Ribbon runs out on the left | JS clones groups until the loop exceeds viewport + one group and travels exactly one measured group width at the original pace. | `app.js`, `identity.css` |
+| Welcome flashes too briefly | 1s hold after the opening sparkle, then crossfade into the language stage. | `app.js` |
+| Testers missed the six elements | Spring wave + sheen once the game is closed (yields to the lift), sideways peek on the mobile row, idle shimmer until a tab is opened, breathing dot on unopened elements. | `element-invite.js`, `app.js`, `refinements.css` |
+| Sound effects and soundtrack | Web Audio, unlocked by the consent click. Effects: sizzle, tear drop, wink, recall note, twinkle, whoosh, conclusion pop. Soundtrack via `MediaElementSource` -> gain (S-curve glides; iOS ignores media volume): held only through the opening sequence, then continuous; claims by playing films duck it; effects never duck it. Films' own audio eases in where volume is settable. | `sound.js`, `app.js`, `tears.js`, `mindset.js` |
+| Dev server 404 in a path with spaces | `serve.mjs` uses `fileURLToPath`; serves `.mp3`/`.m4a` types. | `serve.mjs` |
+
+### Verification For This Release
+
+| Check | Result |
+| --- | --- |
+| `npm run build`, `npm run check`, `npm test` | Passed (60 localized renders). |
+| `scripts/test-moments.mjs` (new) | 116 assertions passed in Chromium and WebKit before the final audio/whoosh additions: order, pill, ribbon at 390/2560 at end of loop, tears geometry and re-formed stop at 1440/390, reduced motion, ignition, X, no outline, no duplicate controls, recall glow, red reveal clear of text, no re-lift, element invitation, sound/no-sound, soundtrack ducking for gallery film, dialect bloom, eased curtain. |
+| Existing suites after the soundtrack (before the last five effects) | experience 124, returning-portal 124, language-family 88, popup-lifecycle 22, mindset desktop+mobile, refinements 92, portrait-contact 144: all passed. |
+| Last additions (welcome hold, five effects, torch slides, soundtrack rule) | At the user's request only one Chromium probe: grid after 1s hold; soundtrack 0.3 after intro, stays up through a later sparkle, 0 under a replayed film; every cue fired once as expected. Suites were not rerun after these. |
+| `scripts/test-layout.mjs` | Full run: 110/132. All 22 failures were the test clicking behind the homepage game dialog (the legitimate first auto-lift during its image scroll, or the game it plays); no layout/overflow issue was reported. After the first test fix a homepage rerun passed the gallery stage in all 10 cases, leaving 12 mobile menu taps blocked by the same dialog. The test now returns the lifted game before both steps; **not rerun after that final fix** at the user's request. |
+
+### Remaining
+
+Device listening (iOS silent switch, autoplay, Bluetooth delay, levels on phone speakers); audio licence confirmation; native review of the tears heading wrap in long locales; commit/publish and production smoke.
+
+## 2A. Previous Release (`f811195`)
 
 ### Portrait: Shine Was Consumed Too Early
 
@@ -274,6 +313,10 @@ Social preview: `assets/matthew-hua-tony-share-v1.jpg`, 1200 x 634, used through
 | Missed game auto-lift, prior lifecycle repair | Intersection happened while menu/modal blocked opening and was not retried. | Refresh after menu close, visibility, navigation and modal/arrival disposal. |
 | Contact icon alignment, `f811195` | Old grid specificity displaced both badges and their inner SVGs; counting icons did not catch it. | Explicit grid areas and geometry/hit-target regression assertions. |
 | Premature portrait shine, `f811195` | Returning Home consumed a one-time effect before the intro film was dismissed. | Pending reveal set by visible intro dismissal; one-shot document flag and workflow test. |
+| Game re-popped / lost progress (working tree) | Hash links such as Discover fire `popstate`; the handler re-rendered the whole page, rebuilding the game and its spotlight. | Same-route, same-locale `popstate` keeps the live page; auto-lift memory is document-scoped. |
+| Outline rectangle on the game (working tree) | Programmatic focus on the `tabindex=-1` title/field drew `:focus-visible`; `showModal()` focused the X. | Outline removed for programmatic targets; dialog focus rests on the title. |
+| Ribbon ran out on wide screens (working tree) | Two fixed copies travelling -50% leave a gap when one copy is narrower than the viewport. | Measured clones, one-group travel, ResizeObserver refill. |
+| Layout test blocked (working tree) | `test-layout.mjs` predates the lifted game; it never closed the dialog it opened before clicking the gallery/menu. | The test returns the game before continuing. |
 
 Do not fix an isolated screenshot by placing a new high-z-index panel over a shared interactive surface. First identify the phase, owner and layout region. Test adjacent phases immediately afterward.
 

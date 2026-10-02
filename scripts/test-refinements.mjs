@@ -24,7 +24,9 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
       await page.locator('.game-dialog[open]').waitFor();
       await page.waitForTimeout(750);
       check(await page.evaluate(()=>document.querySelector('.game-dialog .mindset-game')===window.originalGame),`${name}/${width}: same live game lifted`);
-      check(await page.locator('.game-close').isHidden(),`${name}/${width}: completion X initially hidden`);
+      const closeAtTopLeft=await page.evaluate(()=>{const x=document.querySelector('.game-close').getBoundingClientRect(),w=document.querySelector('.game-window').getBoundingClientRect();return x.width>0&&x.left-w.left<40&&x.top-w.top<40;});
+      check(closeAtTopLeft,`${name}/${width}: small X available at the top left from the start`);
+      check(await page.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle==='none'),`${name}/${width}: lifted game shows no focus rectangle`);
       check(await page.locator('.game-dialog .dialog-ambient').count()===1,`${name}/${width}: game atmosphere mounted`);
       await page.locator('[data-action=begin]').click();
       await page.mouse.click(4,4);

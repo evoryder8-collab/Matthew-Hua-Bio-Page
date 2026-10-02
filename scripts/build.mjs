@@ -6,6 +6,7 @@ for(const route of routes){
   const prefix=route==='home'?'./':'../';
   const asset=file=>prefix+'assets/'+file.split('/').map(encodeURIComponent).join('/');
   const href=r=>prefix+(r==='home'?'':r+'/');
+  const flag=code=>prefix+'static/flags/'+code+'.png';
   const canonical='https://matthewhua.ch/'+(route==='home'?'':route+'/');
   const title=route==='home'?en.seo.title:`${en.nav[route==='private-practice'?'practice':route]} | Matthew Hua | Zurich`;
   const html=`<!doctype html>
@@ -16,7 +17,7 @@ for(const route of routes){
 <link rel="stylesheet" href="${prefix}static/vendor/leaflet.css"><link rel="stylesheet" href="${prefix}static/style.css"><link rel="stylesheet" href="${prefix}static/mindset.css"><link rel="stylesheet" href="${prefix}static/technology.css"><link rel="stylesheet" href="${prefix}static/element-visuals.css"><link rel="stylesheet" href="${prefix}static/identity.css"><link rel="stylesheet" href="${prefix}static/refinements.css">
 <script>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('ready')},5000);</script>
 <script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'Person',name:'Matthew Hua',url:'https://matthewhua.ch/',jobTitle:'Transformational Therapist',email:'info@healwell.ch',telephone:'+41765067488',address:{'@type':'PostalAddress',streetAddress:'Rüdigerstrasse 7/Ground Floor',postalCode:'8045',addressLocality:'Zürich',addressCountry:'CH'},worksFor:{'@type':'Organization',name:'healwell'}})}</script></head>
-<body data-route="${route}"><div class="bg-aurora" aria-hidden="true"><span class="blob g1"></span><span class="blob p1"></span><span class="blob g2"></span><span class="blob p2"></span><span class="blob g3"></span><span class="blob p3"></span></div><div id="shell">${renderHeader(en,href,route)}<main id="main">${renderPage(route,en,asset,href)}</main>${renderFooter(en,href)}</div><div id="overlay-root"></div><canvas id="transition-canvas" aria-hidden="true"></canvas><canvas id="sparkler-canvas" aria-hidden="true"></canvas><script defer src="${prefix}static/vendor/lucide.min.js"></script><script defer src="${prefix}static/vendor/leaflet.js"></script><script type="module" src="${prefix}static/app.js"></script></body></html>`;
+<body data-route="${route}"><div class="bg-aurora" aria-hidden="true"><span class="blob g1"></span><span class="blob p1"></span><span class="blob g2"></span><span class="blob p2"></span><span class="blob g3"></span><span class="blob p3"></span></div><div id="shell">${renderHeader(en,href,route,flag)}<main id="main">${renderPage(route,en,asset,href)}</main>${renderFooter(en,href)}</div><div id="overlay-root"></div><canvas id="transition-canvas" aria-hidden="true"></canvas><canvas id="sparkler-canvas" aria-hidden="true"></canvas><script defer src="${prefix}static/vendor/lucide.min.js"></script><script defer src="${prefix}static/vendor/leaflet.js"></script><script type="module" src="${prefix}static/app.js"></script></body></html>`;
   const dir=route==='home'?root:new URL(route+'/',root); await mkdir(dir,{recursive:true});await writeFile(new URL('index.html',dir),html);
 }
 console.log('Built six static pages with accessible English content and shared multilingual enhancement.');

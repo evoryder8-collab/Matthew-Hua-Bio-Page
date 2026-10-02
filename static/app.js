@@ -6,6 +6,9 @@ import {mountTechnologyEffects} from './technology.js';
 import {mountElementVisual} from './element-visuals.js';
 import {mountDialogAtmosphere} from './dialog-atmosphere.js';
 import {mountGameSpotlight} from './game-spotlight.js';
+import {mountTearsMoment} from './tears.js';
+import {createSoundEffects,createBackgroundMusic} from './sound.js';
+import {mountElementInvite} from './element-invite.js';
 
 const base=new URL('../',import.meta.url);
 document.querySelector('link[rel="icon"]').href=new URL('static/favicon.svg',base).href;
@@ -19,7 +22,31 @@ const localeCache=new Map();
 let dict,locale,route,game,map,observer,portal,portalCleanup,heroVideo,elementVisual,technology,cleanupTilt=()=>{};
 let soundEnabled=false,navigating=false,pendingNavigation=null,selectedElement=0,archiveFilter='all',modal=null;
 let restoreFocus=null,arrival=null,modalCleanup=null,spotlight=null,mapRouteBounds=null;
-let portraitGleamed=false,portraitGleamPending=false;
+let portraitGleamed=false,portraitGleamPending=false,tears=null,cleanupRecognition=()=>{};
+// Document-scoped: the homepage game lifts itself at most once per visit, across re-renders.
+const gameMemory={lifted:false};
+// Elements opened during this visit; the rest keep their small "there is more" dot.
+const exploredElements=new Set([0]);
+let elementInvite=null;
+function markExplored(){document.querySelectorAll('[data-element-tab]').forEach(tab=>tab.toggleAttribute('data-explored',exploredElements.has(Number(tab.dataset.elementTab))));}
+const flagURL=code=>new URL('flags/'+code+'.png',import.meta.url).href;
+// Effects sound only after an explicit "sound on" (portal or header speaker) and never with reduced motion.
+const sfx=createSoundEffects({sizzle:asset('sfx/sparkler-sizzle.mp3'),drop:asset('sfx/tear-drop.mp3'),wink:asset('sfx/element-wink.mp3'),pick:asset('sfx/signal-pick.mp3'),twinkle:asset('sfx/red-twinkle.mp3'),conclusion:asset('sfx/conclusion-pop.mp3'),whoosh:asset('sfx/slide-whoosh.mp3')});
+// Interface cues: [volume, delay ms]. The twinkle waits for the red signal to land; the
+// conclusion pop waits for its slide to arrive after the whoosh.
+const CUES={wink:[.5,0],pick:[.42,0],twinkle:[.62,480],conclusion:[.55,380],whoosh:[.6,0]};
+const cue=name=>{const [volume,delay]=CUES[name]||[];if(!soundEnabled||volume===undefined)return;const play=()=>{if(soundEnabled)sfx.play(name,{volume});};if(delay)setTimeout(play,delay);else play();};
+const sizzle=()=>{if(soundEnabled&&!motion.matches)sfx.play('sizzle',{volume:.72,fadeIn:.06});};
+const tearSound=strength=>{if(soundEnabled)sfx.play('drop',{volume:.62*strength+.08,rate:strength<1?1.18+(1-strength)*.4:1,maxLate:.12});};
+// The soundtrack follows the same consent; films claim it and it glides away beneath them.
+const music=createBackgroundMusic(asset('audio/effortless-prestige.m4a'),sfx,{level:.3});
+// A film's own sound rises in instead of starting at full volume (where volume is settable).
+function easeVolumeIn(video,ms=900){
+  if(video.muted||motion.matches)return;
+  const start=performance.now();video.volume=0;
+  const step=now=>{const t=Math.min(1,(now-start)/ms);video.volume=t*t*(3-2*t);if(t<1&&!video.paused)requestAnimationFrame(step);else video.volume=1;};
+  requestAnimationFrame(step);
+}
 const readStore=(store,key)=>{try{return store.getItem(key);}catch{return null;}};
 const writeStore=(store,key,value)=>{try{store.setItem(key,value);}catch{}};
 const availableStorage=name=>{try{return window[name];}catch{return null;}};
@@ -46,12 +73,16 @@ function setMetadata(){
   document.querySelector('link[rel="canonical"]').href=canonical;
   document.querySelector('meta[property="og:url"]').content=canonical;
 }
-function cleanPage(){spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;technology?.destroy();technology=null;map?.remove();map=null;mapRouteBounds=null;observer?.disconnect();cleanupTilt();cleanupTilt=()=>{};if(heroVideo){heroVideo.pause();heroVideo=null;}}
+function cleanPage(){elementInvite?.destroy();elementInvite=null;spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;technology?.destroy();technology=null;tears?.destroy();tears=null;cleanupRecognition();cleanupRecognition=()=>{};map?.remove();map=null;mapRouteBounds=null;observer?.disconnect();cleanupTilt();cleanupTilt=()=>{};if(heroVideo){heroVideo.pause();heroVideo=null;}}
 function renderSite({element=0}={}){
   cleanPage();document.body.dataset.route=route;document.body.classList.remove('menu-open');
-  shell.innerHTML=renderHeader(dict,href,route)+`<main id="main">${renderPage(route,dict,asset,href)}</main>`+renderFooter(dict,href);
-  setMetadata();icons();setupReveals();setupHero();updateSoundButtons();setupTilt();
+  shell.innerHTML=renderHeader(dict,href,route,flagURL)+`<main id="main">${renderPage(route,dict,asset,href)}</main>`+renderFooter(dict,href);
+  setMetadata();icons();setupReveals();setupHero();updateSoundButtons();setupTilt();setupRecognition();
+  const tearsSection=document.querySelector('.tears-moment');
+  if(tearsSection)tears=mountTearsMoment(tearsSection,{reducedMotion:motion,onImpact:tearSound});
   if(document.getElementById('element-panel'))selectElement(element);
+  const tablist=document.querySelector('.element-tabs');
+  if(tablist)elementInvite=mountElementInvite(tablist,{reducedMotion:motion,isBlocked:()=>!!portal||!!arrival||!!modal||!!document.querySelector('.game-dialog,.game-home-slot.is-igniting')});
   if(document.getElementById('technology'))technology=mountTechnologyEffects(document.getElementById('technology'));
   if(route==='contact'){setupMap();setupEnquiry();}
   archiveFilter='all';selectedElement=element;
@@ -74,6 +105,29 @@ function setupTilt(){
     removals.push(()=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerleave',leave);leave();});
   }
   cleanupTilt=()=>removals.forEach(fn=>fn());
+}
+// The award ribbon repeats its group until the loop is wider than the viewport plus one
+// group, then travels exactly one group width, so the right edge can never run dry.
+function setupRecognition(){
+  const track=document.querySelector('.recognition-track'),template=track?.querySelector('.recognition-group');
+  if(!template)return;
+  let frame=0;
+  const fill=()=>{
+    frame=0;
+    const width=template.getBoundingClientRect().width,viewport=track.parentElement.getBoundingClientRect().width||innerWidth;
+    if(!width)return;
+    const copies=Math.max(2,Math.ceil(viewport/width)+1);
+    const groups=[...track.querySelectorAll('.recognition-group')];
+    for(const extra of groups.slice(copies))if(extra.hasAttribute('data-fill'))extra.remove();
+    for(let count=track.querySelectorAll('.recognition-group').length;count<copies;count++){const clone=template.cloneNode(true);clone.setAttribute('aria-hidden','true');clone.setAttribute('data-fill','');track.append(clone);}
+    track.style.setProperty('--recognition-shift',`${-width}px`);
+    track.style.animationDuration=`${Math.max(18,width/35.5).toFixed(2)}s`;// the ribbon's original pace
+  };
+  const schedule=()=>{if(!frame)frame=requestAnimationFrame(fill);};
+  fill();
+  const resize='ResizeObserver' in window?new ResizeObserver(schedule):null;
+  resize?.observe(template);resize?.observe(track.parentElement);
+  cleanupRecognition=()=>{cancelAnimationFrame(frame);resize?.disconnect();};
 }
 function setupHero(){
   revealPortrait();
@@ -111,10 +165,12 @@ function updateSoundButtons(){
   document.querySelectorAll('.gallery-view video').forEach(video=>video.muted=!soundEnabled);
   icons();
 }
-function setSound(value){soundEnabled=value;updateSoundButtons();}
+// Called from the click that changes it, so switching on also unlocks the effects.
+function setSound(value){soundEnabled=value;if(value){sfx.unlock();music.enable();}else{sfx.silence();music.disable();}updateSoundButtons();}
 
-function prepareArrival(){
+function prepareArrival({holdMusic=false}={}){
   if(arrival)return arrival;
+  if(holdMusic)music.claim('intro',.3);
   const dialog=document.createElement('dialog');
   dialog.className='arrival-player atmospheric-dialog';dialog.setAttribute('aria-label',dict.arrival.eyebrow);
   dialog.innerHTML=`<div class="arrival-screen"><div class="arrival-film-frame"><video playsinline preload="auto" poster="${e(asset('European Championship.webp'))}" src="${e(asset('films/european-championship.mp4'))}" aria-label="${e(dict.arrival.eyebrow)}"></video><button class="arrival-reveal" aria-label="${e(dict.arrival.reveal)}"></button><div class="arrival-controls"><button class="icon-button arrival-close" aria-label="${e(dict.common.close)}" title="${e(dict.common.close)}">${icon('x')}</button><div class="arrival-transport"><button class="icon-button arrival-play" aria-label="${e(dict.common.pause)}" title="${e(dict.common.pause)}">${icon('pause')}</button><span class="arrival-time" aria-hidden="true">00:28</span><button class="icon-button" data-action="sound" aria-label="${e(dict.nav.soundOff)}" title="${e(dict.nav.soundOff)}">${icon('volume-x')}</button></div></div><p class="arrival-error" hidden>${e(dict.common.mediaError)} <a href="${e(asset('films/european-championship.mp4'))}">${e(dict.common.openFilm)}</a></p></div></div><button class="arrival-enter"><span class="arrival-label">matthew hua · ${e(dict.arrival.eyebrow)}</span><span class="arrival-title">${e(dict.arrival.title)}</span><span class="arrival-link">${e(dict.arrival.enter)}${icon('arrow-down')}</span></button>`;
@@ -131,7 +187,7 @@ function prepareArrival(){
     if(dialog.open&&!portraitGleamed)portraitGleamPending=true;
     stopAtmosphere?.();stopAtmosphere=null;
     if(dialog.contains(transitionCanvas))document.body.append(transitionCanvas);
-    dialog.close();dialog.remove();arrival=null;
+    dialog.close();dialog.remove();arrival=null;music.release('arrival');music.release('intro');
     document.querySelector('main h1')?.focus({preventScroll:true});
     revealPortrait();spotlight?.refresh();
   };
@@ -145,6 +201,8 @@ function prepareArrival(){
   dialog.addEventListener('cancel',event=>{event.preventDefault();dismiss();});
   dialog.addEventListener('click',event=>{if(event.target===dialog||event.target===dialog.querySelector('.arrival-screen'))dismiss();});
   video.addEventListener('play',update);video.addEventListener('pause',update);
+  video.addEventListener('playing',()=>{if(!video.muted)music.claim('arrival');easeVolumeIn(video);});
+  video.addEventListener('pause',()=>music.release('arrival'));video.addEventListener('ended',()=>music.release('arrival'));
   video.addEventListener('ended',update);
   video.addEventListener('timeupdate',()=>{const left=Math.ceil(Math.max(0,(video.duration||28)-video.currentTime));dialog.querySelector('.arrival-time').textContent=`00:${String(left).padStart(2,'0')}`;});
   video.addEventListener('error',()=>{dialog.querySelector('.arrival-error').hidden=false;showControls();});
@@ -155,13 +213,13 @@ function prepareArrival(){
 }
 function selectElement(index){
   if(!document.getElementById('element-panel'))return;index=Math.max(0,Math.min(5,Number(index)||0));spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;
-  selectedElement=index;const panel=document.getElementById('element-panel');
+  selectedElement=index;exploredElements.add(index);markExplored();const panel=document.getElementById('element-panel');
   document.querySelectorAll('[data-element-tab]').forEach((tab,i)=>{tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;});
   panel.setAttribute('aria-labelledby',`element-tab-${index}`);
   if(index===0){
     panel.innerHTML='<div id="mindset-host"></div>';const host=document.getElementById('mindset-host');
-    game=mountMindset(host,{copy:dict.game,asset,reducedMotion:motion.matches,onPhaseChange:phase=>spotlight?.syncPhase(phase)});
-    if(route==='home')spotlight=mountGameSpotlight(host,{game,copy:dict.game,common:dict.common,canOpen:()=>!document.hidden&&!portal&&!arrival&&!modal&&!navigating&&!document.body.classList.contains('menu-open'),icons,reducedMotion:motion});
+    game=mountMindset(host,{copy:dict.game,asset,reducedMotion:motion.matches,onPhaseChange:phase=>spotlight?.syncPhase(phase),onSound:cue});
+    if(route==='home')spotlight=mountGameSpotlight(host,{game,copy:dict.game,common:dict.common,canOpen:()=>!document.hidden&&!portal&&!arrival&&!modal&&!navigating&&!document.body.classList.contains('menu-open'),icons,reducedMotion:motion,memory:gameMemory,onClose:()=>elementInvite?.refresh()});
   }
   else {panel.innerHTML=renderElement(index,dict);elementVisual=mountElementVisual(document.getElementById('element-visual-host'),index,{reducedMotion:motion.matches});}
   icons();
@@ -177,7 +235,7 @@ async function navigate(target,{push=true,element=0,url=null,animate=false}={}){
       if(push){const next=new URL(url||href(target));if(locale!=='en')next.searchParams.set('lang',locale);history.pushState({route},'',next);}
       renderSite({element});window.scrollTo({top:0,behavior:'instant'});document.querySelector('main h1')?.focus({preventScroll:true});
     };
-    if(animate&&push)await effects.transition(swap);else swap();
+    if(animate&&push){sizzle();await effects.transition(swap);}else swap();
   }finally{navigating=false;revealPortrait();spotlight?.refresh();if(pendingNavigation){const next=pendingNavigation;pendingNavigation=null;navigate(next.target,next.options);}}
 }
 function setMenu(open){
@@ -188,7 +246,7 @@ function setMenu(open){
   if(open)menu.querySelector('a')?.focus();
   else queueMicrotask(()=>spotlight?.refresh());
 }
-function closeModal(){if(!modal)return;const old=modal;modal=null;modalCleanup?.();modalCleanup=null;old.querySelectorAll('video').forEach(video=>video.pause());old.close();old.remove();restoreFocus?.isConnected&&restoreFocus.focus({preventScroll:true});queueMicrotask(()=>spotlight?.refresh());}
+function closeModal(){if(!modal)return;const old=modal;modal=null;modalCleanup?.();modalCleanup=null;old.querySelectorAll('video').forEach(video=>video.pause());music.release('gallery');old.close();old.remove();restoreFocus?.isConnected&&restoreFocus.focus({preventScroll:true});queueMicrotask(()=>spotlight?.refresh());}
 function openModal(className,content){
   closeModal();restoreFocus=document.activeElement;const dialog=document.createElement('dialog');dialog.className=className+' atmospheric-dialog';dialog.innerHTML=`<div class="modal-surface ${className.replace('-dialog','-surface')}"><button class="icon-button dialog-close" data-action="close-dialog" aria-label="${e(dict.common.close)}" title="${e(dict.common.close)}">${icon('x')}</button>${content}</div>`;
   overlayRoot.append(dialog);modal=dialog;icons();dialog.showModal();modalCleanup=mountDialogAtmosphere(dialog);dialog.querySelector('.dialog-close').focus({preventScroll:true});
@@ -240,7 +298,12 @@ function openMedia(index){
     dialog.querySelector('video')?.pause();current=next;const item=media[current],copy=dict.archive.items[current];
     dialog.querySelector('.gallery-layout').innerHTML=`<div class="gallery-view">${item.film?`<video controls playsinline preload="metadata" poster="${e(asset(item.poster))}" src="${e(asset(item.film))}" aria-label="${e(copy.title)}"></video>`:`<img src="${e(asset(item.image))}" alt="${e(copy.title)}">`}</div><div class="gallery-details"><p class="eyebrow">${e(dict.archive.eyebrow)}${item.year?' / '+item.year:''}</p><h2>${e(copy.title)}</h2><p>${e(copy.caption)}</p><div class="gallery-pagination"><span>${sequence.indexOf(current)+1} / ${sequence.length}</span><div><button class="icon-button" data-gallery-step="-1" aria-label="${e(dict.archive.previous)}">${icon('arrow-left')}</button><button class="icon-button" data-gallery-step="1" aria-label="${e(dict.archive.next)}">${icon('arrow-right')}</button></div></div></div>`;
     icons();const video=dialog.querySelector('video');
-    if(video){video.muted=!soundEnabled;video.play()?.catch(()=>{});video.addEventListener('error',()=>{const error=document.createElement('div');error.className='gallery-media-error';error.innerHTML=`<p>${e(dict.common.mediaError)}</p><a href="${e(asset(item.film))}">${e(dict.common.openFilm)}</a>`;dialog.querySelector('.gallery-view').append(error);},{once:true});}
+    if(video){
+      // Gallery films lower the soundtrack while they play and hand back when they stop.
+      video.addEventListener('playing',()=>{if(!video.muted)music.claim('gallery');easeVolumeIn(video);});
+      for(const type of ['pause','ended'])video.addEventListener(type,()=>music.release('gallery'));
+      video.addEventListener('volumechange',()=>{if(video.muted)music.release('gallery');else if(!video.paused)music.claim('gallery');});
+      video.muted=!soundEnabled;video.play()?.catch(()=>{});video.addEventListener('error',()=>{const error=document.createElement('div');error.className='gallery-media-error';error.innerHTML=`<p>${e(dict.common.mediaError)}</p><a href="${e(asset(item.film))}">${e(dict.common.openFilm)}</a>`;dialog.querySelector('.gallery-view').append(error);},{once:true});}
   }
   const step=delta=>show(sequence[(sequence.indexOf(current)+delta+sequence.length)%sequence.length]);
   dialog.addEventListener('click',event=>{const button=event.target.closest('[data-gallery-step]');if(button)step(Number(button.dataset.galleryStep));});
@@ -248,7 +311,7 @@ function openMedia(index){
   show(index);
 }
 async function applyLocale(next,isCurrent=()=>true){const nextDict=await getLocale(next);if(!isCurrent())return false;locale=next;dict=nextDict;writeStore(localStorage,'matthew-language',next);return true;}
-function dismissPortal(expected=portal){if(portal!==expected)return;portalCleanup?.();portalCleanup=null;if(!portal)return;if(portal.contains(transitionCanvas))document.body.append(transitionCanvas);portal.close();portal.remove();portal=null;shell.inert=false;queueMicrotask(()=>{revealPortrait();spotlight?.refresh();});}
+function dismissPortal(expected=portal){if(portal!==expected)return;music.release('portal');portalCleanup?.();portalCleanup=null;if(!portal)return;if(portal.contains(transitionCanvas))document.body.append(transitionCanvas);portal.close();portal.remove();portal=null;shell.inert=false;queueMicrotask(()=>{revealPortrait();spotlight?.refresh();});}
 async function showPortal({settings=false}={}){
   if(portal||navigating)return;setMenu(false);closeModal();
   restoreFocus=document.activeElement;const dialog=document.createElement('dialog');dialog.className='portal';dialog.setAttribute('aria-label',dict.portal.choose);dialog.innerHTML=`<div class="portal-scene"><div class="portal-brand"><span class="mh-monogram">mh</span>matthew hua</div><div class="portal-stage"><p class="portal-welcome">${e(dict.portal.welcome)}</p></div></div>`;
@@ -273,26 +336,61 @@ async function showPortal({settings=false}={}){
     }catch{if(isCurrent()){errorNode.textContent=dict.languageError;errorNode.setAttribute('role','alert');}}
     finally{if(generation===localeRequest)languageBusy=false;}
   }
+  // Prompts fade their darkness in over the flags and away again; moving between two
+  // prompts keeps the darkness steady and only exchanges the focused content.
   function focusPrompt(label,html){
-    portalCleanup?.();portalCleanup=null;
+    const continuing=!!dialog.querySelector('.portal-shade:not(.is-leaving)');
+    portalCleanup?.(true);portalCleanup=null;
     const scene=dialog.querySelector('.portal-scene');scene.inert=true;scene.setAttribute('aria-hidden','true');
     dialog.setAttribute('aria-label',label);
     const shade=document.createElement('div');shade.className='portal-shade';shade.setAttribute('aria-hidden','true');
     const canvas=document.createElement('canvas');canvas.className='portal-ambient';canvas.setAttribute('aria-hidden','true');
     const frost=document.createElement('div');frost.className='portal-frost';frost.setAttribute('aria-hidden','true');
     const panel=document.createElement('div');panel.className='portal-focus is-in';panel.innerHTML=html;
+    for(const layer of [shade,canvas,frost])layer.classList.add(continuing?'is-steady':'is-arriving');
     dialog.append(shade,canvas,frost,panel);icons();
     const stopAmbient=mountAmbientSparks(canvas);
-    portalCleanup=()=>{stopAmbient();shade.remove();canvas.remove();frost.remove();panel.remove();scene.inert=false;scene.removeAttribute('aria-hidden');};
+    // Replaced by another prompt: the new darkness is already opaque, so remove at once.
+    // Returning to the flags: the prompt and its sparks go, the darkness eases away.
+    portalCleanup=(replacing=false)=>{
+      stopAmbient();scene.inert=false;scene.removeAttribute('aria-hidden');
+      panel.remove();canvas.remove();
+      const layers=[shade,frost];
+      if(replacing||motion.matches||!dialog.isConnected){layers.forEach(layer=>layer.remove());return;}
+      for(const layer of layers){layer.classList.remove('is-arriving','is-steady');layer.classList.add('is-leaving');}
+      setTimeout(()=>layers.forEach(layer=>layer.remove()),420);
+    };
     return panel;
   }
-  function showGerman(){
+  function showGerman(origin=null){
     const generation=++localeRequest;languageBusy=false;
     const title='Deutsch oder Schwiizertüütsch?';
     const panel=focusPrompt(title,`<div class="portal-focus-content german-focus" lang="de"><h2 class="portal-title">${title}</h2><div class="german-options" role="group" aria-label="${title}">${['de','gsw'].map(code=>languageButton(languages.find(language=>language.code===code))).join('')}</div><p class="portal-choice-error" aria-live="polite"></p><button class="portal-back">${icon('arrow-left')}${e(dict.portal.change)}</button></div>`);
     panel.querySelectorAll('[data-locale]').forEach(button=>button.addEventListener('click',()=>chooseLanguage(button.dataset.locale,generation,panel.querySelector('.portal-choice-error'))));
     panel.querySelector('.portal-back').addEventListener('click',()=>showLanguages(false));
     (panel.querySelector(`[data-locale="${locale}"]`)||panel.querySelector('[data-locale]')).focus({preventScroll:true});
+    bloomGerman(panel,origin);
+  }
+  // The split Swiss/German tile opens into its two flags, which then keep gently
+  // floating and taking turns to glow: this one, or this one.
+  function bloomGerman(panel,origin){
+    const options=panel.querySelector('.german-options');
+    const ponder=()=>{if(options.isConnected)options.classList.add('is-pondering');};
+    if(motion.matches||!origin||!options.animate){ponder();return;}
+    const cards=[...options.querySelectorAll('.language-option')];
+    const from={x:origin.left+origin.width/2,y:origin.top+origin.height/2};
+    const flights=cards.map((card,index)=>{
+      const rect=card.getBoundingClientRect();
+      const scale=Math.max(.2,Math.min(1,origin.width/rect.width));
+      const dx=from.x-(rect.left+rect.width/2),dy=from.y-(rect.top+rect.height/2);
+      const turn=index?-7:7;
+      return card.animate([
+        {transform:`translate(${dx}px,${dy}px) scale(${scale}) rotate(${turn}deg)`,opacity:0,filter:'blur(6px)'},
+        {opacity:1,filter:'blur(0)',offset:.38},
+        {transform:'none',opacity:1,filter:'blur(0)'}
+      ],{duration:980,delay:90+index*110,easing:'cubic-bezier(.16,1,.3,1)',fill:'backwards'});
+    });
+    Promise.all(flights.map(flight=>flight.finished)).then(ponder,ponder);
   }
   function showLanguages(auto=true){
     const generation=++localeRequest;languageBusy=false;
@@ -309,7 +407,7 @@ async function showPortal({settings=false}={}){
     const tick=now=>{if(!alive||stopped||document.hidden)return;const remaining=Math.max(0,5000-elapsed-(now-start));const second=Math.ceil(remaining/1000);if(second!==lastSecond){countdown.textContent=interpolate(dict.portal.auto,{language:languages.find(l=>l.code===locale).name,seconds:second});detected?.setAttribute('data-countdown',String(second));detected?.classList.toggle('auto-committing',second<=2);lastSecond=second;}detected?.style.setProperty('--commit-angle',`${360*(1-remaining/5000)}deg`);track.firstElementChild.style.transform=`scaleX(${remaining/5000})`;if(remaining<=0){showSound();return;}frame=requestAnimationFrame(tick);};
     pauseButton.addEventListener('click',stop);dialog.addEventListener('keydown',key);document.addEventListener('visibilitychange',visibility);
     stage().querySelectorAll('[data-locale]').forEach(button=>button.addEventListener('click',()=>{stop();chooseLanguage(button.dataset.locale,generation,countdown);}));
-    stage().querySelector('[data-language-family]').addEventListener('click',()=>{stop();showGerman();});
+    stage().querySelector('[data-language-family]').addEventListener('click',event=>{stop();showGerman(event.currentTarget.getBoundingClientRect());});
     stage().querySelector('[data-portal-close]')?.addEventListener('click',()=>{dismissPortal();restoreFocus?.isConnected&&restoreFocus.focus();});
     portalCleanup=()=>{alive=false;cancelAnimationFrame(frame);dialog.removeEventListener('keydown',key);document.removeEventListener('visibilitychange',visibility);};
     if(stopped)stop();else{detected?.classList.add('auto-selecting');frame=requestAnimationFrame(tick);}
@@ -318,6 +416,7 @@ async function showPortal({settings=false}={}){
   async function leavePortal(swap=()=>{}){
     if(exiting||portal!==dialog)return;exiting=true;
     dialog.querySelectorAll('button').forEach(button=>button.disabled=true);
+    sizzle();
     try{
       await effects.transition(()=>{if(portal!==dialog)return;portalCleanup?.();portalCleanup=null;swap();dialog.classList.add('revealing');dialog.querySelector('.portal-scene').style.visibility='hidden';document.documentElement.classList.add('ready');},{long:true});
     }catch(error){arrival?.dismiss();console.warn('The entrance transition was unavailable.',error);}
@@ -325,21 +424,37 @@ async function showPortal({settings=false}={}){
     if(arrival){arrival.start();arrival.dialog.querySelector('.arrival-enter').focus({preventScroll:true});}else document.querySelector('main h1')?.focus({preventScroll:true});
   }
   function showSound(){
-    ++localeRequest;languageBusy=false;writeStore(localStorage,'matthew-language',locale);
+    ++localeRequest;languageBusy=false;writeStore(localStorage,'matthew-language',locale);sfx.prefetch();
     const panel=focusPrompt(dict.portal.sound,`<div class="portal-focus-content sound-stage"><div class="sound-symbol">${icon('audio-lines')}</div><h2 class="portal-title">${e(dict.portal.sound)}</h2><p class="portal-sub">${e(dict.portal.soundCopy)}</p><div class="sound-choices"><button class="sound-yes"><span>${e(dict.portal.yes)}<small>${e(dict.portal.recommended)}</small></span>${icon('arrow-right')}</button><button class="sound-no">${e(dict.portal.no)}</button></div><button class="portal-back">${icon('arrow-left')}${e(dict.portal.change)}</button></div>`);
-    const enter=enabled=>{setSound(enabled);const player=route==='home'?prepareArrival():null;leavePortal(()=>{if(arrival===player&&route==='home')player?.show();});};
+    // Only the opening sequence (or the moment sound is first chosen) holds the soundtrack
+    // back until the sparkle and arrival film are over. Later language changes keep it playing
+    // through the sparkle; a replayed film lowers it only while it actually plays.
+    const enter=enabled=>{const holdMusic=!settings||!soundEnabled;if(holdMusic)music.claim('portal',.3);setSound(enabled);const player=route==='home'?prepareArrival({holdMusic}):null;leavePortal(()=>{if(arrival===player&&route==='home')player?.show();});};
     panel.querySelector('.sound-yes').addEventListener('click',()=>enter(true),{once:true});
     panel.querySelector('.sound-no').addEventListener('click',()=>enter(false),{once:true});
     panel.querySelector('.portal-back').addEventListener('click',()=>showLanguages(false));panel.querySelector('.sound-yes').focus({preventScroll:true});
   }
-  if(!settings)await effects.opening();
-  if(portal===dialog)showLanguages(!settings);
+  if(!settings){
+    await effects.opening();
+    // Give the welcome a deliberate second, however fast the connection.
+    await new Promise(resolve=>setTimeout(resolve,motion.matches?0:1000));
+  }
+  if(portal!==dialog)return;
+  const welcome=!settings&&!motion.matches&&dialog.querySelector('.portal-welcome');
+  if(welcome?.animate){
+    // Crossfade: the welcome lifts away in place while the language choice rises beneath it.
+    const r=welcome.getBoundingClientRect(),ghost=welcome.cloneNode(true);
+    Object.assign(ghost.style,{position:'fixed',left:`${r.left}px`,top:`${r.top}px`,width:`${r.width}px`,margin:'0',zIndex:'1',pointerEvents:'none',animation:'none'});
+    ghost.setAttribute('aria-hidden','true');dialog.querySelector('.portal-scene').append(ghost);
+    ghost.animate([{opacity:1,filter:'blur(0)',transform:'none'},{opacity:0,filter:'blur(6px)',transform:'translateY(-16px) scale(.985)'}],{duration:760,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'}).finished.then(()=>ghost.remove(),()=>ghost.remove());
+  }
+  showLanguages(!settings);
 }
 
 document.addEventListener('click',event=>{
   const link=event.target.closest('a[data-route]');
   if(link&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&event.button===0){event.preventDefault();const target=link.dataset.route;navigate(target,{element:Number(link.dataset.element)||0,url:link.href,animate:!!link.closest('.desktop-nav,.mobile-nav')});return;}
-  const tab=event.target.closest('[data-element-tab]');if(tab){selectElement(tab.dataset.elementTab);return;}
+  const tab=event.target.closest('[data-element-tab]');if(tab){cue('wink');selectElement(tab.dataset.elementTab);return;}
   const filter=event.target.closest('[data-filter]');if(filter){filterArchive(filter.dataset.filter);return;}
   const card=event.target.closest('[data-media]');if(card){openMedia(Number(card.dataset.media));return;}
   const button=event.target.closest('[data-action]');if(!button)return;
@@ -367,9 +482,15 @@ document.addEventListener('keydown',event=>{
   event.preventDefault();selectElement(next);document.getElementById(`element-tab-${next}`).focus();
 });
 addEventListener('scroll',()=>document.body.classList.toggle('scrolled',scrollY>35),{passive:true});
-addEventListener('popstate',async()=>{const wanted=resolveLocale([],(new URL(location.href)).searchParams.get('lang'),readStore(localStorage,'matthew-language'));if(wanted!==locale)await applyLocale(wanted);navigate(currentRoute(),{push:false});});
+addEventListener('popstate',async()=>{
+  const wanted=resolveLocale([],(new URL(location.href)).searchParams.get('lang'),readStore(localStorage,'matthew-language'));
+  // In-page links such as Discover only change the fragment. Keep the live page, its scroll
+  // and the game's state; still let Back cancel a pending film or open media.
+  if(wanted===locale&&currentRoute()===route&&!navigating){closeModal();arrival?.dismiss();return;}
+  if(wanted!==locale)await applyLocale(wanted);navigate(currentRoute(),{push:false});
+});
 addEventListener('resize',()=>{if(innerWidth>900&&document.body.classList.contains('menu-open'))setMenu(false);},{passive:true});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){heroVideo?.pause();arrival?.video.pause();modal?.querySelectorAll('video').forEach(video=>video.pause());}else spotlight?.refresh();});
+document.addEventListener('visibilitychange',()=>{music.setHidden(document.hidden);if(document.hidden){heroVideo?.pause();arrival?.video.pause();modal?.querySelectorAll('video').forEach(video=>video.pause());}else spotlight?.refresh();});
 motion.addEventListener('change',()=>{cleanupTilt();setupTilt();if(document.getElementById('element-panel'))selectElement(selectedElement);});
 
 async function init(){

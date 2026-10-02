@@ -178,6 +178,14 @@ async function checkFavicon(page, record, phase) {
   }
 }
 
+// Reaching or playing the homepage game lifts it into its dialog by design; return it
+// before interacting with the page behind it.
+async function returnLiftedGame(page) {
+  if (!await page.locator('.game-dialog[open]').count()) return;
+  await page.keyboard.press('Escape');
+  await page.locator('.game-dialog').waitFor({ state: 'detached' });
+}
+
 async function checkHomeFlows(page, record) {
   let stage = 'game-intro';
   try {
@@ -213,6 +221,7 @@ async function checkHomeFlows(page, record) {
     record.issues.push({ type: 'home-game-flow', stage, message: error.message });
   }
   try {
+    await returnLiftedGame(page);
     stage = 'gallery-open';
     const opener = page.locator('.archive-card [data-media="5"]');
     await opener.click();
@@ -293,7 +302,7 @@ async function runCase(context, route, locale, viewport) {
     record.status = response?.status();
     await page.waitForFunction(({ expectedLang, route, locale }) => document.documentElement.lang === expectedLang
       && document.documentElement.classList.contains('ready') && document.body.dataset.route === route
-      && document.querySelector('.language-trigger span')?.textContent.trim() === locale.toUpperCase()
+      && document.querySelector('.language-trigger .language-code')?.textContent.trim() === locale.toUpperCase()
       && !!document.querySelector('main h1'), { expectedLang: htmlLang(locale), route, locale });
     record.documentLang = await page.locator('html').getAttribute('lang');
     await checkFavicon(page, record, 'initial');
@@ -316,6 +325,7 @@ async function runCase(context, route, locale, viewport) {
     record.documentSize = { viewportWidth: bottom.viewportWidth, scrollWidth: bottom.scrollWidth, height: bottom.height };
     await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
     await page.waitForTimeout(200);
+    await returnLiftedGame(page);
     const menu = page.locator('.menu-trigger');
     if (await menu.isVisible()) {
       await menu.click();

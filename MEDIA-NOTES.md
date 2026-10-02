@@ -139,3 +139,26 @@ SHA-256 values below matched before and after all conversions:
 | `Reel 9 Awarded in EMC 2024.mp4` | `ed6c26d3d4d9d2985eb3b0a9e60b246bc42bd0c974f5febdfcccad217193ff3a` |
 | `winning champ of the champs.mp4` | `c1763124e590aa38291f51e8acb1eb466959aaf67085914461c1953433c53c64` |
 | `advice for other therapists as a judge.mp4` | `51682aab0aa8d6c5508cf83d1e2b7cf8ae07b56c3e72bd25ae87f1289b5b8dc0` |
+
+## Interface audio (2026-10-02)
+
+Supplied by the user for this release. Originals were read, never modified; only the web derivatives below are part of the site. They play only after the visitor explicitly chooses sound (portal "sound on" or the header speaker) and are never fetched for a visitor who declines, except that the two short effects are prefetched (not played) while the sound question is on screen.
+
+| Delivery file | Source | Source SHA-256 | Derivative | Use |
+| --- | --- | --- | --- | --- |
+| `assets/sfx/sparkler-sizzle.mp3` (31,392 bytes, 1.49 s) | `~/Downloads/acid-burn-2026-05-18-16-19-43-utc/Acid Burn.wav` ("Acid Burn", AudioJungle item by urbazon / Dejan; the folder's `info.txt` is the marketplace thank-you note) | `92183d8f35ccde6f3414e924fd4185437e2a6b9a71591e951ddd7ba3c92cbfd8` | 0.15 s tail fade, MP3 160 kbps, 44.1 kHz | Signature sparkle transition (entrance and menu destinations) |
+| `assets/sfx/tear-drop.mp3` (13,106 bytes, 0.60 s) | `~/Downloads/CB Video Editing Assets /CB SFX/mechanical sfx like camera or computers & misc/water-drop.mp3` | `0d549515a3b545986880cf66dfcd3ef4fa0e9d1cef5f73f9316d39658d98a617` | Leading 105 ms of silence trimmed so the transient (111 ms in the source) lands on impact; 0.18 s tail fade; MP3 160 kbps | Tear landing; replayed quieter and higher for the rebound bead and satellite droplet |
+| `assets/sfx/element-wink.mp3` (18,670 bytes, 1.10 s) | `CB SFX/Glitch/Good for UI & Overlay motion graphics/Eye Wink 06.wav` | `324f8257c9c5b85dd8e2319fd69d0a11de42105277dfc66e2514d59be3ed23f3` | 25 ms lead trimmed, 0.3 s tail fade | Tapping any of the six element tabs |
+| `assets/sfx/signal-pick.mp3` (19,924 bytes, 1.20 s) | `.../NEW NOTIFICATION.wav` | `28a46ae20f67317fa4dc7c9d13b966736afd3894757bcd79729cc365a1982525` | 95 ms lead trimmed, 0.3 s tail fade | Each tap on a signal while recalling the blue positions |
+| `assets/sfx/red-twinkle.mp3` (21,000 bytes, 1.27 s) | `.../TWINKLE SFX.mp3` | `002a7a370a9ec83e667a8378e5d934c84409c1e76015d8ec29555ae6abe7db85` | +26 dB with limiter (source peaked near -30 dBFS), tail fade | The red signal being revealed after it was missed |
+| `assets/sfx/conclusion-pop.mp3` (29,537 bytes, 1.80 s) | `.../Pop Positive 4.wav` | `77a919cf27cfeebe646940f1b8455b500863b9a7cd8f997db2a9bd3a0a07da2a` | -3 dB (source clipped), trimmed to 1.8 s with fade | The concluding Matthew/Tony slide arriving |
+| `assets/sfx/slide-whoosh.mp3` (23,681 bytes, 1.40 s) | `CB SFX/Whooshes/FIRE WOOSH quick.wav` (6 s source) | `0c9dc5bba5485de05f65eb687e26c09cc0833dc5f5b80fd8d6508f9ce36cb7dc` | First 0.2 s trimmed, 1.4 s body with 0.5 s fade | The right-to-left "torch" pass between the game's teaching slides |
+| `assets/audio/effortless-prestige.m4a` (3,245,106 bytes, 200 s) | `Effortless Prestige.m4a` at the repository root (Opus in MP4, 48 kHz, integrated loudness -16.8 LUFS) | `6ec6aac845bc436d4662bb8b1d93e5dce9566f0f1db18cccc73fd5052ed805da` | AAC-LC 128 kbps, 44.1 kHz, faststart; 0.8 s fade-in and 1.8 s fade-out so the loop restarts gently | Background soundtrack at gain 0.3: silent through the first sparkle and arrival film only, then continuous (effects play on top), lowered to silence only while a film plays |
+
+```sh
+ffmpeg -i "Acid Burn.wav" -af "afade=t=out:st=1.42:d=0.15" -t 1.57 -c:a libmp3lame -b:a 160k -ar 44100 sparkler-sizzle.mp3
+ffmpeg -ss 0.105 -i water-drop.mp3 -t 0.6 -af "afade=t=out:st=0.42:d=0.18" -c:a libmp3lame -b:a 160k -ar 44100 tear-drop.mp3
+ffmpeg -i "Effortless Prestige.m4a" -af "afade=t=in:st=0:d=0.8,afade=t=out:st=198.2:d=1.8" -c:a aac -b:a 128k -ar 44100 -movflags +faststart effortless-prestige.m4a
+```
+
+The Opus source was transcoded because Safari does not reliably play Opus inside MP4. Licence terms for all audio sources come from the user's purchased/asset libraries and were not independently verified here; confirm web-use rights (and any attribution the AudioJungle licence requires) before treating them as cleared. The original `Effortless Prestige.m4a` remains untracked at the repository root and is not referenced by the site.

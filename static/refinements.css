@@ -81,6 +81,91 @@ main h1[tabindex="-1"]:focus {outline:none}
 .german-options .language-option::after {content:'';position:absolute;inset:50% 0 0;background:linear-gradient(transparent,#0006);z-index:1;pointer-events:none}
 .german-options .language-option span {position:absolute;right:10px;bottom:10px;z-index:2;padding:6px 10px;background:#080808a6;color:#fff;border:1px solid #fff6;border-radius:999px;font-size:11px;backdrop-filter:blur(8px)}
 .german-options .language-option[aria-pressed=true] {border-color:#f4d6a1;box-shadow:0 0 0 3px #f4d6a13b,0 20px 60px -24px #f4c88a55}
+/* "This, or this": the two flags float in counterpoint and take turns to glow. */
+.german-options.is-pondering .language-option {animation:german-ponder 4.4s ease-in-out infinite}
+.german-options.is-pondering .language-option:nth-child(2) {animation-delay:-2.2s}
+.german-options .language-option::before {content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;background:linear-gradient(112deg,transparent 32%,#fff7e46b 48%,transparent 64%);transform:translateX(-70%)}
+.german-options.is-pondering .language-option::before {animation:german-sheen 4.4s ease-in-out infinite}
+.german-options.is-pondering .language-option:nth-child(2)::before {animation-delay:-2.2s}
+.german-options.is-pondering .language-option:is(:hover,:focus-visible),.german-options.is-pondering .language-option:is(:hover,:focus-visible)::before {animation-play-state:paused}
+@keyframes german-ponder {
+  0%,100% {transform:translateY(2px);border-color:#ffffff6e;box-shadow:0 14px 34px -24px #000}
+  50% {transform:translateY(-8px);border-color:#f8e2b8;box-shadow:0 0 0 1px #f6dcaecc,0 0 40px -6px #f4c88a9e,0 28px 56px -26px #f4c88ad0}
+}
+@keyframes german-sheen {0%,32%{opacity:0;transform:translateX(-70%)}50%{opacity:1}68%,100%{opacity:0;transform:translateX(70%)}}
+
+/* Focus prompts: darkness eases in over the flags, content rises after it. */
+.portal-shade.is-arriving {animation:prompt-fade-in .72s cubic-bezier(.4,0,.2,1) both}
+.portal-frost.is-arriving {animation:prompt-fade-in .8s cubic-bezier(.4,0,.2,1) both}
+.portal-ambient.is-arriving {animation:prompt-fade-in 1.2s .18s ease both}
+.portal-shade.is-leaving,.portal-frost.is-leaving {animation:prompt-fade-out .42s cubic-bezier(.4,0,.2,1) forwards}
+.portal-focus-content>:not(.german-options) {animation:prompt-rise .75s cubic-bezier(.16,1,.3,1) both}
+.portal-focus-content>:nth-child(2) {animation-delay:.07s}
+.portal-focus-content>:nth-child(3) {animation-delay:.14s}
+.portal-focus-content>:nth-child(4) {animation-delay:.2s}
+.portal-focus-content>:nth-child(n+5) {animation-delay:.28s}
+.german-focus>.portal-title {animation-delay:.2s}
+.german-focus>.portal-back {animation-delay:.55s}
+@keyframes prompt-fade-in {from{opacity:0}}
+@keyframes prompt-fade-out {to{opacity:0}}
+@keyframes prompt-rise {from{opacity:0;transform:translateY(14px)}}
+
+/* Header language: the current flag as a small lit orb inside the site's pill shape. */
+.header-actions .language-trigger {display:inline-flex;align-items:center;gap:8px;height:36px;min-height:36px;margin-right:6px;padding:0 11px 0 4px;border:1px solid rgba(28,16,24,.16);border-radius:999px;background:linear-gradient(135deg,#ffffffa6,#fff3f94d);box-shadow:inset 0 1px 0 #ffffffe6,0 6px 18px -12px #5a1d3f66;color:#241420;font-family:var(--sans);line-height:1;cursor:pointer;backdrop-filter:blur(10px) saturate(130%);-webkit-backdrop-filter:blur(10px) saturate(130%);transition:border-color .3s var(--ease),background .3s,box-shadow .3s}
+.header-actions .language-orb {position:relative;flex:none;display:block;width:26px;height:26px;overflow:hidden;border-radius:50%;background:#f3e6ee;box-shadow:0 0 0 1.5px #fff,0 0 0 2.5px #c81d7724,0 3px 8px -2px #3a102a4d;transition:box-shadow .35s var(--ease),transform .35s var(--ease)}
+.header-actions .language-orb img {display:block;width:100%;height:100%;max-width:none;object-fit:cover;transform:scale(1.18)}
+.header-actions .language-orb::after {content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 24%,#ffffffb3,#ffffff00 46%),radial-gradient(circle at 70% 88%,#0000002e,#00000000 55%);box-shadow:inset 0 0 0 1px #00000014}
+.header-actions .language-code {font-size:10.5px;font-weight:600;letter-spacing:.14em;line-height:1;padding-top:1px}
+.header-actions .language-trigger svg {width:13px;height:13px;margin-left:-2px;stroke-width:1.8;opacity:.55;transition:transform .35s var(--ease),opacity .3s}
+.header-actions .language-trigger:hover {border-color:#c81d775e;background:linear-gradient(135deg,#ffffffd9,#fff0f78c);box-shadow:inset 0 1px 0 #fff,0 10px 26px -14px #c81d778c}
+.header-actions .language-trigger:hover .language-orb {transform:scale(1.06);box-shadow:0 0 0 1.5px #fff,0 0 0 3px #c81d7740,0 0 16px -2px #ff8fc68c}
+.header-actions .language-trigger:hover svg {opacity:1;transform:translateY(1px)}
+.header-actions .language-trigger:focus-visible {outline:2px solid #c81d7799;outline-offset:3px}
+
+/* No need to wipe the tears away: a heading, a fall, and the paragraph that receives it. */
+.tears-moment {position:relative;isolation:isolate;padding-block:clamp(88px,10vw,150px) clamp(80px,9vw,128px);border-bottom:1px solid var(--line)}
+.tears-layout {position:relative;z-index:1}
+.tears-layout>.eyebrow {margin-bottom:28px;color:#5b3f54}
+.tears-title {max-width:10em;margin:0;font-family:var(--serif);font-size:clamp(46px,6.2vw,86px);font-style:italic;font-weight:400;line-height:1.08;color:#c81d77;text-wrap:balance}
+.tears-copy {max-width:min(800px,100%);margin:clamp(92px,9vw,128px) 0 0;font-family:var(--serif);font-size:clamp(21px,2.05vw,29px);font-weight:300;line-height:1.52;color:#241420;text-wrap:pretty}
+.tears-footer {display:flex;flex-wrap:wrap;align-items:center;gap:14px 36px;margin-top:36px}
+.tears-note {font-size:11px;color:#5b4a55}
+.tears-canvas {position:absolute;inset:0;z-index:2;display:block;width:100%;height:100%;pointer-events:none}
+.tears-sr {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.tears-word {display:inline-block;white-space:nowrap}
+.tears-char,.tears-ripple-word {display:inline-block}
+.tears-dot {transition:opacity .45s ease}
+.tears-dot.is-falling {opacity:0;transition:none}
+
+.about-story {padding-block:90px}
+
+/* The six elements invite a tap: a spring wave with a sheen, then a quiet repeat, and a
+   breathing dot on each element not yet opened. Pop direction follows the layout. */
+.element-tabs [data-element-tab] {position:relative;isolation:isolate;overflow:hidden;--pop-x:7px;--pop-y:0px;transition:transform .35s var(--ease),border-color .3s,background .3s,box-shadow .3s}
+.element-tabs [data-element-tab]::after {content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;background:linear-gradient(100deg,transparent 28%,#ffffffc2 47%,#ffd6ecb3 53%,transparent 72%);transform:translateX(-130%)}
+.element-tabs [data-element-tab]:not([data-explored])::before {content:'';position:absolute;top:50%;right:16px;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:#c81d77;box-shadow:0 0 0 3px #c81d771c,0 0 10px #ff8fc6aa;animation:element-dot 2.6s ease-in-out infinite;pointer-events:none}
+.element-tabs.is-inviting [data-element-tab] {animation:element-pop .95s cubic-bezier(.3,.7,.3,1) calc(var(--tab-index,0) * 95ms) both}
+.element-tabs.is-inviting [data-element-tab]::after {animation:element-sweep .9s cubic-bezier(.4,0,.2,1) calc(var(--tab-index,0) * 95ms + 80ms) both}
+.element-tabs.is-inviting [data-element-tab] span {animation:element-number .95s ease calc(var(--tab-index,0) * 95ms) both}
+.element-tabs.is-hinting [data-element-tab]:not([aria-selected=true]) {animation:element-nudge 7s ease-in-out calc(1.2s + var(--tab-index,0) * 140ms) infinite}
+.element-tabs.is-hinting [data-element-tab]:not([aria-selected=true])::after {animation:element-glint 7s ease-in-out calc(1.2s + var(--tab-index,0) * 140ms) infinite}
+@media(hover:hover) and (pointer:fine){.element-tabs [data-element-tab]:not([aria-selected=true]):hover {transform:translate(calc(var(--pop-x) * .45),calc(var(--pop-y) * .45));border-color:#c81d7745}}
+@keyframes element-pop {
+  0% {transform:none}
+  28% {transform:translate(var(--pop-x),var(--pop-y)) scale(1.035);border-color:#c81d7766;box-shadow:0 10px 28px -14px #c81d7780,0 0 0 3px #f7a8d433}
+  52% {transform:translate(calc(var(--pop-x) * -.3),calc(var(--pop-y) * -.3)) scale(.992)}
+  74% {transform:translate(calc(var(--pop-x) * .12),calc(var(--pop-y) * .12)) scale(1.006)}
+  100% {transform:none}
+}
+@keyframes element-sweep {0%{opacity:1;transform:translateX(-130%)}100%{opacity:1;transform:translateX(130%)}}
+@keyframes element-number {30%{color:#c81d77;text-shadow:0 0 12px #ff8fc6aa}}
+@keyframes element-nudge {0%,12%,100%{transform:none}5%{transform:translate(calc(var(--pop-x) * .5),calc(var(--pop-y) * .5))}}
+@keyframes element-glint {0%{opacity:0;transform:translateX(-130%)}2%{opacity:1}11%{opacity:1;transform:translateX(130%)}12%,100%{opacity:0;transform:translateX(130%)}}
+@keyframes element-dot {0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.35);opacity:1;box-shadow:0 0 0 5px #c81d7712,0 0 14px #ff8fc6}}
+@media(max-width:899px){
+  .element-tabs [data-element-tab] {--pop-x:0px;--pop-y:-3px}
+  .element-tabs [data-element-tab]:not([data-explored])::before {top:8px;right:8px;margin-top:0;width:5px;height:5px}
+}
 
 .atmospheric-dialog {
   position:fixed;inset:0;
@@ -130,13 +215,34 @@ main h1[tabindex="-1"]:focus {outline:none}
 .arrival-transport {bottom:18px;gap:16px}
 
 .game-home-slot {position:relative;padding-top:48px;min-width:0}
+/* "Firing up": a line of light traces the frame, the field brightens, then it lifts. */
+@property --ignite-sweep {syntax:'<angle>';inherits:false;initial-value:0deg}
+.game-home-slot>#mindset-host {position:relative}
+.game-home-slot>#mindset-host::before,.game-home-slot>#mindset-host::after {content:'';position:absolute;inset:0;z-index:3;border-radius:18px;pointer-events:none;opacity:0}
+.game-home-slot>#mindset-host::before {padding:2px;background:conic-gradient(from 0deg,#fffaf0 0deg,#ffd27a calc(var(--ignite-sweep) * .7),#ffb4dc var(--ignite-sweep),transparent var(--ignite-sweep));mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;-webkit-mask-composite:xor;filter:drop-shadow(0 0 6px #ffd27acc)}
+.game-home-slot.is-igniting>#mindset-host::before {animation:game-ignite-sweep .5s cubic-bezier(.45,0,.2,1) forwards}
+.game-home-slot.is-igniting>#mindset-host::after {animation:game-ignite-glow .5s cubic-bezier(.4,0,.2,1) forwards}
+.game-home-slot.is-igniting .mindset-game {border-color:#ffe2ab66;transition:border-color .5s}
+.game-home-slot.is-igniting .mindset-field {animation:game-ignite-field .5s ease-in forwards}
+.game-window.is-launching {animation:game-launch-glow .9s cubic-bezier(.4,0,.2,1) both}
+.game-dialog[open]::backdrop {animation:game-backdrop-in .9s cubic-bezier(.4,0,.2,1) both}
+.game-dialog.returning::backdrop {animation:game-backdrop-out .6s ease forwards}
+.game-dialog .dialog-atmosphere {animation-duration:.9s}
+@keyframes game-ignite-sweep {0%{opacity:1;--ignite-sweep:0deg}100%{opacity:1;--ignite-sweep:360deg}}
+@keyframes game-ignite-glow {0%{opacity:0;box-shadow:0 0 0 1px #ffe2ab00,0 0 0 0 #ffd27a00,inset 0 0 0 #ffd27a00}40%{opacity:.75;box-shadow:0 0 0 1px #ffe2ab88,0 0 26px 3px #ffd27a66,0 0 80px 14px #f7a8d433,inset 0 0 40px #ffd27a1f}100%{opacity:1;box-shadow:0 0 0 1px #fff4d9,0 0 30px 5px #ffd27ab3,0 0 96px 22px #ffd27a5c,0 0 190px 44px #f7a8d44d,inset 0 0 90px #ffd27a3d}}
+@keyframes game-ignite-field {to{filter:brightness(1.55) saturate(1.3)}}
+@keyframes game-launch-glow {from{box-shadow:0 0 0 1px #fff1cfcc,0 0 60px 8px #ffd27a80,0 0 150px 24px #f7a8d44d}to{box-shadow:0 35px 120px #0008,0 0 35px -20px #ffd49a66}}
+@keyframes game-backdrop-in {from{background:rgba(3,3,3,0);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0)}}
+@keyframes game-backdrop-out {to{background:rgba(3,3,3,0);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0)}}
 .game-expand {position:absolute;top:0;right:0;width:36px;height:36px;border:1px solid #24142030;background:#ffffff36;border-radius:50%;color:#6c3d57}
 .game-expand svg {width:16px;height:16px}
 .game-dialog {overflow:hidden;padding:20px}
 .game-window {width:min(1120px,94vw);max-height:90dvh;display:flex;flex-direction:column;background:#0c0a12;color:#f3eef5;overflow:hidden;transform-origin:0 0;animation:none}
 .game-window-toolbar {height:48px;flex:none;padding:0 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #ffffff0f}
 .game-window-label {font-size:10px;color:#e6c4d8}
-.game-close {width:34px;height:34px;border:1px solid #ffffff26;border-radius:50%;color:#f7e8f1}
+.game-close {width:34px;height:34px;border:1px solid #ffffff26;border-radius:50%;color:#f7e8f1;transition:background .25s,border-color .25s}
+.game-close svg {width:16px;height:16px}
+.game-close:hover {background:#ffffff14;border-color:#ffffff4d}
 .game-replay {margin-left:auto;display:flex;align-items:center;gap:8px;min-height:40px;font-size:11px;color:#f6d5a2}
 .game-replay svg {width:14px;height:14px}
 .game-scroll {min-height:0;overflow:auto;max-height:calc(90dvh - 48px);overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#665268 #0c0a12}
@@ -144,7 +250,7 @@ main h1[tabindex="-1"]:focus {outline:none}
 .game-window .mindset-field {height:clamp(300px,43svh,480px)}
 .game-window .mindset-meaning .mindset-field {height:100%;min-height:min(620px,calc(82dvh - 48px))}
 .game-window .mindset-content {padding-bottom:28px}
-.game-dialog.returning .dialog-atmosphere {opacity:0;transition:opacity .52s ease}
+.game-dialog.returning .dialog-atmosphere {opacity:0;transition:opacity .6s ease}
 
 .contact-details .contact-channels>a {display:grid;grid-template-columns:52px minmax(0,1fr) 20px;gap:18px;align-items:center;padding:21px 0;min-width:0}
 .contact-channels .contact-symbol {grid-area:1 / 1;margin:0;width:50px;height:50px;display:grid;place-items:center;border:1px solid #c81d7738;border-radius:14px;background:linear-gradient(135deg,#fff8fcad,#e7fff17d);color:#a71a65;box-shadow:inset 0 1px 0 #ffffffc7,0 5px 16px -10px #8d315e45;transition:transform .25s var(--ease),border-color .25s,box-shadow .25s}
@@ -255,6 +361,14 @@ main h1[tabindex="-1"]:focus {outline:none}
   .enquiry-section{grid-template-columns:1fr;gap:35px;padding-block:55px}
   .enquiry-section h2{font-size:33px}
   .enquiry-fields{gap:22px}
+  .header-actions .language-trigger{height:34px;min-height:34px;gap:7px;margin-right:2px;padding:0 10px 0 3px}
+  .header-actions .language-orb{width:24px;height:24px}
+  .header-actions .language-code{font-size:10px;letter-spacing:.1em}
+  .header-actions .language-trigger svg{display:none}
+  .tears-title{font-size:clamp(40px,11.5vw,50px)}
+  .tears-copy{margin-top:88px;font-size:20px}
+  .tears-footer{gap:12px 26px;margin-top:28px}
+  .about-story{padding-block:55px}
 }
 @media(max-height:650px){.arrival-title{font-size:18px}.arrival-label{display:none}.arrival-enter{gap:4px;padding-block:6px}.arrival-link{font-size:9px}.game-window .mindset-field{min-height:300px}.game-window .mindset-meaning .mindset-field{min-height:400px}}
 @media(prefers-reduced-motion:reduce){
@@ -264,4 +378,10 @@ main h1[tabindex="-1"]:focus {outline:none}
   .contact-channels .contact-symbol,.contact-channels>a>svg{transition:none}
   .contact-channels>a:is(:hover,:focus-visible) .contact-symbol,.contact-channels>a:is(:hover,:focus-visible)>svg{transform:none}
   .game-dialog.returning .dialog-atmosphere{transition:none}
+  .game-home-slot.is-igniting>#mindset-host::before,.game-home-slot.is-igniting>#mindset-host::after,.game-home-slot.is-igniting .mindset-field,.game-window.is-launching,.game-dialog[open]::backdrop,.game-dialog.returning::backdrop{animation:none}
+  .german-options.is-pondering .language-option,.german-options.is-pondering .language-option::before{animation:none}
+  .portal-shade,.portal-frost,.portal-ambient,.portal-focus,.portal-focus-content>*{animation:none!important}
+  .header-actions .language-trigger,.header-actions .language-orb,.header-actions .language-trigger svg{transition:none}
+  .header-actions .language-trigger:hover .language-orb,.header-actions .language-trigger:hover svg{transform:none}
+  .element-tabs [data-element-tab],.element-tabs [data-element-tab]::before,.element-tabs [data-element-tab]::after,.element-tabs [data-element-tab] span{animation:none!important;transition:none}
 }

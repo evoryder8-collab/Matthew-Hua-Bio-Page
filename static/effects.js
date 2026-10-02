@@ -16,9 +16,13 @@ const instances = new WeakMap();
 const ambientInstances = new WeakMap();
 const CURTAIN = '#030303';
 const DURATION = 2000;
+// The black curtain eases in and out over these spans; the sparkler keeps its own timing.
+const CURTAIN_IN = 560;
+const CURTAIN_OUT = 620;
 const TAU = Math.PI * 2;
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const smooth = (value) => { const t = clamp(value); return t * t * (3 - 2 * t); };
+const silk = (value) => { const t = clamp(value); return t * t * t * (t * (t * 6 - 15) + 10); };
 const setting = (key, fallback, min, max) => {
   const value = Number(SPARK_TUNING[key]);
   return Number.isFinite(value) ? clamp(value, min, max) : fallback;
@@ -296,7 +300,7 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
 
   function drawOpening(job) {
     clear(curtain);
-    const alpha = smooth(job.elapsed / 120) * (1 - smooth((job.elapsed - (DURATION - 250)) / 250));
+    const alpha = silk(job.elapsed / CURTAIN_IN) * (1 - silk((job.elapsed - (DURATION - CURTAIN_OUT)) / CURTAIN_OUT));
     curtain.globalAlpha = alpha;
     curtain.fillStyle = CURTAIN;
     curtain.fillRect(0, 0, width, height);
@@ -307,8 +311,14 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
   function drawTransition(job) {
     const covered = job.phase === 'covered' || job.phase === 'waiting';
     const progress = covered ? 1 : clamp(job.elapsed / job.halfDuration);
+    // Black arrives and leaves on a soft S-curve rather than snapping in. The page is
+    // still fully covered whenever the swap runs (end of cover, start of reveal).
     const alpha = covered ? 1 : reduced
       ? job.phase === 'cover' ? smooth(progress) : 1 - smooth(progress)
+      : job.phase === 'cover' ? silk(job.elapsed / Math.min(CURTAIN_IN, job.halfDuration))
+        : 1 - silk((job.elapsed - (job.halfDuration - CURTAIN_OUT)) / CURTAIN_OUT);
+    // The sparkler keeps the original envelope so its character is unchanged.
+    const sparkAlpha = covered ? 1 : reduced ? alpha
       : job.phase === 'cover' ? smooth(job.elapsed / 120)
         : 1 - smooth((job.elapsed - (job.halfDuration - 250)) / 250);
     // The CSS backing also guards the opaque hold if a swap resizes/reparents us.
@@ -319,7 +329,7 @@ export function createEffects({ transitionCanvas, cursorCanvas }) {
     curtain.fillRect(0, 0, width, height);
     curtain.globalAlpha = 1;
     const time = (covered ? 0.5 : job.phase === 'cover' ? progress * 0.5 : 0.5 + progress * 0.5) * DURATION / 1000;
-    drawSparkler(job, time, smooth(alpha * 2));
+    drawSparkler(job, time, smooth(sparkAlpha * 2));
   }
 
   function drawActive() {
