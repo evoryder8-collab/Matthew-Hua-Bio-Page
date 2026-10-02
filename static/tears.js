@@ -40,7 +40,25 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
   let frame = null;
   let observer = null;
   let state = 'idle';
-  const setState = (next) => { state = next; section.dataset.tearState = next; };
+  // While the tear falls, scrolling slows right down so it can be watched; it frees on 'done'.
+  let lastTouch = null;
+  const brakeWheel = (event) => { if (event.ctrlKey) return; event.preventDefault(); win.scrollBy(0, event.deltaY * 0.15); };
+  const brakeStart = (event) => { lastTouch = event.touches[0]?.clientY ?? null; };
+  const brakeMove = (event) => {
+    const y = event.touches[0]?.clientY;
+    if (lastTouch === null || y === undefined) return;
+    event.preventDefault(); win.scrollBy(0, (lastTouch - y) * 0.15); lastTouch = y;
+  };
+  let braking = false;
+  function brake(on) {
+    if (on === braking) return;
+    braking = on;
+    const method = on ? 'addEventListener' : 'removeEventListener';
+    win[method]('wheel', brakeWheel, { passive: false });
+    win[method]('touchstart', brakeStart, { passive: true });
+    win[method]('touchmove', brakeMove, { passive: false });
+  }
+  const setState = (next) => { state = next; section.dataset.tearState = next; brake(['wave', 'gather', 'falling', 'splash'].includes(next)); };
 
   function segments(text, granularity) {
     if (win.Intl?.Segmenter) {
@@ -625,6 +643,7 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      brake(false);
       observer?.disconnect();
       if (frame !== null) win.cancelAnimationFrame(frame);
       for (const id of timers) win.clearTimeout(id);
