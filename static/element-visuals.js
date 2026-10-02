@@ -541,12 +541,14 @@ function createRenderers() {
       Object.assign(st, { cols, rows, x0: w * 0.06, x1: w * 0.94, y0: h * 0.16, y1: h * 0.7, z: new Float32Array(cols * rows), v: new Float32Array(cols * rows) });
       st.hands = [0, 1].map((i) => ({ i, lift: 1, vlift: 0, u: 0.5, v: 0.5, angle: 0, layer: Object.assign(document.createElement('canvas'), { width: 256, height: 300 }) }));
     },
+    // Massage rhythm per hand: lower 0.55 s, hold about 2 s with a slow glide, release.
     path(i, t) {
-      const turn = Math.floor(t / 1.9), active = turn % 2 === i, k = (t % 1.9) / 1.35;
+      const TURN = 3.3, turn = Math.floor(t / TURN), active = turn % 2 === i, k = t % TURN;
+      const envelope = k < 0.55 ? smooth(k / 0.55) : k < 2.55 ? 0.94 + 0.06 * Math.sin((k - 0.55) * 3) : k < 3.1 ? smooth((3.1 - k) / 0.55) : 0;
       return {
         u: 0.5 + 0.13 * Math.sin(t * 0.34 + i * 2.4) + (i ? 0.21 : -0.21),
         v: 0.6 + 0.12 * Math.sin(t * 0.5 + i * 1.7),
-        press: active && k < 1 ? Math.pow(Math.sin(Math.PI * k), 1.5) : 0,
+        press: active ? envelope : 0,
       };
     },
     project(st, i, j, z, w) {
@@ -563,7 +565,7 @@ function createRenderers() {
           const du = p.u - hand.u;
           hand.u = p.u; hand.v = p.v;
           // A hand has weight: it lowers onto a spring, settles a touch past contact, lifts away.
-          hand.vlift += (40 * ((1 - 1.3 * p.press) - hand.lift) - 8.5 * hand.vlift) * dt;
+          hand.vlift += (40 * ((1 - 1.5 * p.press) - hand.lift) - 8.5 * hand.vlift) * dt;
           hand.lift += hand.vlift * dt;
           hand.angle += ((hand.i ? -0.1 : 0.1) + clamp(du / Math.max(dt, 1e-3), -1, 1) * 0.25 - hand.angle) * clamp(dt * 3);
           hand.contact = clamp((0.15 - hand.lift) / 0.45);
@@ -577,14 +579,17 @@ function createRenderers() {
           for (const hand of st.hands) {
             if (hand.contact <= 0) continue;
             const hi = hand.u * (cols - 1), hj = hand.v * (rows - 1), ca = Math.cos(hand.angle), sa = Math.sin(hand.angle);
-            const press = (gi, gj, sigma, f) => {
+            // The hand pushes the surface toward a set depth, so a long hold gives a firm,
+            // stable dent (not an ever-deepening one) that rebounds in waves on release.
+            const press = (gi, gj, sigma, depth) => {
               for (let j = Math.max(1, Math.floor(gj - 3 * sigma)); j < Math.min(rows - 1, gj + 3 * sigma); j++) for (let i = Math.max(1, Math.floor(gi - 3 * sigma)); i < Math.min(cols - 1, gi + 3 * sigma); i++) {
-                v[j * cols + i] -= f * hand.contact * Math.exp(-((i - gi) ** 2 + (j - gj) ** 2) / (2 * sigma * sigma)) * sdt;
+                const n = j * cols + i, g = Math.exp(-((i - gi) ** 2 + (j - gj) ** 2) / (2 * sigma * sigma));
+                v[n] += 90 * hand.contact * g * (depth * hand.contact - z[n]) * sdt;
               }
             };
-            press(hi, hj + 0.3 * PALM_CELLS, 1.6, 34);   // heel and centre of the palm
+            press(hi, hj + 0.3 * PALM_CELLS, 1.6, -0.55);   // heel and centre of the palm
             for (const [x, y] of fingertips(hand.i === 1, hand.contact * 0.3, hand.contact)) {
-              press(hi + (x * ca - y * sa) * PALM_CELLS, hj + (x * sa + y * ca) * PALM_CELLS, 0.75, 26);
+              press(hi + (x * ca - y * sa) * PALM_CELLS, hj + (x * sa + y * ca) * PALM_CELLS, 0.75, -0.4);
             }
           }
           for (let n = 0; n < z.length; n++) z[n] += v[n] * sdt;
