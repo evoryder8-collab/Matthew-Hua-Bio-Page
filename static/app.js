@@ -243,9 +243,11 @@ function arriveAtNextElement(){
   selectElement(1);
   document.querySelector('.method-console')?.scrollIntoView({block:'start',behavior:'instant'});
 }
+// Once the light has lifted, the tabs wave and the row peeks sideways once more.
 function continueFromGame(image){
-  if(spotlight?.isOpen){spotlight.journey(image,hdrWhite,arriveAtNextElement);return;}
-  playSunJourney({image,hdrSrc:hdrWhite,reducedMotion:motion.matches,onCovered:arriveAtNextElement});
+  const remind=()=>setTimeout(()=>elementInvite?.nudge(),250);
+  if(spotlight?.isOpen){spotlight.journey(image,hdrWhite,arriveAtNextElement).then(remind);return;}
+  playSunJourney({image,hdrSrc:hdrWhite,reducedMotion:motion.matches,onCovered:arriveAtNextElement}).then(remind);
 }
 function selectElement(index){
   if(!document.getElementById('element-panel'))return;index=Math.max(0,Math.min(5,Number(index)||0));spotlight?.destroy();spotlight=null;game?.destroy();game=null;elementVisual?.destroy();elementVisual=null;

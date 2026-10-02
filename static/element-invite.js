@@ -15,13 +15,14 @@ export function mountElementInvite(tablist, { reducedMotion, isBlocked = () => f
   }
 
   // A sideways row reveals that more tabs wait to the right, then springs home.
-  function peek() {
+  function peek(reach = PEEK_PX, insist = false) {
     const room = tablist.scrollWidth - tablist.clientWidth;
     if (room < 24 || tablist.scrollLeft > 4) return;
-    const distance = Math.min(PEEK_PX, room);
+    const distance = Math.min(reach, room);
     const start = win.performance.now();
+    if (frame !== null) win.cancelAnimationFrame(frame);
     const step = (now) => {
-      if (destroyed || touched) { frame = null; return; }
+      if (destroyed || (touched && !insist)) { frame = null; return; }
       const t = Math.min(1, (now - start) / 1500);
       // Out with ease, back with a small damped overshoot.
       const offset = t < 0.4
@@ -72,6 +73,17 @@ export function mountElementInvite(tablist, { reducedMotion, isBlocked = () => f
   return {
     /** Re-check after something that blocked the invitation (the game dialog) closes. */
     refresh: invite,
+    /** A deliberate reminder (after the game): wave once more and peek along the row. */
+    nudge() {
+      if (destroyed || reducedMotion.matches) return;
+      win.clearTimeout(waveTimer);
+      tablist.classList.remove('is-inviting', 'is-hinting');
+      void tablist.offsetWidth;
+      tablist.classList.add('is-inviting');
+      peek(PEEK_PX * 1.5, true);
+      const count = tablist.querySelectorAll('[data-element-tab]').length;
+      waveTimer = win.setTimeout(() => { tablist.classList.remove('is-inviting'); hint(); }, 1000 + count * 95);
+    },
     destroy() {
       if (destroyed) return;
       destroyed = true;
