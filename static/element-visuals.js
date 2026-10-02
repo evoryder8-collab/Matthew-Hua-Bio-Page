@@ -224,7 +224,7 @@ function createRenderers() {
       st.cx = w * 0.5; st.cy = h * 0.34; st.R = Math.min(w, h) * 0.085;
       const count = Math.round(40 * clamp(w / 900, 0.6, 1.2));
       st.flakes = Array.from({ length: count }, () => ({ x: Math.random() * w * 0.45, y: Math.random() * h, v: 14 + Math.random() * 22, r: 0.9 + Math.random() * 1.7, ph: Math.random() * TAU, dx: 0 }));
-      st.embers = []; st.steam = []; st.emberClock = 0; st.steamClock = 0; st.rings = []; st.nextRing = 0.4;
+      st.embers = []; st.steam = []; st.emberClock = 0; st.steamClock = 0; st.sparks = []; st.sparkClock = 0;
       const segs = [];
       const L0 = Math.min(w, h) * 0.09;
       function grow(x, y, a, L, depth, at) {
@@ -283,8 +283,21 @@ function createRenderers() {
           if (s.life > s.max) st.steam.splice(i, 1);
         }
         if (st.steam.length > 90) st.steam.splice(0, st.steam.length - 90);
-        if (time >= st.nextRing) { st.nextRing = time + 3; st.rings.push(time); }
-        st.rings = st.rings.filter((start) => time - start < 3.4);
+        // Sparkler: sparks spray from the head, slowed by air and pulled down by gravity.
+        const unit = Math.min(w, h) / 500;
+        st.sparkClock += dt * 150;
+        while (st.sparkClock >= 1) {
+          st.sparkClock--;
+          const an = Math.random() * TAU, sp = (140 + Math.pow(Math.random(), 1.4) * 620) * unit, roll = Math.random();
+          st.sparks.push({ x: cx, y: cy - 4 * unit, px: cx, py: cy, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, life: 0, max: 0.25 + Math.random() * 0.4, drag: 2.2 + Math.random() * 2, s: Math.random(), c: roll > 0.9 ? C.white : roll > 0.55 ? [255, 248, 232] : [255, 202, 120] });
+        }
+        for (let i = st.sparks.length - 1; i >= 0; i--) {
+          const p = st.sparks[i];
+          p.life += dt; p.px = p.x; p.py = p.y;
+          const d = Math.exp(-p.drag * dt); p.vx *= d; p.vy = p.vy * d + 380 * unit * dt;
+          p.x += p.vx * dt; p.y += p.vy * dt;
+          if (p.life > p.max) st.sparks.splice(i, 1);
+        }
       });
       const bg = ctx.createLinearGradient(0, 0, w, 0);
       bg.addColorStop(0, '#05182b'); bg.addColorStop(0.46, '#0a1220'); bg.addColorStop(0.54, '#1a0d0c'); bg.addColorStop(1, '#2a110b');
@@ -331,26 +344,31 @@ function createRenderers() {
       ctx.beginPath();
       for (let y = 0; y <= h; y += 6) { const x = w * 0.5 + Math.sin(y * 0.03 + t * 1.4) * 5; if (!y) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
       ctx.stroke();
-      // Composure: steady, slowly breathing, cool on one side and warm on the other.
-      const breathe = 1 + 0.04 * Math.sin(t * TAU / 6.5);
-      const r = R0 * breathe;
-      for (const start of st.rings) {
-        const k = (t - start) / 3.4;
-        ctx.globalAlpha = Math.pow(1 - k, 2) * 0.32; ctx.strokeStyle = rgba(C.white, 1); ctx.lineWidth = 1.2;
-        ctx.beginPath(); ctx.arc(cx, cy, r * (1.25 + k * 2.6), 0, TAU); ctx.stroke();
+      // At the centre, a sparkler burns upright on its wire, as in the page transitions.
+      const unit = Math.min(w, h) / 500;
+      const wire = ctx.createLinearGradient(cx, h, cx, cy);
+      wire.addColorStop(0, 'rgba(108,79,60,0)'); wire.addColorStop(0.7, 'rgba(145,103,70,0.25)'); wire.addColorStop(1, '#f2b971');
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+      ctx.strokeStyle = wire; ctx.lineWidth = 1.6 * unit; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(cx, h + 4); ctx.lineTo(cx, cy); ctx.stroke();
+      ctx.globalCompositeOperation = 'lighter';
+      light(ctx, [255, 200, 120], cx, cy - 6 * unit, 70 * unit, 0.35 + 0.08 * Math.sin(t * 23));
+      for (const p of st.sparks) {
+        const k = p.life / p.max, a = Math.pow(1 - k, 0.6) * 0.95;
+        ctx.globalAlpha = a; ctx.strokeStyle = rgba(p.c, 1); ctx.lineWidth = (0.5 + p.s * 0.9) * unit;
+        ctx.beginPath(); ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); ctx.stroke();
+        if (p.c === C.white && k < 0.5) light(ctx, C.white, p.x, p.y, 2.5 * unit, a * 0.7);
       }
-      light(ctx, [150, 205, 255], cx - r * 0.45, cy, r * 3.3, 0.42);
-      light(ctx, [255, 160, 110], cx + r * 0.45, cy, r * 3.3, 0.42);
-      ctx.globalCompositeOperation = 'source-over';
-      const core = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.35, r * 0.05, cx, cy, r);
-      core.addColorStop(0, 'rgba(255,255,255,1)');
-      core.addColorStop(0.55, 'rgba(250,244,250,.92)');
-      core.addColorStop(1, 'rgba(240,226,240,.55)');
-      ctx.globalAlpha = 1; ctx.fillStyle = core;
-      ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill();
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = rgba([150, 205, 255], 0.85); ctx.beginPath(); ctx.arc(cx, cy, r + 1.5, Math.PI * 0.55, Math.PI * 1.45); ctx.stroke();
-      ctx.strokeStyle = rgba([255, 160, 110], 0.85); ctx.beginPath(); ctx.arc(cx, cy, r + 1.5, -Math.PI * 0.45, Math.PI * 0.45); ctx.stroke();
+      // The white-hot head: an uneven, flickering burning edge.
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+      ctx.fillStyle = '#fffdf5'; ctx.shadowColor = '#ffdda0'; ctx.shadowBlur = 8 * unit;
+      ctx.beginPath();
+      for (let i = 0; i <= 24; i++) {
+        const an = i / 24 * TAU, rr = 6.5 * unit * (1 + Math.sin(i * 2.7 + t * 14) * 0.24 + Math.cos(i * 1.4 - t * 9) * 0.16);
+        const x = cx + Math.cos(an) * rr, y = cy - 4 * unit + Math.sin(an) * rr * 1.3;
+        if (!i) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath(); ctx.fill(); ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
     },
   };

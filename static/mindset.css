@@ -494,7 +494,8 @@ button.mindset-signal:focus-visible { outline: 2px solid #d6f7e0; outline-offset
 @keyframes mindset-torch { from { transform: translateX(70%); opacity: 0; } 18% { opacity: 1; } 82% { opacity: 1; } to { transform: translateX(-70%); opacity: 0; } }
 @keyframes mindset-whoosh-in { from { opacity: 0; transform: translateX(72px); filter: blur(8px); } 60% { filter: blur(0); } to { opacity: 1; transform: none; filter: blur(0); } }
 @keyframes mindset-whoosh-field { from { opacity: 0; translate: 6% 0; } to { opacity: 1; translate: 0 0; } }
-@keyframes mindset-whoosh-photo { from { opacity: 0; translate: 9% 0; filter: blur(6px); } to { opacity: 1; translate: 0 0; filter: blur(0); } }
+/* No filter on the photo: it is a very large image and Safari runs out of memory blurring it. */
+@keyframes mindset-whoosh-photo { from { opacity: 0; translate: 9% 0; } to { opacity: 1; translate: 0 0; } }
 
 /* "Let's continue": the way on, breathing with a warm aura. */
 .mindset-continue {

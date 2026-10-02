@@ -63,9 +63,9 @@ export function playSunJourney({ image, hdrSrc, reducedMotion = false, onCovered
       bloom.style.setProperty('--sun-y', `${cy}px`);
       const toCentre = rect ? `translate(${innerWidth / 2 - cx}px, ${innerHeight * 0.45 - cy}px)` : 'none';
       run(figure, [
-        { transform: 'none', filter: 'brightness(1) drop-shadow(0 0 0 #fff)' },
-        { transform: `${toCentre} scale(1.35)`, filter: 'brightness(1.6) drop-shadow(0 0 24px #fffaf0)', offset: 0.45 },
-        { transform: `${toCentre} scale(3.1)`, filter: 'brightness(4.5) drop-shadow(0 0 90px #ffffff)' },
+        { transform: 'none', opacity: 1 },
+        { transform: `${toCentre} scale(1.35)`, opacity: 1, offset: 0.45 },
+        { transform: `${toCentre} scale(3.1)`, opacity: 0.9 },
       ], { duration: GROW_MS + 400, easing: 'cubic-bezier(.55,0,.85,.4)' });
       run(bloom, [
         { opacity: 0, transform: 'scale(.15)' },
