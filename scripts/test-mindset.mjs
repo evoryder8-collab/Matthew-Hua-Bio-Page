@@ -196,7 +196,7 @@ async function photoPixels(page, viewport) {
   const photo = page.locator('.mindset-photo');
   await photo.evaluate(node => node.decode());
   check(await photo.evaluate(node => node.naturalWidth === 6696 && node.naturalHeight === 6696), `${viewport}: original photo decoded`);
-  check(decodeURIComponent(await photo.getAttribute('src')).endsWith('/v3 mat x tonyPHOTO-2026-03-16-21-22-09-2.webp'), `${viewport}: correct untouched source photo`);
+  check(decodeURIComponent(await photo.getAttribute('src')).endsWith('/matthew-tony-game-2400.webp'), `${viewport}: correct untouched source photo`);
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
   const field = page.locator('.mindset-photo-frame');
   const background = await page.locator('.mindset-field').evaluate(node => getComputedStyle(node).backgroundColor);
