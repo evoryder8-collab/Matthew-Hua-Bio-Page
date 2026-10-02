@@ -61,12 +61,16 @@ export function playSunJourney({ image, hdrSrc, reducedMotion = false, onCovered
       const cy = rect ? rect.top + rect.height * 0.42 : innerHeight / 2;
       bloom.style.setProperty('--sun-x', `${cx}px`);
       bloom.style.setProperty('--sun-y', `${cy}px`);
-      const toCentre = rect ? `translate(${innerWidth / 2 - cx}px, ${innerHeight * 0.45 - cy}px)` : 'none';
-      run(figure, [
-        { transform: 'none', opacity: 1 },
-        { transform: `${toCentre} scale(1.35)`, opacity: 1, offset: 0.45 },
-        { transform: `${toCentre} scale(3.1)`, opacity: 0.9 },
-      ], { duration: GROW_MS + 400, easing: 'cubic-bezier(.55,0,.85,.4)' });
+      // Straight out of the screen: the photograph travels toward the viewer along the depth
+      // axis. For a flat image facing us that projects to a uniform scale of P / (P - z)
+      // about its centre, so it is computed here in 2D (reliable in every Safari) and grows
+      // ever faster as it nears. Motion blur and light build with that speed.
+      const P = 900, Z = 795, frames = [];
+      for (let i = 0; i <= 40; i++) {
+        const k = i / 40, z = Z * Math.pow(k, 2.1), scale = P / (P - z), near = (scale - 1) / (P / (P - Z) - 1);
+        frames.push({ offset: k, transform: `scale(${scale.toFixed(4)})`, filter: `blur(${(9 * Math.pow(near, 1.3)).toFixed(2)}px) brightness(${(1 + 2.3 * Math.pow(k, 1.6)).toFixed(3)})` });
+      }
+      run(figure, frames, { duration: GROW_MS + 400, easing: 'linear' });
       run(bloom, [
         { opacity: 0, transform: 'scale(.15)' },
         { opacity: 0.55, transform: 'scale(1.1)', offset: 0.5 },
