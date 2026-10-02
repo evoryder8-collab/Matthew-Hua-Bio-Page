@@ -9,13 +9,13 @@ const check=(value,label,detail)=>{assert.ok(value,`${label}: ${JSON.stringify(d
 for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
   const browser=await engine.launch();
   try{
-    for(const scenario of ['menu-retry','cancelled-arrival']){
+    for(const scenario of ['menu-retry','cancelled-arrival','returning-cancelled-arrival']){
       const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
       const page=await context.newPage(),errors=[];
       page.on('pageerror',error=>errors.push(error.message));
       try{
+        if(scenario!=='cancelled-arrival')await page.addInitScript(()=>{sessionStorage.setItem('matthew-entered','1');localStorage.setItem('matthew-language','en');});
         if(scenario==='menu-retry'){
-          await page.addInitScript(()=>{sessionStorage.setItem('matthew-entered','1');localStorage.setItem('matthew-language','en');});
           await page.goto(base);
           await page.locator('#mindset-host').waitFor();
           await page.locator('.menu-trigger').tap();
@@ -29,6 +29,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
           await page.locator('.game-dialog').waitFor({state:'detached'});
         }else{
           await page.goto(base);
+          if(scenario==='returning-cancelled-arrival')await page.locator('.language-trigger').tap();
           await page.locator('[data-locale=en]').waitFor();
           await page.evaluate(()=>history.pushState({},'',`${location.pathname}?entrance-history-check=1`));
           await page.locator('[data-locale=en]').tap();

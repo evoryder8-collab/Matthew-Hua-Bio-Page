@@ -38,9 +38,11 @@ Generated `index.html` files are committed, so GitHub Pages does not need a buil
 
 The first visit in a tab runs the portal. A valid URL language takes precedence, then a saved choice, then the browser language. Swiss German preferences map to Zurich Swiss German. The detected tile has a filling progress ring and a live five-second countdown; keyboard interaction or the pause icon stops auto-selection. The split Swiss/German flag opens a separate dialect choice with full-bleed flags and also pauses the timer. This choice and the sound prompt have dark, blurred, continuously sparkling backgrounds. Returning visits in the same tab skip the portal. The language button always allows changing it.
 
+Explicitly choosing a language from the header runs the same sound prompt and entrance transition, not a settings-only shortcut. On the homepage it also introduces the European Championship film; on another page it preserves that page after the transition. The existing portal design is shared by both paths.
+
 Sound is never assumed or persisted. The European Championship arrival film starts after the full entrance transition. Its upper stage uses 82% of the viewport; the portrait film stays contained inside a rounded, warm-glowing frame. Tap the film to reveal controls; tapping outside or the typography below dismisses it. Escape and keyboard navigation also work. Autoplay-blocking browsers retain a play control. Its darkened, blurred backdrop shares the continuous sparks used by gallery and map dialogs.
 
-The signature sparkler runs for two seconds against black, with a compact white-hot core and fine warm trails. Beyond the entrance, it runs only when selecting a different page from the navigation menu. Back/Forward, same-page selections, changing language and closing the arrival film do not replay it. Both portal prompts use a very dark blurred background, with the sparks above the darkening layer.
+The signature sparkler runs for two seconds against black, with a compact white-hot core and fine warm trails. Beyond the entrance or confirming a language choice, it runs only when selecting a different page from the navigation menu. Back/Forward, same-page selections and closing the arrival film do not replay it. Both portal prompts use a very dark blurred background, with the sparks above the darkening layer.
 
 Only memory encoding is timed. Active game choices are never blurred or obscured. Reflection appears above the blurred completed game and requires Next. Reduced-motion users receive a short fade instead of moving particles. Touch devices have no custom cursor.
 
@@ -58,6 +60,7 @@ Install Playwright for development, or set `PLAYWRIGHT_MODULE` to an existing ru
 
 ```sh
 node scripts/test-experience.mjs
+node scripts/test-returning-portal.mjs
 node scripts/test-language-family.mjs
 node scripts/test-mindset.mjs
 node scripts/test-refinements.mjs

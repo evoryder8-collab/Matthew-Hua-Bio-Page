@@ -265,8 +265,10 @@ async function showPortal({settings=false}={}){
     const isCurrent=()=>portal===dialog&&generation===localeRequest&&!exiting;
     try{
       if(!await applyLocale(next,isCurrent))return;
-      if(settings){await leavePortal(()=>{const nextURL=new URL(location.href);if(locale==='en')nextURL.searchParams.delete('lang');else nextURL.searchParams.set('lang',locale);history.replaceState({route},'',nextURL);renderSite({element:selectedElement});});}
-      else{renderSite({element:selectedElement});shell.inert=true;showSound();}
+      if(settings){const nextURL=new URL(location.href);if(locale==='en')nextURL.searchParams.delete('lang');else nextURL.searchParams.set('lang',locale);history.replaceState({route},'',nextURL);}
+      renderSite({element:selectedElement});
+      if(settings)restoreFocus=document.querySelector('.language-trigger');
+      shell.inert=true;showSound();
     }catch{if(isCurrent()){errorNode.textContent=dict.languageError;errorNode.setAttribute('role','alert');}}
     finally{if(generation===localeRequest)languageBusy=false;}
   }
@@ -314,7 +316,6 @@ async function showPortal({settings=false}={}){
   }
   async function leavePortal(swap=()=>{}){
     if(exiting||portal!==dialog)return;exiting=true;
-    if(settings){swap();dismissPortal(dialog);document.querySelector('main h1')?.focus({preventScroll:true});return;}
     dialog.querySelectorAll('button').forEach(button=>button.disabled=true);
     try{
       await effects.transition(()=>{if(portal!==dialog)return;portalCleanup?.();portalCleanup=null;swap();dialog.classList.add('revealing');dialog.querySelector('.portal-scene').style.visibility='hidden';document.documentElement.classList.add('ready');},{long:true});
