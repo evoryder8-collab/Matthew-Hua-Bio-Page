@@ -102,13 +102,16 @@ function mountFilm(frame,resume){
     if(request&&(document.fullscreenEnabled||document.webkitFullscreenEnabled))request.call(frame)?.catch?.(()=>{});
     else video.webkitEnterFullscreen?.();
   });
-  // Scrolled well past, it rests (so its sound never talks over the game or the tear);
-  // back in view it continues, unless the visitor paused it.
+  // Scrolled past (half the frame gone), it stops where it is; it continues only once the
+  // frame itself is back in view (two thirds of it), unless the visitor paused it. The gap
+  // between the two keeps it from flickering at the edge. Fullscreen never counts as away.
+  const away=()=>document.fullscreenElement===frame||document.webkitFullscreenElement===frame||video.webkitDisplayingFullscreen;
   const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{
     const ratio=entries[entries.length-1].intersectionRatio;
-    if(ratio<.18&&playing()){autoPaused=true;video.pause();}
-    else if(ratio>=.18&&autoPaused&&!userPaused&&!video.ended){autoPaused=false;play();}
-  },{threshold:[0,.18,.5]}):null;
+    if(away())return;
+    if(ratio<.5&&playing()){autoPaused=true;video.pause();}
+    else if(ratio>=.66&&autoPaused&&!userPaused&&!video.ended){autoPaused=false;play();}
+  },{threshold:[0,.25,.5,.66,.8,1]}):null;
   observer?.observe(frame);
   sync();
 
