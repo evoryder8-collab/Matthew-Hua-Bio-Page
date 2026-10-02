@@ -227,13 +227,17 @@ function selectElement(index){
 async function navigate(target,{push=true,element=0,url=null,animate=false}={}){
   if(!routes.includes(target))return;
   if(navigating){pendingNavigation={target,options:{push,element,url,animate}};return;}
-  if(target===route&&push){setMenu(false);return;}
+  // A link may carry an in-page anchor (the menu's address icon -> Contact #map).
+  const anchorOf=()=>{const hash=url?new URL(url).hash.slice(1):'';return hash?document.getElementById(decodeURIComponent(hash)):null;};
+  if(target===route&&push){setMenu(false);anchorOf()?.scrollIntoView({block:'start',behavior:motion.matches?'instant':'smooth'});return;}
   navigating=true;setMenu(false);closeModal();arrival?.dismiss();
   try{
     const swap=()=>{
       route=target;
       if(push){const next=new URL(url||href(target));if(locale!=='en')next.searchParams.set('lang',locale);history.pushState({route},'',next);}
-      renderSite({element});window.scrollTo({top:0,behavior:'instant'});document.querySelector('main h1')?.focus({preventScroll:true});
+      renderSite({element});
+      const anchor=anchorOf();if(anchor)anchor.scrollIntoView({block:'start',behavior:'instant'});else window.scrollTo({top:0,behavior:'instant'});
+      document.querySelector('main h1')?.focus({preventScroll:true});
     };
     if(animate&&push){sizzle();await effects.transition(swap);}else swap();
   }finally{navigating=false;revealPortrait();spotlight?.refresh();if(pendingNavigation){const next=pendingNavigation;pendingNavigation=null;navigate(next.target,next.options);}}
