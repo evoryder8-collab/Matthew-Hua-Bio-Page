@@ -358,3 +358,13 @@ body.bio-spotlit .bio-call-hero{position:relative;z-index:60}
 }
 @keyframes bio-say{0%,26%,100%{transform:none;color:#cfe9dc;text-shadow:none}9%{transform:translateY(-2.5px);color:#fff;text-shadow:0 0 10px rgba(110,255,170,.95),0 0 2px rgba(255,255,255,.8)}}
 @keyframes bio-call-wave-lg{0%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:scale(1.6)}}
+
+/* The game's first screen on this page: Begin waits in the middle of the signal field */
+/* (positioned against the copy block below the field, so it moves up by the field's height) */
+.bio-page .mindset-game[data-phase="intro"] .mindset-controls{position:absolute;z-index:4;left:0;right:0;top:calc(var(--field-h,0px) * -1);height:var(--field-h,0px);display:flex;align-items:center;justify-content:center;margin:0;padding:0;pointer-events:none}
+.bio-page .mindset-game[data-phase="intro"] .mindset-controls::before{content:'';position:absolute;left:50%;top:50%;width:250px;height:150px;border-radius:50%;background:radial-gradient(closest-side,rgba(9,7,14,.85),rgba(9,7,14,.4) 60%,transparent);transform:translate(-50%,-50%);pointer-events:none}
+.bio-page .mindset-game[data-phase="intro"] .mindset-controls .mindset-button{position:relative;min-width:150px;min-height:54px;font-size:17px;pointer-events:auto}
+@media (prefers-reduced-motion:no-preference){
+  .bio-page .mindset-game[data-phase="intro"] .mindset-controls .mindset-button{animation:bio-begin 2.4s ease-in-out infinite}
+}
+@keyframes bio-begin{0%,100%{box-shadow:0 12px 28px -12px #ffd27a88,0 0 0 0 rgba(255,210,122,.45)}50%{box-shadow:0 14px 32px -10px #ffd27aaa,0 0 0 12px rgba(255,210,122,0)}}

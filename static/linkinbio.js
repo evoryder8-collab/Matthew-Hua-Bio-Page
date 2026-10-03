@@ -296,7 +296,8 @@ function mountWheelIntro(section,wheelApi){
 }
 
 /* The revealed element ------------------------------------------------------------- */
-function clearStage(){game?.destroy();game=null;visual?.destroy();visual=null;}
+let fieldWatch=null;
+function clearStage(){fieldWatch?.disconnect();fieldWatch=null;game?.destroy();game=null;visual?.destroy();visual=null;}
 async function showStage(index,{instant=false}={}){
   const panel=document.getElementById('element-panel');if(!panel)return;
   const token=++stageToken;
@@ -310,6 +311,9 @@ async function showStage(index,{instant=false}={}){
   if(index===0){
     panel.innerHTML='<div id="mindset-host"></div>';
     game=mountMindset(document.getElementById('mindset-host'),{copy:dict.game,asset,reducedMotion:motion.matches,onSound:cue,onContinue:continueFromGame});
+    // On this page Begin sits in the middle of the signal field (CSS); it needs the field's height.
+    const root=panel.querySelector('.mindset-game'),field=panel.querySelector('.mindset-field');
+    if(root&&field){const measure=()=>root.style.setProperty('--field-h',`${field.offsetHeight}px`);measure();if('ResizeObserver' in window){fieldWatch=new ResizeObserver(measure);fieldWatch.observe(field);}}
   }else{
     panel.innerHTML=renderElement(index,dict);
     visual=mountElementVisual(document.getElementById('element-visual-host'),index,{reducedMotion:motion.matches});
