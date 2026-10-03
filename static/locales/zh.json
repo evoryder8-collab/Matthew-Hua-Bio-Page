@@ -5,7 +5,7 @@
   "portal": {
     "welcome": "留一点时间给自己。",
     "choose": "选择您的语言",
-    "hint": "在这里，请自在一些。",
+    "hint": "放轻松，就当在家里。",
     "auto": "检测到{language} · {seconds} 秒后自动选择…",
     "detected": "您的语言",
     "pause": "暂停自动选择",
@@ -57,7 +57,7 @@
     "homeLink": "返回首页"
   },
   "home": {
-    "eyebrow": "身心调理师 · Zurich",
+    "eyebrow": "身心调理师 · 苏黎世",
     "title": "Matthew Hua",
     "headline": "为肩负重任的您，留一处私人空间。",
     "intro": "为备受关注的人士、创业者及专业人士，提供结合身体调理、呼吸练习与精密设备的个性化服务。",
@@ -70,10 +70,10 @@
     "methodCopy": "触碰、呼吸、温度、觉察与活动，围绕您的需要相互配合。从您的感受出发，让每次调理自然展开。",
     "practiceLabel": "私人调理",
     "practiceTitle": "您的时间。您的空间。",
-    "practiceCopy": "在 Zurich，放慢脚步，把关注从肩上的责任，带回您自己。",
+    "practiceCopy": "在苏黎世，放慢脚步，把关注从肩上的责任，带回您自己。",
     "aboutLabel": "调理背后的人",
     "aboutTitle": "跨越国界的人生，不拘定式的调理。",
-    "aboutCopy": "从 Vietnam 到 Australia，再到 Zurich，Matthew 的经历涵盖社区健康、手法技艺、教学与国际赛事。",
+    "aboutCopy": "从越南到澳大利亚，再到苏黎世，Matthew 的经历涵盖社区健康、手法技艺、教学与国际赛事。",
     "awardsLabel": "在实践中获得认可",
     "awardRome": "欧洲赛事组别金奖",
     "awardGermany": "东方自由式金奖",
@@ -86,12 +86,36 @@
     "title": "六个元素，一体调理。",
     "intro": "从感受、活动到如何面对当下，各个元素相互关联，也各有作用。每次调理，结合真正适合您的部分。",
     "elements": [
-      {"name": "心态", "line": "我们注意到什么，就会影响我们的体验。", "copy": "一起探索注意力、看待事物的角度，以及回应的方式。不妨从一个小实验开始。"},
-      {"name": "热 / 冷", "line": "从容面对当下。", "copy": "在引导下体验温度变化，把注意力带回此刻。充分准备、评估个人适合程度，以及稳定的陪伴，共同构成这一过程。"},
-      {"name": "呼吸练习", "line": "回到呼吸。", "copy": "在引导中探索呼吸与觉察，融入 Matthew 在 Wim Hof Method 和 Oxygen Advantage 导师培训中所学。"},
-      {"name": "身体", "line": "通过触碰展开对话。", "copy": "融合古典、泰式、中式、巴厘式、指压与运动按摩，形成灵活而个性化的身体调理方式。触碰与动作，始终回应按摩床上这一个人的需要。"},
-      {"name": "活动", "line": "主动感受，与身体建立联系。", "copy": "在支持下活动身体、探索灵活度，并带着好奇心感受日常动作。看看身体如何活动，哪里可以更轻松。"},
-      {"name": "社群", "line": "练习，也可以一起进行。", "copy": "工作坊与共同体验，让人们有机会相互学习。Matthew 将社区健康工作的经验，融入教学与交流。"}
+      {
+        "name": "心态",
+        "line": "我们注意到什么，就会影响我们的体验。",
+        "copy": "一起探索注意力、看待事物的角度，以及回应的方式。不妨从一个小实验开始。"
+      },
+      {
+        "name": "热 / 冷",
+        "line": "从容面对当下。",
+        "copy": "在引导下体验温度变化，把注意力带回此刻。充分准备、评估个人适合程度，以及稳定的陪伴，共同构成这一过程。"
+      },
+      {
+        "name": "呼吸练习",
+        "line": "回到呼吸。",
+        "copy": "在引导中探索呼吸与觉察，融入 Matthew 在 Wim Hof Method 和 Oxygen Advantage 导师培训中所学。"
+      },
+      {
+        "name": "身体",
+        "line": "通过触碰展开对话。",
+        "copy": "融合古典、泰式、中式、巴厘式、指压与运动按摩，形成灵活而个性化的身体调理方式。触碰与动作，始终回应按摩床上这一个人的需要。"
+      },
+      {
+        "name": "活动",
+        "line": "主动感受，与身体建立联系。",
+        "copy": "在支持下活动身体、探索灵活度，并带着好奇心感受日常动作。看看身体如何活动，哪里可以更轻松。"
+      },
+      {
+        "name": "社群",
+        "line": "练习，也可以一起进行。",
+        "copy": "工作坊与共同体验，让人们有机会相互学习。Matthew 将社区健康工作的经验，融入教学与交流。"
+      }
     ],
     "technologyLabel": "双手与设备",
     "technologyTitle": "精密技术，保有人与人的温度。",
@@ -100,14 +124,22 @@
     "releaseTitle": "Release Cutter",
     "releaseLine": "双手始终是核心。",
     "releaseCopy": "调理师佩戴耦合手套传递电刺激。这种设备辅助手法，让触碰与调理师的专注始终参与其中。",
-    "zimmerLabel": "Zimmer · Germany",
+    "zimmerLabel": "Zimmer · 德国",
     "zimmerTitle": "Soleo SonoStim",
     "zimmerLine": "用心选择，妥善运用。",
     "zimmerCopy": "Soleo 系列将超声波与电疗引入由调理师全程指导的服务。具体应用与参数设置，取决于设备配置和个人情况。",
     "handsTitle": "用双手感知。",
-    "handsItems": ["专注触碰，及时回应", "适合个人的触碰与活动节奏", "调理师全程参与"],
+    "handsItems": [
+      "专注触碰，及时回应",
+      "适合个人的触碰与活动节奏",
+      "调理师全程参与"
+    ],
     "instrumentsTitle": "以设备辅助。",
-    "instrumentsItems": ["更丰富的应用方式", "根据个人情况设定参数", "由调理师引导设备的使用"],
+    "instrumentsItems": [
+      "更丰富的应用方式",
+      "根据个人情况设定参数",
+      "由调理师引导设备的使用"
+    ],
     "techNote": "调理方式与设备使用，会在开始前与您单独沟通。",
     "nextPage": "了解私人调理"
   },
@@ -116,13 +148,13 @@
     "title": "一个关于注意力的小实验。",
     "intro": "您寻找什么，会影响您记住什么。",
     "introSub": "先做一个简短的记忆实验，再留一点时间想一想。",
-    "begin":"来试试这个实验！",
+    "begin": "来试试这个实验！",
     "memorize": "请记住蓝色标记的位置。",
     "memorizeSub": "稍后需要您凭记忆找出它们。",
     "recall": "三个蓝色标记刚才在哪里？",
     "recallSub": "请选择三个位置。不用着急。",
     "position": "位置 {number}",
-    "selected": "已选 {count} 个，共需选择 3 个",
+    "selected": "已选择 {count} / 3",
     "confirm": "继续",
     "red": "那么，红色标记在哪里？",
     "redSub": "请选择画面四个区域中的一个，也可以选择不确定。",
@@ -143,67 +175,146 @@
     "integrationCopy": "通过呼吸、触碰、温暖、活动与专注陪伴，Matthew 邀请您以不同的方式觉察身体。",
     "finalTitle": "专注在哪里，能量就流向哪里。",
     "finalCopy": "Tony Robbins 长期影响着 Matthew 对个人成长的探索。两人的相遇，是这段漫长学习与实践旅程中的一部分。",
-    "replay": "再试一次","continueOn":"继续前行",
+    "replay": "再试一次",
+    "continueOn": "继续前行",
     "next": "下一步",
-    "labels": ["问题", "压力", "不如意的事", "呼吸", "感恩", "支持", "小小的进步"],
+    "labels": [
+      "问题",
+      "压力",
+      "不如意的事",
+      "呼吸",
+      "感恩",
+      "支持",
+      "小小的进步"
+    ],
     "paused": "您离开时，实验已暂停。",
     "fieldLabel": "注意力实验：十二个标记位置",
     "progressLabel": "实验进度"
   },
   "practice": {
-    "eyebrow": "私人调理 · Zurich",
+    "eyebrow": "私人调理 · 苏黎世",
     "title": "给责任背后的自己，一点空间。",
     "intro": "工作、责任、生活的节奏。在这里，把关注重新带回您自己。",
     "principles": [
-      {"title": "专属于您的关注", "copy": "先聊聊您的感受，以及您为何而来。每次调理，都从这样的交流开始。"},
-      {"title": "尊重隐私", "copy": "为重视个性化服务的备受关注的人士、创业者与专业人士，提供周到、私密的环境。"},
-      {"title": "相互配合的调理", "copy": "身体调理、呼吸、心态、活动与精选设备，可以在一次经过细致安排的调理中相互配合。"}
+      {
+        "title": "专属于您的关注",
+        "copy": "先聊聊您的感受，以及您为何而来。每次调理，都从这样的交流开始。"
+      },
+      {
+        "title": "尊重隐私",
+        "copy": "为重视个性化服务的备受关注的人士、创业者与专业人士，提供周到、私密的环境。"
+      },
+      {
+        "title": "相互配合的调理",
+        "copy": "身体调理、呼吸、心态、活动与精选设备，可以在一次经过细致安排的调理中相互配合。"
+      }
     ],
     "processLabel": "初次来访",
     "processTitle": "聊一聊，体验调理，再留些时间回味。",
     "steps": [
-      {"title": "联系", "copy": "预约前，直接联系 Matthew，聊聊您的想法、方便的时间，以及任何疑问。"},
-      {"title": "到访", "copy": "来到 Sihlcity 附近的工作室，先让自己安定下来。一起讨论本次重点，确定适合的方式。"},
-      {"title": "体验", "copy": "调理会根据您的反馈逐步展开。触碰、节奏与力度，始终可以随时沟通。"},
-      {"title": "后续", "copy": "回顾自己的感受，再一起讨论后续调理或工作坊是否适合您。"}
+      {
+        "title": "联系",
+        "copy": "预约前，直接联系 Matthew，聊聊您的想法、方便的时间，以及任何疑问。"
+      },
+      {
+        "title": "到访",
+        "copy": "来到 Sihlcity 附近的工作室，先让自己安定下来。一起讨论本次重点，确定适合的方式。"
+      },
+      {
+        "title": "体验",
+        "copy": "调理会根据您的反馈逐步展开。触碰、节奏与力度，始终可以随时沟通。"
+      },
+      {
+        "title": "后续",
+        "copy": "回顾自己的感受，再一起讨论后续调理或工作坊是否适合您。"
+      }
     ],
     "faqTitle": "见面之前",
     "faqs": [
-      {"q": "如何预约？", "a": "请发邮件至 info@healwell.ch，或通过 WhatsApp 联系 Matthew：+41 76 506 74 88。可预约时间、调理时长与费用，请直接沟通确认。"},
-      {"q": "可以申请医疗保险报销吗？", "a": "Matthew 已就五种方法完成 EMR 注册。能否报销取决于您的补充医疗保险、所用方法及保单条款。请在预约前向保险公司确认。"},
-      {"q": "在哪里进行调理？", "a": "Healwell 工作室位于 Rüdigerstrasse 7, Ground Floor, 8045 Zürich，靠近 Sihlcity。联系页面提供路线信息。"},
-      {"q": "调理时可以使用哪些语言？", "a": "工作语言为英语和德语；Matthew 也会一些普通话。网站提供十种语言版本。咨询时，请告知您希望使用的交流语言。"}
+      {
+        "q": "如何预约？",
+        "a": "请发邮件至 info@healwell.ch，或通过 WhatsApp 联系 Matthew：+41 76 506 74 88。可预约时间、调理时长与费用，请直接沟通确认。"
+      },
+      {
+        "q": "可以申请医疗保险报销吗？",
+        "a": "Matthew 已就五种方法完成 EMR 注册。能否报销取决于您的补充医疗保险、所用方法及保单条款。请在预约前向保险公司确认。"
+      },
+      {
+        "q": "在哪里进行调理？",
+        "a": "Healwell 工作室位于苏黎世 Rüdigerstrasse 7 一楼（邮编 8045），靠近 Sihlcity。联系页面提供路线信息。"
+      },
+      {
+        "q": "调理时可以使用哪些语言？",
+        "a": "工作语言为英语和德语；Matthew 也会一些普通话。网站提供十种语言版本。咨询时，请告知您希望使用的交流语言。"
+      }
     ],
     "closing": "从一次交谈开始。"
   },
   "about": {
     "eyebrow": "关于 Matthew",
     "title": "不断前行的人生。",
-    "intro": "出生于 Vietnam，在 Australia 长大，如今在 Zurich 从业。一路学习、服务他人，也用双手磨炼技艺。",
+    "intro": "出生于越南，在澳大利亚长大，如今在苏黎世从业。一路学习、服务他人，也用双手磨炼技艺。",
     "quote": "我练习放下。",
     "quoteBy": "Matthew Hua",
     "chapters": [
-      {"label": "01 / 跨越海岸", "title": "更宽广的视角。", "copy": "Matthew 幼时随家人乘船离开 Vietnam，来到 Australia。在 Sydney 度过的少年时期，冥想走进了他的生活。之后，他从事社区健康工作，并在 University of Technology Sydney 学习社会科学与国际研究。"},
-      {"label": "02 / 触碰的语言", "title": "用双手学习。", "copy": "他于 1997 年在 Sydney 开始学习按摩，随后在 Guangzhou 与 Zurich 继续深造。古典、中式、巴厘式、泰式、指压与运动按摩，逐渐融入他灵活而独特的风格。Healwell 为这份实践在 Zurich 安了家。"},
-      {"label": "03 / 走出熟悉的范围", "title": "教学之余，始终保持练习。", "copy": "作为 Wim Hof Method 高级导师与 Oxygen Advantage 呼吸训练导师，Matthew 持续探索自己教授的方法。他曾与 Wim Hof 冬季徒步，在 Sweden 协助工作坊，也曾赤脚完成 Zurich 马拉松。"},
-      {"label": "04 / 传递经验", "title": "从按摩床走向国际赛场。", "copy": "参赛经历为他带来瑞士自由式金奖、Germany 东方自由式金奖，以及 Rome 欧洲赛事的亚洲灵感 / Nuad Thai 组别金奖。截至 2026 年，他的国际工作还包括在 Paris 附近担任欧洲赛事反馈评委，以及受邀在 Tokyo 担任评委。"}
+      {
+        "label": "01 / 跨越海岸",
+        "title": "更宽广的视角。",
+        "copy": "Matthew 幼时随家人乘船离开越南，来到澳大利亚。在悉尼度过的少年时期，冥想走进了他的生活。之后，他从事社区健康工作，并在 University of Technology Sydney 学习社会科学与国际研究。"
+      },
+      {
+        "label": "02 / 触碰的语言",
+        "title": "用双手学习。",
+        "copy": "他于 1997 年在悉尼开始学习按摩，随后在广州与苏黎世继续深造。古典、中式、巴厘式、泰式、指压与运动按摩，逐渐融入他灵活而独特的风格。Healwell 为这份实践在苏黎世安了家。"
+      },
+      {
+        "label": "03 / 走出熟悉的范围",
+        "title": "教学之余，始终保持练习。",
+        "copy": "作为 Wim Hof Method 高级导师与 Oxygen Advantage 呼吸训练导师，Matthew 持续探索自己教授的方法。他曾与 Wim Hof 冬季徒步，在瑞典协助工作坊，也曾赤脚完成苏黎世马拉松。"
+      },
+      {
+        "label": "04 / 传递经验",
+        "title": "从按摩床走向国际赛场。",
+        "copy": "参赛经历为他带来瑞士自由式金奖、德国东方自由式金奖，以及罗马欧洲赛事的亚洲灵感 / Nuad Thai 组别金奖。截至 2026 年，他的国际工作还包括在巴黎附近担任欧洲赛事反馈评委，以及受邀在东京担任评委。"
+      }
     ],
     "timelineTitle": "一步步形成的调理实践。",
     "timeline": [
-      {"year": "1997", "text": "在 Sydney 开始学习按摩。"},
-      {"year": "2017", "text": "在 Zurich 创立 Healwell；2018 年起对外讲述品牌故事。"},
-      {"year": "2021", "text": "完成五种获认可方法的 EMR 注册。"},
-      {"year": "2022", "text": "取得 Wim Hof Method 导师认证。"},
-      {"year": "2023", "text": "获得瑞士自由式金奖，并在 Germany 的 Universal Massage Championship 获得金奖与银奖。"},
-      {"year": "2024", "text": "在 Rome 获得欧洲赛事组别金奖；参与 Zurich 的 VAULT 工作室。"},
-      {"year": "2026", "text": "参与国际评审、专业反馈与从业者指导。"}
+      {
+        "year": "1997",
+        "text": "在悉尼开始学习按摩。"
+      },
+      {
+        "year": "2017",
+        "text": "在苏黎世创立 Healwell；2018 年起对外讲述品牌故事。"
+      },
+      {
+        "year": "2021",
+        "text": "完成五种获认可方法的 EMR 注册。"
+      },
+      {
+        "year": "2022",
+        "text": "取得 Wim Hof Method 导师认证。"
+      },
+      {
+        "year": "2023",
+        "text": "获得瑞士自由式金奖，并在德国的 Universal Massage Championship 获得金奖与银奖。"
+      },
+      {
+        "year": "2024",
+        "text": "在罗马获得欧洲赛事组别金奖；参与苏黎世的 VAULT 工作室。"
+      },
+      {
+        "year": "2026",
+        "text": "参与国际评审、专业反馈与从业者指导。"
+      }
     ],
     "foundationTitle": "有根基的技艺。",
     "foundationCopy": "他获 EMR 认可的方法包括治疗性按摩、古典按摩、足部反射疗法、徒手淋巴引流及自生训练法。在这些基础之上，他持续学习，并参与国际交流。",
     "tonyTitle": "影响与相遇。",
     "tonyCopy": "超过 35 年的时间里，Tony Robbins 一直影响着 Matthew 对个人成长的兴趣。两人的相遇，是他持续探索注意力、个人责任，以及如何面对人生体验的一部分。",
-    "todayTitle": "扎根 Zurich，面向世界。",
-    "todayCopy": "除 Healwell 外，Matthew 也与 Zurich 的 VAULT 保持工作联系。教学、合作实践与国际交流，不断为工作室带回新的视角。"
+    "todayTitle": "扎根苏黎世，面向世界。",
+    "todayCopy": "除 Healwell 外，Matthew 也与苏黎世的 VAULT 保持工作联系。教学、合作实践与国际交流，不断为工作室带回新的视角。"
   },
   "archive": {
     "eyebrow": "影像记录",
@@ -214,19 +325,40 @@
     "recognition": "荣誉",
     "practice": "调理实践",
     "items": [
-      {"title": "欧洲锦标赛", "caption": "Rome，2024 · 亚洲灵感 / Nuad Thai 组别金奖"},
-      {"title": "Champ of the Champs", "caption": "Penzberg，2023 · 国际赛场"},
-      {"title": "来自评委的建议", "caption": "观察、反馈与新一代从业者"},
-      {"title": "重燃内在热情", "caption": "一部关于实践与可能性的短片"},
-      {"title": "在 Switzerland 获得认可", "caption": "Matthew 参赛旅程中的一个片刻"},
-      {"title": "Champ of the Champs", "caption": "在 Champ of the Champs 共同见证成就"},
-      {"title": "Switzerland 的领奖台上", "caption": "瑞士按摩锦标赛 · Fribourg，2023。"}
+      {
+        "title": "欧洲锦标赛",
+        "caption": "罗马，2024 · 亚洲灵感 / Nuad Thai 组别金奖"
+      },
+      {
+        "title": "Champ of the Champs",
+        "caption": "彭茨贝格，2023 · 国际赛场"
+      },
+      {
+        "title": "来自评委的建议",
+        "caption": "观察、反馈与新一代从业者"
+      },
+      {
+        "title": "重燃内在热情",
+        "caption": "一部关于实践与可能性的短片"
+      },
+      {
+        "title": "在瑞士获得认可",
+        "caption": "Matthew 参赛旅程中的一个片刻"
+      },
+      {
+        "title": "Champ of the Champs",
+        "caption": "在 Champ of the Champs 共同见证成就"
+      },
+      {
+        "title": "瑞士的领奖台上",
+        "caption": "瑞士按摩锦标赛 · 弗里堡，2023。"
+      }
     ],
     "previous": "上一则记录",
     "next": "下一则记录"
   },
   "contact": {
-    "eyebrow": "联系 · Zurich",
+    "eyebrow": "联系 · 苏黎世",
     "title": "属于您的时间，从这里开始。",
     "intro": "无论是一个疑问、首次预约，还是新的想法，都可以直接与 Matthew 聊聊。",
     "email": "给 Matthew 发邮件",
@@ -234,8 +366,8 @@
     "phone": "电话",
     "addressLabel": "工作室",
     "address": "Rüdigerstrasse 7",
-    "floor": "底层",
-    "city": "8045 Zürich, Switzerland",
+    "floor": "一楼",
+    "city": "8045 Zürich, 瑞士",
     "near": "靠近 Sihlcity · 敬请预约",
     "drive": "驾车前往",
     "chooseMap": "前往工作室。",
@@ -244,8 +376,8 @@
     "apple": "Apple Maps",
     "googleHint": "在 Google Maps 中查看路线",
     "appleHint": "在 Apple Maps 中查看路线",
-    "mapLabel": "Healwell 工作室，Rüdigerstrasse 7，Zurich",
-    "route": "从 Zürich HB 到工作室",
+    "mapLabel": "Healwell 工作室，Rüdigerstrasse 7，苏黎世",
+    "route": "从苏黎世火车总站到工作室",
     "mapFallback": "在地图中查看位置",
     "insurance": "医疗保险认可",
     "insuranceCopy": "采用 EMR 认可的方法。请向您的补充医疗保险公司确认报销范围。",
@@ -276,7 +408,7 @@
   },
   "footer": {
     "line": "改变，从身体开始。",
-    "location": "Zurich, Switzerland",
+    "location": "瑞士苏黎世",
     "rights": "Matthew Hua",
     "privacy": "隐私",
     "privacyText": "语言偏好保存在您的浏览器中，声音仅在您同意后开启。地图从 OpenStreetMap 加载图块并传输连接数据。联系表单资料发送至 FormSubmit，进行垃圾信息筛查并通过邮件转送至 info@healwell.ch。请勿包含医疗信息或敏感资料。电子邮件、WhatsApp 和导航链接会打开外部服务。",
@@ -289,8 +421,39 @@
     "reveal": "显示视频控件"
   },
   "seo": {
-    "title": "Matthew Hua | 身心调理师 | Zurich",
-    "description": "为肩负重任的人士，留一处私人空间。在 Zurich，与 Matthew Hua 一起体验结合身体调理、呼吸练习与精密设备的个性化服务。"
+    "title": "Matthew Hua | 身心调理师 | 苏黎世",
+    "description": "为肩负重任的人士，留一处私人空间。在苏黎世，与 Matthew Hua 一起体验结合身体调理、呼吸练习与精密设备的个性化服务。"
   },
-  "bio": {"title":"Matthew Hua | 链接 | 苏黎世","description":"直接联系 Matthew Hua，保存他的联系方式，观看他的欧洲锦标赛影片，探索他在苏黎世的六大元素疗法。","website":"网站","welcome":"很高兴在这里见到您。","links":"联系方式与链接","whatsapp":"通过 WhatsApp 联系 Matthew","whatsappDetail":"一起找一个适合您的时间。","save":"保存我的联系方式","saveDetail":"将 Matthew Hua 添加到通讯录","call":"致电 Matthew","email":"发送邮件","subject":"预约咨询 · matthewhua.ch","instagramDetail":"疗愈日常的点滴","facebookDetail":"保持联系","threadsDetail":"想法与交流","youtubeDetail":"疗愈影片","linkedinDetail":"职业背景","mapsDetail":"评价与路线","wheelHint":"轻触每个元素，了解更多","studio":"找到工作室。","farewell":"期待与您相见。","tapSound":"轻触开启声音","more":"更多信息","explore":"网站内容","fullscreen":"全屏观看","moreContact":"更多联系 Matthew 的方式","callTitle":"您想如何致电？","callPhone":"电话拨打","callWhatsapp":"WhatsApp 通话","callInvite":"先从一通电话开始吧，我在这里倾听。"}
+  "bio": {
+    "title": "Matthew Hua | 链接 | 苏黎世",
+    "description": "直接联系 Matthew Hua，保存他的联系方式，观看他在欧洲锦标赛的短片，探索他在苏黎世的六大元素疗法。",
+    "website": "网站",
+    "welcome": "很高兴在这里见到您。",
+    "links": "联系方式与链接",
+    "whatsapp": "通过 WhatsApp 联系 Matthew",
+    "whatsappDetail": "一起找一个适合您的时间。",
+    "save": "保存我的联系方式",
+    "saveDetail": "将 Matthew Hua 添加到通讯录",
+    "call": "致电 Matthew",
+    "email": "发送邮件",
+    "subject": "预约咨询 · matthewhua.ch",
+    "instagramDetail": "疗愈日常的点滴",
+    "facebookDetail": "保持联系",
+    "threadsDetail": "想法与交流",
+    "youtubeDetail": "疗愈影片",
+    "linkedinDetail": "职业背景",
+    "mapsDetail": "评价与路线",
+    "wheelHint": "轻触每个元素，了解更多",
+    "studio": "如何前往工作室",
+    "farewell": "期待与您相见。",
+    "tapSound": "开启声音",
+    "more": "更多信息",
+    "explore": "网站内容",
+    "fullscreen": "全屏观看",
+    "moreContact": "其他联系方式",
+    "callTitle": "您想如何致电？",
+    "callPhone": "普通电话",
+    "callWhatsapp": "WhatsApp 通话",
+    "callInvite": "先从一通电话开始吧，我在这里倾听。"
+  }
 }

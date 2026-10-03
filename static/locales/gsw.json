@@ -1,5 +1,5 @@
 {
-  "languageError": "Die Sprach het nöd chöne glade werde. Probier's nomal.",
+  "languageError": "D Spraach hät nöd chöne glade wärde. Probier s nomal.",
   "locale": "gsw",
   "nativeName": "Züritüütsch",
   "portal": {
@@ -53,14 +53,14 @@
     "openFilm": "Film ufmache",
     "imageAlt": "De Matthew Hua mit em Tony Robbins",
     "photoCredit": "Fotografie us em redaktionelle Porträt vom Matthew",
-    "contactLink": "Redemer mitenand",
+    "contactLink": "Lass üs rede",
     "homeLink": "Zrugg zur Startsiite"
   },
   "home": {
-    "eyebrow": "Therapeut für Veränderig · Zurich",
+    "eyebrow": "Transformationstherapeut · Züri",
     "title": "Matthew Hua",
-    "headline": "En persönliche Ruum für Lüüt mit eme aaspruchsvolle Alltag.",
-    "intro": "Körperarbet, Atemarbet und Präzisionstechnologie, persönlich abgstimmt uf Lüüt, wo i de Öffentlichkeit stönd, Unternehmerinne, Unternehmer und Bruefstätigi.",
+    "headline": "En private Rückzugsort für Lüüt mit eme aaspruchsvolle Alltag.",
+    "intro": "Persönlichi Körperarbet, Atemarbet und Präzisionstechnologie für bekannti Persönlichkeite, Unternehmerinne und Unternehmer und Füehrigschräft.",
     "signature": "Veränderig fangt im Körper aa.",
     "filmLabel": "Was d Praxis usmacht",
     "filmTitle": "Weck dis innere Füür.",
@@ -70,16 +70,16 @@
     "methodCopy": "Berüehrig, Atem, Temperatur, Uufmerksamkeit und Bewegig chömed für dich zäme. Am Aafang staht, wie du dich füelsch. Vo det us entwicklet sich d Sitzig.",
     "practiceLabel": "Privatpraxis",
     "practiceTitle": "Dini Ziit. Din Ruum.",
-    "practiceCopy": "E Begägnig ohni Ziitdruck i Zurich. Im Mittelpunkt staht de Mänsch hinder all dene Verpflichtige.",
+    "practiceCopy": "E Begägnig ohni Ziitdruck i Züri. Im Mittelpunkt staht de Mänsch hinder all dene Verpflichtige.",
     "aboutLabel": "De Mänsch hinder de Praxis",
     "aboutTitle": "Es Läbe über Gränze use. E Praxis ohni feschts Drehbuech.",
-    "aboutCopy": "Vo Vietnam über Australie nach Zurich: Em Matthew sin Wäg verbindet Gsundheitsarbet i de Gmeinschaft, praktisches Handwärk, Underichte und internationali Wettkämpf.",
-    "awardsLabel": "Uszeichnige us de Praxis",
+    "aboutCopy": "Vo Vietnam über Australie nach Züri: Em Matthew sin Wäg verbindet Gsundheitsarbet i de Gmeinschaft, praktisches Handwärk, Underichte und internationali Wettkämpf.",
+    "awardsLabel": "Uszeichnige",
     "awardRome": "EM-Gold i sinere Kategorie",
     "awardGermany": "Gold i Eastern Freestyle",
     "awardSwiss": "Schwiizer Freestyle-Meischter",
-    "awardJury": "Internationale Juror und Kursleiter",
-    "closing": "Schaff Ruum für dich."
+    "awardJury": "Internationale Juror und Dozent",
+    "closing": "Nimm der Ziit für dich."
   },
   "method": {
     "eyebrow": "D Methode vo de Transformationstherapie",
@@ -87,7 +87,7 @@
     "intro": "En Aasatz, wo dis Gfühl, dini Bewegig und din Umgang mit em Momänt verbindet. Jedes Element hät sin Platz. I dinere Sitzig chunnt das zäme, wo für dich wichtig isch.",
     "elements": [
       {
-        "name": "Inneri Haltig",
+        "name": "Mindset",
         "line": "Was mer wahrnähmed, prägt, was mer erläbed.",
         "copy": "E Iiladig, dini Uufmerksamkeit, din Blickwinkel und dini Reaktione z erkunde. Fang mit eme chliine Experimänt aa."
       },
@@ -114,7 +114,7 @@
       {
         "name": "Gmeinschaft",
         "line": "Zäme üebe, zäme lerne.",
-        "copy": "Workshops und gmeinsami Erfahrige schaffed Ruum, zum mitenand lerne. Em Matthew sini Erfahrig i de Gsundheitsarbet i de Gmeinschaft prägt, wie er underichtet und uf Lüüt zuegaht."
+        "copy": "Workshops und gmeinsami Erfahrige schaffed Ruum, zum mitenand z lerne. Em Matthew sini Erfahrig i de Gsundheitsarbet i de Gmeinschaft prägt, wie er underichtet und uf Lüüt zuegaht."
       }
     ],
     "technologyLabel": "Händ und Instrumänt",
@@ -144,11 +144,11 @@
     "nextPage": "D Privatpraxis kännelere"
   },
   "game": {
-    "eyebrow": "01 / Inneri Haltig",
+    "eyebrow": "01 / Mindset",
     "title": "Es Experimänt mit de Uufmerksamkeit.",
     "intro": "Wonach du suechsch, prägt, woran du dich erinnerisch.",
     "introSub": "Es churzes Gedächtnisexperimänt. Und dänn en Momänt zum Nahdänke.",
-    "begin":"Probier das Experiment!",
+    "begin": "Experimänt starte",
     "memorize": "Märk der, wo d blaue Signal sind.",
     "memorizeSub": "Nachher suechsch sie us em Gedächtnis.",
     "recall": "Wo sind die drüü blaue Signal gsi?",
@@ -164,10 +164,10 @@
     "br": "Unde rächts",
     "unknown": "Ich bi nöd sicher",
     "caught": "Du häsch s gseh.",
-    "missed": "Das isch au da gsi.",
+    "missed": "Es isch d ganz Ziit da gsi.",
     "revealCopy": "D blaue Signal händ dini Uufmerksamkeit gha. S rote Signal isch im undere rächte Viertel gsi.",
     "score": "Du häsch dich a {count} vo de 3 blaue Positione erinneret.",
-    "focusTitle": "Wo d Uufmerksamkeit ane gaht, fliesst d Energie hii.",
+    "focusTitle": "D Energie folgt de Uufmerksamkeit.",
     "focusCopy": "Was mer sueched, gsehmer liechter. Das isch e Iiladig zum Nahdänke, kei Test vo dine Fähigkeite.",
     "lessonTitle": "Was bestimmt din Blick?",
     "lessonCopy": "Wänn mer immer wieder Problem zähled, chönd sie s ganze Bild usfülle. Unterstützig, chliini Erfolg und Gründ zum Dankbar-sii sind villicht gliich no da und warted druf, dass mer sie wahrnimmt.",
@@ -175,7 +175,8 @@
     "integrationCopy": "Mit Atem, Berüehrig, Wärmi, Bewegig und Präsenz ladet de Matthew dich ii, dim Körper e anderi Art vo Uufmerksamkeit z schänke.",
     "finalTitle": "Wo din Fokus ane gaht, fliesst dini Energie hii.",
     "finalCopy": "De Tony Robbins prägt scho lang em Matthew sis Intresse a persönlicher Entwicklig. Ihri Begägnig isch en Teil vo eme vil längere Wäg vom Lerne und Üebe.",
-    "replay": "Nomol probiere","continueOn":"Wiiter gaht's",
+    "replay": "Nomol probiere",
+    "continueOn": "Wiiter gaht's",
     "next": "Wiiter",
     "labels": [
       "Problem",
@@ -191,7 +192,7 @@
     "progressLabel": "Fortschritt vom Experimänt"
   },
   "practice": {
-    "eyebrow": "Privatpraxis · Zurich",
+    "eyebrow": "Privatpraxis · Züri",
     "title": "Ruum für de Mänsch hinder all däm.",
     "intro": "Dini Arbet, dini Verantwortig, dis Läbestempo. Da gaht s wieder um dich.",
     "principles": [
@@ -201,11 +202,11 @@
       },
       {
         "title": "Diskretion",
-        "copy": "En private Rahme, mit Sorgfalt gstaltet, für Lüüt, wo i de Öffentlichkeit stönd, Unternehmerinne, Unternehmer und Bruefstätigi, wo en persönliche Aasatz schätzed."
+        "copy": "En private Rahme, mit Sorgfalt gstaltet, für bekannti Persönlichkeite, Unternehmerinne und Unternehmer und Füehrigschräft, wo en persönliche Aasatz schätzed."
       },
       {
         "title": "En verbundene Aasatz",
-        "copy": "Körperarbet, Atem, inneri Haltig, Bewegig und usgwählti Technologie chönd i einere wohlüberleite Sitzig zämecho."
+        "copy": "Körperarbet, Atem, Mindset, Bewegig und usgwählti Technologie chönd i einere guet überleite Sitzig zämecho."
       }
     ],
     "processLabel": "Din erschte Bsuech",
@@ -235,7 +236,7 @@
         "a": "Schriib a info@healwell.ch oder mäld di bim Matthew per WhatsApp uf +41 76 506 74 88. Freii Termin, d Duur vo de Sitzig und s Honorar mached ihr direkt ab."
       },
       {
-        "q": "Isch e Anerkennig dur d Chrankekasse möglich?",
+        "q": "Zahlt d Chrankekasse öppis?",
         "a": "De Matthew isch für füüf Methode bim EMR registriert. Ob du öppis zruggerstattet überchunsch, hangt vo dinere Zuesatzversicherig, de Methode und dinere Police ab. Klär d Choschteübernahm vor em Bueche mit dinere Versicherig ab."
       },
       {
@@ -252,7 +253,7 @@
   "about": {
     "eyebrow": "Über de Matthew",
     "title": "Es Läbe i Bewegig.",
-    "intro": "I Vietnam gebore. I Australie ufgwachse. I Zurich tätig. Es Läbe lang lerne, für anderi da sii und mit de Händ schaffe.",
+    "intro": "I Vietnam gebore. I Australie ufgwachse. I Züri tätig. Es Läbe lang lerne, für anderi da sii und mit de Händ schaffe.",
     "quote": "Ich üebe, loszlah.",
     "quoteBy": "Matthew Hua",
     "chapters": [
@@ -264,17 +265,17 @@
       {
         "label": "02 / D Spraach vo de Berüehrig",
         "title": "Mit de Händ lerne.",
-        "copy": "Sini Massageusbildig hät 1997 i Sydney aagfange und ihn spöter nach Guangzhou und Zurich gfüehrt. Klassischi, chinesischi, balinesischi, thailändischi und sportlichi Iiflüss sowie Shiatsu sind Teil vo sim dynamische, persönliche Stil worde. Mit Healwell hät die Praxis es Dehei i Zurich gfunde."
+        "copy": "Sini Massageusbildig hät 1997 i Sydney aagfange und ihn spöter nach Guangzhou und Züri gfüehrt. Klassischi, chinesischi, balinesischi, thailändischi und sportlichi Iiflüss sowie Shiatsu sind Teil vo sim dynamische, persönliche Stil worde. Mit Healwell hät die Praxis es Dehei i Züri gfunde."
       },
       {
         "label": "03 / Über s Vertraute use",
         "title": "Wer underichtet, üebt wiiter.",
-        "copy": "Als fortgschrittene Instruktor vo de Wim Hof Method und Ateminstruktor für Oxygen Advantage vertüüft de Matthew laufend, was er underichtet. Zu sine Erfahrige ghöred e Winterwanderig mit em Wim Hof, d Assistenz bi Workshops i Schwede und en Marathon i Zurich, wo er barfuess gloffe isch."
+        "copy": "Als fortgschrittene Instruktor vo de Wim Hof Method und Ateminstruktor für Oxygen Advantage vertüüft de Matthew laufend, was er underichtet. Zu sine Erfahrige ghöred e Winterwanderig mit em Wim Hof, d Assistenz bi Workshops i Schwede und en Marathon i Züri, wo er barfuess gloffe isch."
       },
       {
         "label": "04 / Wiitergäh",
         "title": "Vo de Liegi uf d international Büüni.",
-        "copy": "Bi Wettkämpf hät er Schwiizer Freestyle-Gold, Gold i Eastern Freestyle i Dütschland und europäischs Gold i Asian Inspired / Nuad Thai i Rome gwunne. Bis 2026 sind zu sinere internationale Arbet au d European Feedback Jury bi Paris und e Beruefig als Juror i Tokyo dezuecho."
+        "copy": "Bi Wettkämpf hät er Schwiizer Freestyle-Gold, Gold i Eastern Freestyle i Dütschland und europäischs Gold i Asian Inspired / Nuad Thai i Rom gwunne. Bis 2026 sind zu sinere internationale Arbet au d European Feedback Jury bi Paris und e Beruefig als Juror i Tokio dezuecho."
       }
     ],
     "timelineTitle": "E Praxis nimmt Form aa.",
@@ -285,7 +286,7 @@
       },
       {
         "year": "2017",
-        "text": "Healwell wird i Zurich gründet; d öffentlichi Markegschicht fangt 2018 aa."
+        "text": "Healwell wird i Züri gründet; d öffentlichi Markegschicht fangt 2018 aa."
       },
       {
         "year": "2021",
@@ -301,7 +302,7 @@
       },
       {
         "year": "2024",
-        "text": "EM-Gold i sinere Kategorie i Rome; Mitarbeit im Studio VAULT i Zurich."
+        "text": "EM-Gold i sinere Kategorie i Rom; Mitarbeit im Studio VAULT i Züri."
       },
       {
         "year": "2026",
@@ -312,8 +313,8 @@
     "foundationCopy": "Sini EMR-anerkannte Methode sind Therapeutischi Massage, Klassischi Massage, Fuessreflexzonemassage, Manuelli Lymphdrainage und Autogens Training. Laufendi Wiiterbildig und internationale Uustusch ergänzed die Grundlag.",
     "tonyTitle": "Iifluss und Begägnig.",
     "tonyCopy": "De Tony Robbins prägt sit meh als 35 Jahr em Matthew sis Intresse a persönlicher Entwicklig. Ihri Begägnig ghört zu ere laufende Usenandersetzig mit Uufmerksamkeit, Eigeverantwortig und de Frag, wie mer mit Erfahrige umgaht.",
-    "todayTitle": "I Zurich verwurzlet. Offe für d Wält.",
-    "todayCopy": "Näbed Healwell isch de Matthew au mit VAULT i Zurich verbunde. Underichte, gmeinsams Praktiziere und internationale Uustusch bringed immer wieder neui Blickwinkel is Studio."
+    "todayTitle": "I Züri verwurzlet. Offe für d Wält.",
+    "todayCopy": "Näbed Healwell isch de Matthew au mit VAULT i Züri verbunde. Underichte, gmeinsams Praktiziere und internationale Uustusch bringed immer wieder neui Blickwinkel is Studio."
   },
   "archive": {
     "eyebrow": "S Archiv",
@@ -326,7 +327,7 @@
     "items": [
       {
         "title": "Europameischterschaft",
-        "caption": "Rome, 2024 · Gold, Asian Inspired / Nuad Thai"
+        "caption": "Rom, 2024 · Gold, Asian Inspired / Nuad Thai"
       },
       {
         "title": "Champ of the Champs",
@@ -357,7 +358,7 @@
     "next": "Nächschte Momänt"
   },
   "contact": {
-    "eyebrow": "Kontakt · Zurich",
+    "eyebrow": "Kontakt · Züri",
     "title": "Da fangt dini Ziit aa.",
     "intro": "E Frag, e erschti Sitzig, e neui Möglichkeit. Red direkt mit em Matthew.",
     "email": "Em Matthew es E-Mail schriibe",
@@ -366,7 +367,7 @@
     "addressLabel": "S Studio",
     "address": "Rüdigerstrasse 7",
     "floor": "Erdgeschoss",
-    "city": "8045 Zürich, Switzerland",
+    "city": "8045 Zürich, Schwiiz",
     "near": "Bi Sihlcity · Nach Abmachig",
     "drive": "Mit em Auto cho",
     "chooseMap": "Din Wäg zu üs.",
@@ -375,7 +376,7 @@
     "apple": "Apple Maps",
     "googleHint": "Aafahrt i Google Maps",
     "appleHint": "Aafahrt i Apple Maps",
-    "mapLabel": "Healwell-Studio, Rüdigerstrasse 7, Zurich",
+    "mapLabel": "Healwell-Studio, Rüdigerstrasse 7, Züri",
     "route": "Vo Zürich HB zum Studio",
     "mapFallback": "De Standort uf de Charte aluege",
     "insurance": "Vo Chrankekasse anerkannt",
@@ -385,9 +386,9 @@
     "direct": "Es direkts Gspröch. E persönlichi Antwort."
   },
   "emotion": {
-    "eyebrow": "Ruum, zum du sälber sii",
+    "eyebrow": "Ruum, zum ganz du sälber z sii",
     "title": "Du muesch dini Träne nöd wegwüsche.",
-    "copy": "Träne sind da willkomme. Du muesch nüt zrugghalte, dini Gfühl nöd erkläre und dich nöd pressiere, zum wieder gfasst sii. Mängisch fangt Stärchi demit aa, dass mer üs erlaubt z fühle.",
+    "copy": "Träne sind da willkomme. Du muesch nüt zrugghalte, dini Gfühl nöd erkläre und dich nöd pressiere, zum wieder gfasst z sii. Mängisch fangt Stärchi demit aa, dass mer üs erlaubt z fühle.",
     "note": "Dis Tempo. Dis Wohlbefinde. Dini Entscheidig."
   },
   "enquiry": {
@@ -397,9 +398,9 @@
     "phone": "Telefonnummer (freiwillig)",
     "message": "Dini Nachricht",
     "note": "Für Termin und allgemeini Frage. Bitte kei medizinische oder andere sensible Date schicke.",
-    "consent": "Ich bi iiverstande, dass mini Date über FormSubmit a Matthew gönd.",
+    "consent": "Ich bi iiverstande, dass mini Date über FormSubmit zum Matthew gönd.",
     "send": "Nachricht schicke",
-    "received": "Dini Nachricht isch übermittelt. Matthew meldet sich persönlich bi dir.",
+    "received": "Dini Nachricht isch übermittlet. De Matthew meldet sich persönlich bi dir.",
     "mapControls": "Charte bediene",
     "zoomIn": "Vergrössere",
     "zoomOut": "Verchlinere",
@@ -407,10 +408,10 @@
   },
   "footer": {
     "line": "Veränderig fangt im Körper aa.",
-    "location": "Zurich, Schwiiz",
+    "location": "Züri, Schwiiz",
     "rights": "Matthew Hua",
     "privacy": "Dateschutz",
-    "privacyText": "Dini Sprachuswahl wird im Browser gspeicheret. Ton startet nur mit dim Iiverständnis. D Charte ladet OpenStreetMap-Date; debi werde Verbindigsdate übermittelt. Date us em Kontaktformular gönd a FormSubmit für de Spamfilter und de Versand a info@healwell.ch. Bitte kei medizinische oder sensible Date schicke. E-Mail, WhatsApp und Charte-Links öffned externi Dienscht.",
+    "privacyText": "Dini Spraachuswahl wird im Browser gspeicheret. Ton startet nur mit dim Iiverständnis. D Charte ladet OpenStreetMap-Date; debii wärded Verbindigsdate übermittlet. Date us em Kontaktformular gönd a FormSubmit für de Spamfilter und de Versand a info@healwell.ch. Bitte kei medizinische oder sensible Date schicke. E-Mail-, WhatsApp- und Charte-Links öffned externi Dienscht.",
     "backTop": "Zrugg nach obe"
   },
   "arrival": {
@@ -420,8 +421,39 @@
     "reveal": "Videosteuerig aazeige"
   },
   "seo": {
-    "title": "Matthew Hua | Therapeut für Veränderig | Zurich",
-    "description": "En persönliche Ruum für Lüüt mit eme aaspruchsvolle Alltag. Körperarbet, Atemarbet und Präzisionstechnologie, persönlich uf dich abgstimmt, bim Matthew Hua i Zurich."
+    "title": "Matthew Hua | Therapeut für Veränderig | Züri",
+    "description": "En private Rückzugsort für Lüüt mit eme aaspruchsvolle Alltag. Persönlichi Körperarbet, Atemarbet und Präzisionstechnologie bim Matthew Hua i Züri."
   },
-  "bio": {"title":"Matthew Hua | Links | Züri","description":"Schriib em Matthew Hua direkt, speicher sin Kontakt, lueg de Film vo de Europameisterschaft und entdeck di sechs Element vo sinere Praxis in Züri.","website":"Websiite","welcome":"Schön, bisch da.","links":"Kontakt und Links","whatsapp":"Em Matthew uf WhatsApp schriibe","whatsappDetail":"Mir finded en Termin, wo zu dir passt.","save":"Min Kontakt speichere","saveDetail":"De Matthew Hua zu dine Kontäkt hinzuefüege","call":"De Matthew aalüüte","email":"Es E-Mail schicke","subject":"Terminaafrog · matthewhua.ch","instagramDetail":"Momänt us de Praxis","facebookDetail":"In Kontakt bliibe","threadsDetail":"Gedanke und Gspröch","youtubeDetail":"Film us de Praxis","linkedinDetail":"Beruefliche Wäg","mapsDetail":"Bewärtige und Wägbeschriibig","wheelHint":"Tipp uf jedes Element, zum meh erfahre","studio":"Zum Studio.","farewell":"Ich freu mi, dich kännezlehre.","tapSound":"Für Ton tippe","more":"Meh Informatione","explore":"Uf de Websiite","fullscreen":"Im Vollbild aaluege","moreContact":"Meh Wäg zum Matthew","callTitle":"Wie wotsch aalüüte?","callPhone":"Telefonaaruef","callWhatsapp":"WhatsApp-Aaruef","callInvite":"Fanged mir mit emne Aaruef aa. Ich los dir zue."}
+  "bio": {
+    "title": "Matthew Hua | Links | Züri",
+    "description": "Schriib em Matthew Hua direkt, speicher sin Kontakt, lueg de Film vo de Europameischterschaft und entdeck di sächs Element vo sinere Praxis i Züri.",
+    "website": "Websiite",
+    "welcome": "Schön, bisch da.",
+    "links": "Kontakt und Links",
+    "whatsapp": "Em Matthew uf WhatsApp schriibe",
+    "whatsappDetail": "Mir finded en Termin, wo zu dir passt.",
+    "save": "Min Kontakt speichere",
+    "saveDetail": "De Matthew Hua zu dine Kontäkt hinzuefüege",
+    "call": "De Matthew aalüüte",
+    "email": "Es E-Mail schicke",
+    "subject": "Terminaafrog · matthewhua.ch",
+    "instagramDetail": "Momänt us de Praxis",
+    "facebookDetail": "In Kontakt bliibe",
+    "threadsDetail": "Gedanke und Gspröch",
+    "youtubeDetail": "Film us de Praxis",
+    "linkedinDetail": "Beruefliche Wäg",
+    "mapsDetail": "Bewärtige und Wägbeschriibig",
+    "wheelHint": "Tipp uf es Element, zum meh z erfahre",
+    "studio": "So findsch zum Studio.",
+    "farewell": "Ich freu mi, dich kännezlehre.",
+    "tapSound": "Ton iischalte",
+    "more": "Meh Informatione",
+    "explore": "Uf de Websiite",
+    "fullscreen": "Im Vollbild aaluege",
+    "moreContact": "Wiiteri Kontaktmöglichkeite",
+    "callTitle": "Wie wotsch aalüüte?",
+    "callPhone": "Telefonaaruef",
+    "callWhatsapp": "WhatsApp-Aaruef",
+    "callInvite": "Fanged mer mit eme Aaruef aa. Ich los der zue."
+  }
 }

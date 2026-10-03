@@ -26,8 +26,8 @@
     "archive": "Tư liệu",
     "contact": "Liên hệ",
     "inquiry": "Trao đổi riêng",
-    "menu": "Mở trình đơn",
-    "closeMenu": "Đóng trình đơn",
+    "menu": "Mở menu",
+    "closeMenu": "Đóng menu",
     "language": "Ngôn ngữ",
     "soundOn": "Tắt âm thanh",
     "soundOff": "Bật âm thanh",
@@ -37,8 +37,8 @@
     "next": "Tiếp theo",
     "back": "Quay lại",
     "close": "Đóng",
-    "play": "Phát phim",
-    "pause": "Tạm dừng phim",
+    "play": "Phát video",
+    "pause": "Tạm dừng video",
     "replay": "Xem lại",
     "discover": "Khám phá",
     "viewAll": "Xem tư liệu",
@@ -46,18 +46,18 @@
     "book": "Đặt lịch trị liệu",
     "readStory": "Câu chuyện của Matthew",
     "watchFilm": "Khơi lại ngọn lửa bên trong",
-    "minutes": "Một thước phim ngắn",
+    "minutes": "Một video ngắn",
     "scroll": "Khám phá",
     "loading": "Đang tải",
-    "mediaError": "Phim cần thêm một chút thời gian để tải. Bạn có thể mở trực tiếp.",
-    "openFilm": "Mở phim",
+    "mediaError": "Video cần thêm chút thời gian để tải. Bạn có thể mở trực tiếp.",
+    "openFilm": "Mở video",
     "imageAlt": "Matthew Hua cùng Tony Robbins",
     "photoCredit": "Ảnh từ bài viết chân dung Matthew",
     "contactLink": "Cùng trò chuyện",
     "homeLink": "Về trang chủ"
   },
   "home": {
-    "eyebrow": "Chuyên viên trị liệu chuyển hóa · Zurich",
+    "eyebrow": "Chuyên viên trị liệu chuyển hóa · Zürich",
     "title": "Matthew Hua",
     "headline": "Một không gian riêng giữa cuộc sống nhiều trọng trách.",
     "intro": "Trị liệu cơ thể, thực hành hơi thở và công nghệ chính xác, được điều chỉnh riêng cho người được công chúng quan tâm, doanh nhân và giới chuyên môn.",
@@ -70,28 +70,52 @@
     "methodCopy": "Tiếp xúc, hơi thở, nhiệt độ, sự chú tâm và chuyển động kết hợp theo nhu cầu của bạn. Điểm khởi đầu là cảm nhận của bạn. Buổi trị liệu được định hình từ đó.",
     "practiceLabel": "Trị liệu riêng",
     "practiceTitle": "Thời gian của bạn. Không gian của bạn.",
-    "practiceCopy": "Một cuộc gặp không vội vã tại Zurich, dành cho con người bạn phía sau những trách nhiệm.",
+    "practiceCopy": "Một cuộc gặp không vội vã tại Zürich, dành cho con người bạn phía sau những trách nhiệm.",
     "aboutLabel": "Con người phía sau phương pháp",
     "aboutTitle": "Một cuộc đời qua nhiều biên giới. Một cách trị liệu không theo khuôn mẫu.",
-    "aboutCopy": "Từ Vietnam đến Australia rồi Zurich, hành trình của Matthew đi qua sức khỏe cộng đồng, kỹ năng trị liệu bằng tay, giảng dạy và thi đấu quốc tế.",
-    "awardsLabel": "Sự ghi nhận từ thực hành",
+    "aboutCopy": "Từ Việt Nam đến Úc rồi Zürich, hành trình của Matthew đi qua sức khỏe cộng đồng, kỹ năng trị liệu bằng tay, giảng dạy và thi đấu quốc tế.",
+    "awardsLabel": "Giải thưởng",
     "awardRome": "Huy chương vàng hạng mục châu Âu",
-    "awardGermany": "Huy chương vàng tự do phương Đông",
-    "awardSwiss": "Vô địch Thụy Sĩ nội dung tự do",
+    "awardGermany": "Huy chương vàng Eastern Freestyle",
+    "awardSwiss": "Vô địch Thụy Sĩ nội dung freestyle",
     "awardJury": "Giám khảo và giảng viên quốc tế",
-    "closing": "Dành chỗ cho chính mình."
+    "closing": "Dành thời gian cho chính mình."
   },
   "method": {
     "eyebrow": "Phương pháp trị liệu chuyển hóa",
     "title": "Sáu yếu tố. Một phương pháp.",
     "intro": "Một cách tiếp cận kết nối cảm nhận, chuyển động và cách bạn đón nhận hiện tại. Mỗi yếu tố đều có vai trò riêng. Buổi trị liệu kết hợp những gì phù hợp với bạn.",
     "elements": [
-      {"name": "Tư duy", "line": "Điều ta chú ý định hình điều ta trải nghiệm.", "copy": "Lời mời khám phá sự chú tâm, góc nhìn và cách ta phản ứng. Hãy bắt đầu bằng một thử nghiệm nhỏ."},
-      {"name": "Nóng / Lạnh", "line": "Đón nhận hiện tại với sự bình tâm.", "copy": "Trải nghiệm nhiệt độ có hướng dẫn đưa sự chú ý về hiện tại. Quá trình này được định hình bởi sự chuẩn bị, mức độ phù hợp với từng người và sự đồng hành vững vàng."},
-      {"name": "Thực hành hơi thở", "line": "Trở về với hơi thở.", "copy": "Khám phá hơi thở và nhận biết cơ thể dưới sự hướng dẫn của Matthew, dựa trên quá trình đào tạo giảng viên Wim Hof Method và Oxygen Advantage của anh."},
-      {"name": "Cơ thể", "line": "Một cuộc trò chuyện qua tiếp xúc.", "copy": "Các kỹ thuật massage cổ điển, Thái, Trung Hoa, Bali, Shiatsu và thể thao hòa vào một phong cách trị liệu linh hoạt, mang dấu ấn riêng. Tiếp xúc và chuyển động được điều chỉnh theo người đang nằm trên giường trị liệu."},
-      {"name": "Chuyển động", "line": "Chủ động kết nối với cơ thể.", "copy": "Các bài tập có hỗ trợ, sự linh hoạt và niềm tò mò về cảm nhận cơ thể hằng ngày. Khám phá cách bạn chuyển động và nơi cơ thể có thể trở nên thoải mái hơn."},
-      {"name": "Cộng đồng", "line": "Thực hành là điều ta có thể chia sẻ.", "copy": "Các buổi thực hành nhóm và trải nghiệm chung tạo không gian để cùng học hỏi. Matthew đưa kinh nghiệm về sức khỏe cộng đồng vào cách giảng dạy và kết nối."}
+      {
+        "name": "Tư duy",
+        "line": "Điều ta chú ý định hình điều ta trải nghiệm.",
+        "copy": "Lời mời khám phá sự chú tâm, góc nhìn và cách ta phản ứng. Hãy bắt đầu bằng một thử nghiệm nhỏ."
+      },
+      {
+        "name": "Nóng / Lạnh",
+        "line": "Đón nhận hiện tại với sự bình tâm.",
+        "copy": "Trải nghiệm nhiệt độ có hướng dẫn đưa sự chú ý về hiện tại. Quá trình này được định hình bởi sự chuẩn bị, mức độ phù hợp với từng người và sự đồng hành vững vàng."
+      },
+      {
+        "name": "Thực hành hơi thở",
+        "line": "Trở về với hơi thở.",
+        "copy": "Khám phá hơi thở và nhận biết cơ thể dưới sự hướng dẫn của Matthew, dựa trên quá trình đào tạo giảng viên Wim Hof Method và Oxygen Advantage của anh."
+      },
+      {
+        "name": "Cơ thể",
+        "line": "Một cuộc trò chuyện qua tiếp xúc.",
+        "copy": "Các kỹ thuật massage cổ điển, Thái, Trung Hoa, Bali, Shiatsu và thể thao hòa vào một phong cách trị liệu linh hoạt, mang dấu ấn riêng. Tiếp xúc và chuyển động được điều chỉnh theo người đang nằm trên giường trị liệu."
+      },
+      {
+        "name": "Chuyển động",
+        "line": "Chủ động kết nối với cơ thể.",
+        "copy": "Các bài tập có hỗ trợ, sự linh hoạt và niềm tò mò về cảm nhận cơ thể hằng ngày. Khám phá cách bạn chuyển động và nơi cơ thể có thể trở nên thoải mái hơn."
+      },
+      {
+        "name": "Cộng đồng",
+        "line": "Thực hành là điều ta có thể chia sẻ.",
+        "copy": "Các buổi thực hành nhóm và trải nghiệm chung tạo không gian để cùng học hỏi. Matthew đưa kinh nghiệm về sức khỏe cộng đồng vào cách giảng dạy và kết nối."
+      }
     ],
     "technologyLabel": "Đôi tay và thiết bị",
     "technologyTitle": "Chính xác, vẫn gần gũi.",
@@ -100,14 +124,22 @@
     "releaseTitle": "Release Cutter",
     "releaseLine": "Đôi tay vẫn ở vị trí trung tâm.",
     "releaseCopy": "Kích thích điện được truyền qua găng tay tiếp dẫn do chuyên viên đeo. Cách tiếp cận có thiết bị hỗ trợ này giữ sự tiếp xúc và chú tâm của chuyên viên trong suốt buổi trị liệu.",
-    "zimmerLabel": "Zimmer · Germany",
+    "zimmerLabel": "Zimmer · Đức",
     "zimmerTitle": "Soleo SonoStim",
     "zimmerLine": "Thiết bị được sử dụng có cân nhắc.",
     "zimmerCopy": "Dòng Soleo đưa siêu âm và điện trị liệu vào buổi trị liệu có giám sát. Cách ứng dụng và thông số được lựa chọn theo cấu hình thiết bị và từng người.",
     "handsTitle": "Đôi tay biết lắng nghe.",
-    "handsItems": ["Tiếp xúc chú tâm, điều chỉnh theo phản hồi", "Nhịp tiếp xúc và chuyển động phù hợp với từng người", "Chuyên viên trực tiếp tham gia xuyên suốt"],
+    "handsItems": [
+      "Tiếp xúc chú tâm, điều chỉnh theo phản hồi",
+      "Nhịp tiếp xúc và chuyển động phù hợp với từng người",
+      "Chuyên viên trực tiếp tham gia xuyên suốt"
+    ],
     "instrumentsTitle": "Thiết bị hỗ trợ.",
-    "instrumentsItems": ["Nhiều lựa chọn ứng dụng hơn", "Thông số được chọn cho từng người", "Công nghệ do chuyên viên hướng dẫn"],
+    "instrumentsItems": [
+      "Nhiều lựa chọn ứng dụng hơn",
+      "Thông số được chọn cho từng người",
+      "Công nghệ do chuyên viên hướng dẫn"
+    ],
     "techNote": "Phương pháp và việc sử dụng thiết bị được trao đổi riêng trước buổi trị liệu.",
     "nextPage": "Tìm hiểu trị liệu riêng"
   },
@@ -116,7 +148,7 @@
     "title": "Một thử nghiệm về sự chú ý.",
     "intro": "Điều bạn tìm kiếm định hình điều bạn ghi nhớ.",
     "introSub": "Một thử nghiệm trí nhớ ngắn. Rồi một khoảnh khắc để suy ngẫm.",
-    "begin":"Thử ngay thí nghiệm này!",
+    "begin": "Bắt đầu thử nghiệm",
     "memorize": "Ghi nhớ vị trí các tín hiệu màu xanh dương.",
     "memorizeSub": "Bạn sẽ được yêu cầu tìm lại chúng theo trí nhớ.",
     "recall": "Ba tín hiệu màu xanh dương ở đâu?",
@@ -125,14 +157,14 @@
     "selected": "Đã chọn {count} trên 3 vị trí",
     "confirm": "Tiếp tục",
     "red": "Còn tín hiệu màu đỏ ở đâu?",
-    "redSub": "Chọn một trong bốn phần của vùng hiển thị, hoặc cho biết bạn không chắc.",
+    "redSub": "Chọn một trong bốn góc, hoặc cho biết bạn không chắc.",
     "tl": "Trên bên trái",
     "tr": "Trên bên phải",
     "bl": "Dưới bên trái",
     "br": "Dưới bên phải",
     "unknown": "Tôi không chắc",
     "caught": "Bạn đã nhận ra.",
-    "missed": "Tín hiệu ấy cũng ở đó.",
+    "missed": "Nó vẫn luôn ở đó.",
     "revealCopy": "Các tín hiệu màu xanh dương đã thu hút sự chú ý của bạn. Tín hiệu màu đỏ nằm ở phần tư phía dưới bên phải.",
     "score": "Bạn nhớ được {count} trong 3 vị trí màu xanh dương.",
     "focusTitle": "Chú ý ở đâu, năng lượng hướng về đó.",
@@ -143,90 +175,190 @@
     "integrationCopy": "Qua hơi thở, tiếp xúc, hơi ấm, chuyển động và sự hiện diện, Matthew mời bạn chú tâm đến cơ thể theo một cách khác.",
     "finalTitle": "Tập trung ở đâu, năng lượng hướng về đó.",
     "finalCopy": "Tony Robbins từ lâu đã ảnh hưởng đến sự quan tâm của Matthew đối với phát triển bản thân. Cuộc gặp của họ là một phần trong hành trình học hỏi và thực hành dài lâu.",
-    "replay": "Thử lại","continueOn":"Cùng tiếp tục",
+    "replay": "Thử lại",
+    "continueOn": "Cùng tiếp tục",
     "next": "Tiếp theo",
-    "labels": ["vấn đề", "căng thẳng", "điều chưa ổn", "hơi thở", "lòng biết ơn", "sự hỗ trợ", "thành quả nhỏ"],
+    "labels": [
+      "vấn đề",
+      "căng thẳng",
+      "điều chưa ổn",
+      "hơi thở",
+      "lòng biết ơn",
+      "sự hỗ trợ",
+      "thành quả nhỏ"
+    ],
     "paused": "Đã tạm dừng khi bạn rời đi.",
     "fieldLabel": "Thử nghiệm sự chú ý: mười hai vị trí tín hiệu",
     "progressLabel": "Tiến độ thử nghiệm"
   },
   "practice": {
-    "eyebrow": "Trị liệu riêng · Zurich",
+    "eyebrow": "Trị liệu riêng · Zürich",
     "title": "Không gian cho chính bạn, phía sau mọi vai trò.",
     "intro": "Công việc, trách nhiệm, nhịp sống của bạn. Ở đây, sự chú tâm trở về với chính bạn.",
     "principles": [
-      {"title": "Sự quan tâm riêng", "copy": "Bắt đầu bằng cuộc trò chuyện về cảm nhận của bạn và điều đưa bạn đến đây. Buổi trị liệu được định hình từ cuộc gặp ấy."},
-      {"title": "Kín đáo", "copy": "Một không gian riêng tư, chu đáo cho người được công chúng quan tâm, doanh nhân và giới chuyên môn coi trọng cách tiếp cận dành riêng cho mình."},
-      {"title": "Trị liệu kết hợp", "copy": "Trị liệu cơ thể, hơi thở, tư duy, chuyển động và công nghệ được lựa chọn có thể cùng hiện diện trong một buổi trị liệu được cân nhắc kỹ."}
+      {
+        "title": "Sự quan tâm riêng",
+        "copy": "Bắt đầu bằng cuộc trò chuyện về cảm nhận của bạn và điều đưa bạn đến đây. Buổi trị liệu được định hình từ cuộc gặp ấy."
+      },
+      {
+        "title": "Kín đáo",
+        "copy": "Một không gian riêng tư, chu đáo cho người được công chúng quan tâm, doanh nhân và giới chuyên môn coi trọng cách tiếp cận dành riêng cho mình."
+      },
+      {
+        "title": "Trị liệu kết hợp",
+        "copy": "Trị liệu cơ thể, hơi thở, tư duy, chuyển động và công nghệ được lựa chọn có thể cùng hiện diện trong một buổi trị liệu được cân nhắc kỹ."
+      }
     ],
     "processLabel": "Lần đầu đến đây",
     "processTitle": "Trò chuyện. Trị liệu. Thời gian để cảm nhận.",
     "steps": [
-      {"title": "Kết nối", "copy": "Liên hệ trực tiếp với Matthew để trao đổi về nhu cầu, thời gian phù hợp và mọi câu hỏi trước khi đặt lịch."},
-      {"title": "Đến studio", "copy": "Tại studio gần Sihlcity, dành một chút thời gian để ổn định. Cùng trao đổi về trọng tâm và thống nhất cách tiếp cận."},
-      {"title": "Trải nghiệm", "copy": "Buổi trị liệu tiến triển theo phản hồi của bạn. Sự tiếp xúc, nhịp độ và cường độ luôn được trao đổi trong suốt quá trình."},
-      {"title": "Tiếp nối", "copy": "Nhìn lại cảm nhận của bạn và cùng trao đổi xem những buổi trị liệu tiếp theo hoặc buổi thực hành nhóm có phù hợp không."}
+      {
+        "title": "Kết nối",
+        "copy": "Liên hệ trực tiếp với Matthew để trao đổi về nhu cầu, thời gian phù hợp và mọi câu hỏi trước khi đặt lịch."
+      },
+      {
+        "title": "Đến studio",
+        "copy": "Tại studio gần Sihlcity, dành một chút thời gian để ổn định. Cùng trao đổi về trọng tâm và thống nhất cách tiếp cận."
+      },
+      {
+        "title": "Trải nghiệm",
+        "copy": "Buổi trị liệu tiến triển theo phản hồi của bạn. Sự tiếp xúc, nhịp độ và cường độ luôn được trao đổi trong suốt quá trình."
+      },
+      {
+        "title": "Tiếp nối",
+        "copy": "Nhìn lại cảm nhận của bạn và cùng trao đổi xem những buổi trị liệu tiếp theo hoặc buổi thực hành nhóm có phù hợp không."
+      }
     ],
     "faqTitle": "Trước khi gặp nhau",
     "faqs": [
-      {"q": "Tôi đặt lịch trị liệu thế nào?", "a": "Gửi email đến info@healwell.ch hoặc liên hệ với Matthew qua WhatsApp theo số +41 76 506 74 88. Lịch hẹn, thời lượng và chi phí được thống nhất trực tiếp."},
-      {"q": "Trị liệu có được bảo hiểm y tế công nhận không?", "a": "Matthew đã đăng ký EMR cho năm phương pháp. Việc hoàn trả chi phí phụ thuộc vào bảo hiểm bổ sung, phương pháp và điều khoản hợp đồng của bạn. Vui lòng kiểm tra phạm vi bảo hiểm với đơn vị bảo hiểm trước khi đặt lịch."},
-      {"q": "Buổi trị liệu diễn ra ở đâu?", "a": "Studio Healwell ở Rüdigerstrasse 7, Ground Floor, 8045 Zürich, gần Sihlcity. Trang Liên hệ có hướng dẫn đường đi."},
-      {"q": "Có thể dùng ngôn ngữ nào trong buổi trị liệu?", "a": "Ngôn ngữ làm việc là tiếng Anh và tiếng Đức; Matthew cũng biết một ít tiếng Quan Thoại. Website có mười ngôn ngữ. Khi liên hệ, vui lòng trao đổi về ngôn ngữ bạn muốn sử dụng trong buổi trị liệu."}
+      {
+        "q": "Tôi đặt lịch trị liệu thế nào?",
+        "a": "Gửi email đến info@healwell.ch hoặc liên hệ với Matthew qua WhatsApp theo số +41 76 506 74 88. Lịch hẹn, thời lượng và chi phí được thống nhất trực tiếp."
+      },
+      {
+        "q": "Trị liệu có được bảo hiểm y tế công nhận không?",
+        "a": "Matthew đã đăng ký EMR cho năm phương pháp. Việc hoàn trả chi phí phụ thuộc vào bảo hiểm bổ sung, phương pháp và điều khoản hợp đồng của bạn. Vui lòng kiểm tra phạm vi bảo hiểm với đơn vị bảo hiểm trước khi đặt lịch."
+      },
+      {
+        "q": "Buổi trị liệu diễn ra ở đâu?",
+        "a": "Studio Healwell ở Rüdigerstrasse 7, tầng trệt, 8045 Zürich, gần Sihlcity. Trang Liên hệ có hướng dẫn đường đi."
+      },
+      {
+        "q": "Có thể dùng ngôn ngữ nào trong buổi trị liệu?",
+        "a": "Ngôn ngữ làm việc là tiếng Anh và tiếng Đức; Matthew cũng biết một ít tiếng Quan Thoại. Website có mười ngôn ngữ. Khi liên hệ, vui lòng trao đổi về ngôn ngữ bạn muốn sử dụng trong buổi trị liệu."
+      }
     ],
     "closing": "Bắt đầu bằng một cuộc trò chuyện."
   },
   "about": {
     "eyebrow": "Về Matthew",
     "title": "Một cuộc đời luôn chuyển động.",
-    "intro": "Sinh ra tại Vietnam. Lớn lên ở Australia. Hành nghề tại Zurich. Một cuộc đời học hỏi, phụng sự và rèn luyện đôi tay.",
+    "intro": "Sinh ra tại Việt Nam. Lớn lên ở Úc. Làm việc tại Zürich. Một cuộc đời học hỏi, giúp đỡ người khác và rèn luyện đôi tay.",
     "quote": "Tôi thực hành buông bỏ.",
     "quoteBy": "Matthew Hua",
     "chapters": [
-      {"label": "01 / Giữa những bờ xa", "title": "Một góc nhìn rộng mở.", "copy": "Matthew cùng gia đình rời Vietnam bằng thuyền và đến Australia khi còn nhỏ. Tại Sydney, anh bắt đầu biết đến thiền trong những năm thiếu niên. Sau đó là công việc về sức khỏe cộng đồng và việc học Khoa học xã hội cùng Quốc tế học tại University of Technology Sydney."},
-      {"label": "02 / Ngôn ngữ của tiếp xúc", "title": "Học hỏi bằng đôi tay.", "copy": "Anh bắt đầu học massage tại Sydney năm 1997, rồi tiếp tục ở Guangzhou và Zurich. Các kỹ thuật cổ điển, Trung Hoa, Bali, Thái, Shiatsu và thể thao dần hòa vào một phong cách linh hoạt, mang dấu ấn riêng. Healwell trở thành nơi anh phát triển phương pháp ấy tại Zurich."},
-      {"label": "03 / Bước ra ngoài điều quen thuộc", "title": "Người dạy vẫn tiếp tục thực hành.", "copy": "Là giảng viên Wim Hof Method cấp cao và giảng viên thực hành hơi thở Oxygen Advantage, Matthew tiếp tục khám phá những phương pháp mình giảng dạy. Anh từng đi bộ đường dài vào mùa đông cùng Wim Hof, hỗ trợ các buổi thực hành tại Sweden và chạy marathon chân trần ở Zurich."},
-      {"label": "04 / Truyền lại kinh nghiệm", "title": "Từ giường trị liệu đến đấu trường quốc tế.", "copy": "Thi đấu mang về cho anh huy chương vàng tự do Thụy Sĩ, huy chương vàng tự do phương Đông tại Germany và huy chương vàng châu Âu hạng mục cảm hứng châu Á / Nuad Thai ở Rome. Đến năm 2026, hoạt động quốc tế của anh bao gồm vai trò giám khảo phản hồi tại giải châu Âu gần Paris và được mời làm giám khảo ở Tokyo."}
+      {
+        "label": "01 / Giữa những bờ xa",
+        "title": "Một góc nhìn rộng mở.",
+        "copy": "Matthew cùng gia đình rời Việt Nam bằng thuyền và đến Úc khi còn nhỏ. Tại Sydney, anh bắt đầu biết đến thiền trong những năm thiếu niên. Sau đó là công việc về sức khỏe cộng đồng và việc học Khoa học xã hội cùng Quốc tế học tại University of Technology Sydney."
+      },
+      {
+        "label": "02 / Ngôn ngữ của tiếp xúc",
+        "title": "Học hỏi bằng đôi tay.",
+        "copy": "Anh bắt đầu học massage tại Sydney năm 1997, rồi tiếp tục ở Quảng Châu và Zürich. Các kỹ thuật cổ điển, Trung Hoa, Bali, Thái, Shiatsu và thể thao dần hòa vào một phong cách linh hoạt, mang dấu ấn riêng. Healwell trở thành nơi anh phát triển phương pháp ấy tại Zürich."
+      },
+      {
+        "label": "03 / Bước ra ngoài điều quen thuộc",
+        "title": "Người dạy vẫn tiếp tục thực hành.",
+        "copy": "Là giảng viên Wim Hof Method cấp cao và giảng viên thực hành hơi thở Oxygen Advantage, Matthew tiếp tục khám phá những phương pháp mình giảng dạy. Anh từng đi bộ đường dài vào mùa đông cùng Wim Hof, hỗ trợ các buổi thực hành tại Thụy Điển và chạy marathon chân trần ở Zürich."
+      },
+      {
+        "label": "04 / Truyền lại kinh nghiệm",
+        "title": "Từ giường trị liệu đến đấu trường quốc tế.",
+        "copy": "Thi đấu mang về cho anh huy chương vàng freestyle Thụy Sĩ, huy chương vàng Eastern Freestyle tại Đức và huy chương vàng châu Âu hạng mục Asian Inspired / Nuad Thai ở Rome. Đến năm 2026, hoạt động quốc tế của anh bao gồm vai trò giám khảo phản hồi tại giải châu Âu gần Paris và được mời làm giám khảo ở Tokyo."
+      }
     ],
     "timelineTitle": "Một phương pháp dần thành hình.",
     "timeline": [
-      {"year": "1997", "text": "Bắt đầu học massage tại Sydney."},
-      {"year": "2017", "text": "Healwell được thành lập tại Zurich; câu chuyện thương hiệu bắt đầu được chia sẻ rộng rãi từ năm 2018."},
-      {"year": "2021", "text": "Đăng ký EMR cho năm phương pháp được công nhận."},
-      {"year": "2022", "text": "Nhận chứng nhận giảng viên Wim Hof Method."},
-      {"year": "2023", "text": "Huy chương vàng tự do Thụy Sĩ; huy chương vàng và bạc tại Universal Massage Championship ở Germany."},
-      {"year": "2024", "text": "Huy chương vàng hạng mục châu Âu tại Rome; tham gia hoạt động của studio VAULT ở Zurich."},
-      {"year": "2026", "text": "Làm giám khảo quốc tế, đưa ra phản hồi chuyên môn và hướng dẫn người hành nghề."}
+      {
+        "year": "1997",
+        "text": "Bắt đầu học massage tại Sydney."
+      },
+      {
+        "year": "2017",
+        "text": "Healwell được thành lập tại Zürich; câu chuyện thương hiệu bắt đầu được chia sẻ rộng rãi từ năm 2018."
+      },
+      {
+        "year": "2021",
+        "text": "Đăng ký EMR cho năm phương pháp được công nhận."
+      },
+      {
+        "year": "2022",
+        "text": "Nhận chứng nhận giảng viên Wim Hof Method."
+      },
+      {
+        "year": "2023",
+        "text": "Huy chương vàng freestyle Thụy Sĩ; huy chương vàng và bạc tại Universal Massage Championship ở Đức."
+      },
+      {
+        "year": "2024",
+        "text": "Huy chương vàng hạng mục châu Âu tại Rome; tham gia hoạt động của studio VAULT ở Zürich."
+      },
+      {
+        "year": "2026",
+        "text": "Làm giám khảo quốc tế, đưa ra phản hồi chuyên môn và hướng dẫn người hành nghề."
+      }
     ],
     "foundationTitle": "Tay nghề có nền tảng.",
     "foundationCopy": "Các phương pháp của anh được EMR công nhận gồm massage trị liệu, massage cổ điển, phản xạ bàn chân, dẫn lưu bạch huyết bằng tay và luyện tập thư giãn tự sinh. Việc học hỏi liên tục và trao đổi quốc tế bổ sung cho nền tảng này.",
     "tonyTitle": "Ảnh hưởng và cuộc gặp.",
     "tonyCopy": "Tony Robbins đã ảnh hưởng đến sự quan tâm của Matthew đối với phát triển bản thân trong hơn 35 năm. Cuộc gặp của họ là một phần trong quá trình tiếp tục khám phá sự chú ý, trách nhiệm cá nhân và cách ta đón nhận trải nghiệm.",
-    "todayTitle": "Gắn bó với Zurich. Rộng mở với thế giới.",
-    "todayCopy": "Bên cạnh Healwell, công việc của Matthew còn gắn với VAULT tại Zurich. Giảng dạy, hợp tác thực hành và trao đổi quốc tế tiếp tục mang những góc nhìn mới về studio."
+    "todayTitle": "Gắn bó với Zürich. Rộng mở với thế giới.",
+    "todayCopy": "Bên cạnh Healwell, công việc của Matthew còn gắn với VAULT tại Zürich. Giảng dạy, hợp tác thực hành và trao đổi quốc tế tiếp tục mang những góc nhìn mới về studio."
   },
   "archive": {
     "eyebrow": "Tư liệu",
     "title": "Thực hành qua từng chuyển động.",
     "intro": "Những khoảnh khắc bên giường trị liệu, trên sân khấu và trong hành trình học hỏi không ngừng.",
     "all": "Tất cả khoảnh khắc",
-    "films": "Phim",
+    "films": "Video",
     "recognition": "Sự ghi nhận",
     "practice": "Thực hành",
     "items": [
-      {"title": "Giải vô địch châu Âu", "caption": "Rome, 2024 · Huy chương vàng, cảm hứng châu Á / Nuad Thai"},
-      {"title": "Champ of the Champs", "caption": "Penzberg, 2023 · Đấu trường quốc tế"},
-      {"title": "Lời khuyên từ giám khảo", "caption": "Quan sát, phản hồi và thế hệ tiếp nối"},
-      {"title": "Khơi lại ngọn lửa bên trong", "caption": "Phim ngắn về thực hành và những khả năng mới"},
-      {"title": "Sự ghi nhận tại Switzerland", "caption": "Một khoảnh khắc trong hành trình thi đấu của Matthew"},
-      {"title": "Champ of the Champs", "caption": "Cùng chia sẻ thành quả tại Champ of the Champs"},
-      {"title": "Trên bục nhận giải tại Switzerland", "caption": "Giải vô địch massage Thụy Sĩ · Fribourg, 2023."}
+      {
+        "title": "Giải vô địch châu Âu",
+        "caption": "Rome, 2024 · Huy chương vàng, Asian Inspired / Nuad Thai"
+      },
+      {
+        "title": "Champ of the Champs",
+        "caption": "Penzberg, 2023 · Đấu trường quốc tế"
+      },
+      {
+        "title": "Lời khuyên từ giám khảo",
+        "caption": "Quan sát, phản hồi và thế hệ tiếp nối"
+      },
+      {
+        "title": "Khơi lại ngọn lửa bên trong",
+        "caption": "Phim ngắn về thực hành và những khả năng mới"
+      },
+      {
+        "title": "Sự ghi nhận tại Thụy Sĩ",
+        "caption": "Một khoảnh khắc trong hành trình thi đấu của Matthew"
+      },
+      {
+        "title": "Champ of the Champs",
+        "caption": "Cùng chia sẻ thành quả tại Champ of the Champs"
+      },
+      {
+        "title": "Trên bục nhận giải tại Thụy Sĩ",
+        "caption": "Giải vô địch massage Thụy Sĩ · Fribourg, 2023."
+      }
     ],
     "previous": "Khoảnh khắc trước",
     "next": "Khoảnh khắc tiếp theo"
   },
   "contact": {
-    "eyebrow": "Liên hệ · Zurich",
+    "eyebrow": "Liên hệ · Zürich",
     "title": "Thời gian cho bạn bắt đầu từ đây.",
     "intro": "Một câu hỏi, buổi trị liệu đầu tiên, một khả năng mới. Hãy trao đổi trực tiếp với Matthew.",
     "email": "Gửi email cho Matthew",
@@ -235,7 +367,7 @@
     "addressLabel": "Studio",
     "address": "Rüdigerstrasse 7",
     "floor": "Tầng trệt",
-    "city": "8045 Zürich, Switzerland",
+    "city": "8045 Zürich, Thụy Sĩ",
     "near": "Gần Sihlcity · Theo lịch hẹn",
     "drive": "Lái xe đến đây",
     "chooseMap": "Đường đến studio.",
@@ -244,7 +376,7 @@
     "apple": "Apple Maps",
     "googleHint": "Xem đường đi trên Google Maps",
     "appleHint": "Xem đường đi trên Apple Maps",
-    "mapLabel": "Studio Healwell, Rüdigerstrasse 7, Zurich",
+    "mapLabel": "Studio Healwell, Rüdigerstrasse 7, Zürich",
     "route": "Từ Zürich HB đến studio",
     "mapFallback": "Xem vị trí trên bản đồ",
     "insurance": "Được bảo hiểm y tế công nhận",
@@ -257,7 +389,7 @@
     "eyebrow": "Không gian để là chính mình",
     "title": "Không cần vội lau nước mắt.",
     "copy": "Ở đây, bạn có thể khóc. Không cần kìm nén mọi thứ, giải thích cảm xúc hay vội lấy lại bình tĩnh. Đôi khi, sức mạnh bắt đầu từ việc cho phép mình cảm nhận.",
-    "note": "Theo nhịp của bạn. Theo sự thoải mái của bạn. Do bạn lựa chọn."
+    "note": "Theo nhịp của bạn. Theo cách của bạn. Bạn quyết định."
   },
   "enquiry": {
     "title": "Bắt đầu bằng một cuộc trò chuyện.",
@@ -276,7 +408,7 @@
   },
   "footer": {
     "line": "Chuyển hóa bắt đầu từ cơ thể.",
-    "location": "Zurich, Switzerland",
+    "location": "Zürich, Thụy Sĩ",
     "rights": "Matthew Hua",
     "privacy": "Quyền riêng tư",
     "privacyText": "Lựa chọn ngôn ngữ được lưu trong trình duyệt. Âm thanh chỉ phát khi bạn đồng ý. Bản đồ tải dữ liệu từ OpenStreetMap và truyền thông tin kết nối. Thông tin trong biểu mẫu được gửi tới FormSubmit để lọc thư rác và chuyển qua email tới info@healwell.ch. Vui lòng không gửi thông tin y tế hay dữ liệu nhạy cảm. Liên kết email, WhatsApp và chỉ đường mở các dịch vụ bên ngoài.",
@@ -289,8 +421,39 @@
     "reveal": "Hiện các nút điều khiển video"
   },
   "seo": {
-    "title": "Matthew Hua | Chuyên viên trị liệu chuyển hóa | Zurich",
-    "description": "Không gian riêng giữa cuộc sống nhiều trọng trách. Trị liệu cơ thể, thực hành hơi thở và công nghệ chính xác dành riêng cho bạn cùng Matthew Hua tại Zurich."
+    "title": "Matthew Hua | Chuyên viên trị liệu chuyển hóa | Zürich",
+    "description": "Không gian riêng giữa cuộc sống nhiều trọng trách. Trị liệu cơ thể, thực hành hơi thở và công nghệ chính xác dành riêng cho bạn cùng Matthew Hua tại Zürich."
   },
-  "bio": {"title":"Matthew Hua | Liên kết | Zurich","description":"Liên hệ trực tiếp với Matthew Hua, lưu thông tin liên lạc, xem phim Giải vô địch châu Âu và khám phá sáu yếu tố trong phương pháp của anh tại Zurich.","website":"Trang web","welcome":"Rất vui được gặp bạn ở đây.","links":"Liên hệ và liên kết","whatsapp":"Nhắn tin cho Matthew qua WhatsApp","whatsappDetail":"Cùng tìm thời gian phù hợp với bạn.","save":"Lưu liên hệ của tôi","saveDetail":"Thêm Matthew Hua vào danh bạ","call":"Gọi cho Matthew","email":"Gửi email","subject":"Đặt lịch hẹn · matthewhua.ch","instagramDetail":"Khoảnh khắc từ phòng trị liệu","facebookDetail":"Giữ liên lạc","threadsDetail":"Suy nghĩ và trò chuyện","youtubeDetail":"Phim từ phòng trị liệu","linkedinDetail":"Quá trình làm nghề","mapsDetail":"Đánh giá và chỉ đường","wheelHint":"Chạm vào từng yếu tố để tìm hiểu thêm","studio":"Tìm đến phòng trị liệu.","farewell":"Mong được gặp bạn.","tapSound":"Chạm để bật âm thanh","more":"Thêm thông tin","explore":"Trên trang web","fullscreen":"Xem toàn màn hình","moreContact":"Thêm cách liên hệ Matthew","callTitle":"Bạn muốn gọi bằng cách nào?","callPhone":"Gọi điện thoại","callWhatsapp":"Gọi qua WhatsApp","callInvite":"Hãy bắt đầu bằng một cuộc gọi. Tôi ở đây để lắng nghe."}
+  "bio": {
+    "title": "Matthew Hua | Liên kết | Zürich",
+    "description": "Liên hệ trực tiếp với Matthew Hua, lưu thông tin liên lạc, xem video Giải vô địch châu Âu và khám phá sáu yếu tố trong phương pháp của anh tại Zürich.",
+    "website": "Trang web",
+    "welcome": "Rất vui được gặp bạn ở đây.",
+    "links": "Liên hệ và liên kết",
+    "whatsapp": "Nhắn tin cho Matthew qua WhatsApp",
+    "whatsappDetail": "Cùng tìm thời gian phù hợp với bạn.",
+    "save": "Lưu liên hệ của tôi",
+    "saveDetail": "Thêm Matthew Hua vào danh bạ",
+    "call": "Gọi cho Matthew",
+    "email": "Gửi email",
+    "subject": "Đặt lịch hẹn · matthewhua.ch",
+    "instagramDetail": "Khoảnh khắc từ phòng trị liệu",
+    "facebookDetail": "Giữ liên lạc",
+    "threadsDetail": "Suy nghĩ và trò chuyện",
+    "youtubeDetail": "Video từ phòng trị liệu",
+    "linkedinDetail": "Quá trình làm nghề",
+    "mapsDetail": "Đánh giá và chỉ đường",
+    "wheelHint": "Chạm vào từng yếu tố để tìm hiểu thêm",
+    "studio": "Tìm đến phòng trị liệu.",
+    "farewell": "Mong được gặp bạn.",
+    "tapSound": "Bật âm thanh",
+    "more": "Thêm thông tin",
+    "explore": "Trên trang web",
+    "fullscreen": "Xem toàn màn hình",
+    "moreContact": "Cách liên hệ khác",
+    "callTitle": "Bạn muốn gọi bằng cách nào?",
+    "callPhone": "Gọi điện thoại",
+    "callWhatsapp": "Gọi qua WhatsApp",
+    "callInvite": "Hãy bắt đầu bằng một cuộc gọi. Tôi ở đây để lắng nghe."
+  }
 }
