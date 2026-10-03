@@ -22,7 +22,7 @@ export const ELEMENT_TINTS=[['#ff7cc0','#c81d77'],['#8fdcff','#ffb35c'],['#9fe7f
 // Matthew's own brand marks: flat, solid forms in each platform's colour (currentColor),
 // with cut-outs in the card's glass colour (.g-cut), no containers.
 const glyph=body=>`<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">${body}</svg>`;
-const GLYPHS={
+export const GLYPHS={
   whatsapp:glyph('<path fill="currentColor" d="M12 2.4a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.9-1.3A9.5 9.5 0 1 0 12 2.4z"/><path class="g-cut" d="M9.3 7.3c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.2 3.5 5.5 4.8 2.7 1.1 3.3.9 3.9.8.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4l-2-1c-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6z"/>'),
   contact:glyph('<rect x="2.5" y="4.6" width="19" height="14.8" rx="3.4" fill="currentColor"/><circle class="g-cut" cx="8.6" cy="10.4" r="2.3"/><path class="g-cut" d="M4.9 16.3c.5-2 2-3.1 3.7-3.1s3.2 1.1 3.7 3.1z"/><rect class="g-cut" x="13.6" y="9" width="5.4" height="1.7" rx=".85"/><rect class="g-cut" x="13.6" y="12.4" width="3.8" height="1.7" rx=".85" opacity=".7"/>'),
   phone:glyph('<path fill="currentColor" d="M6.7 3.1c.5-.4 1.3-.3 1.7.2l2.2 2.8c.4.5.4 1.2 0 1.7l-1.3 1.6a11.8 11.8 0 0 0 5.3 5.3l1.6-1.3c.5-.4 1.2-.4 1.7 0l2.8 2.2c.5.4.6 1.2.2 1.7l-1.3 1.7c-.8 1-2.2 1.5-3.4 1.1C9.9 18.4 5.6 14.1 3.9 7.8c-.3-1.2.1-2.6 1.1-3.4z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M14.6 3.6a6.3 6.3 0 0 1 5.8 5.8M14.3 6.9a3.2 3.2 0 0 1 2.8 2.8" opacity=".8"/>'),
@@ -66,7 +66,7 @@ function wheel(d){
 // A photographic glass card: the platform-toned photo on the right under frosted glass,
 // the platform's mark beside a hairline, a small label, the invitation, and a light that
 // travels round the frame.
-const CALL_GLYPH='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M6.7 3.1c.5-.4 1.3-.3 1.7.2l2.2 2.8c.4.5.4 1.2 0 1.7l-1.3 1.6a11.8 11.8 0 0 0 5.3 5.3l1.6-1.3c.5-.4 1.2-.4 1.7 0l2.8 2.2c.5.4.6 1.2.2 1.7l-1.3 1.7c-.8 1-2.2 1.5-3.4 1.1C9.9 18.4 5.6 14.1 3.9 7.8c-.3-1.2.1-2.6 1.1-3.4z"/></svg>';
+export const CALL_GLYPH='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M6.7 3.1c.5-.4 1.3-.3 1.7.2l2.2 2.8c.4.5.4 1.2 0 1.7l-1.3 1.6a11.8 11.8 0 0 0 5.3 5.3l1.6-1.3c.5-.4 1.2-.4 1.7 0l2.8 2.2c.5.4.6 1.2.2 1.7l-1.3 1.7c-.8 1-2.2 1.5-3.4 1.1C9.9 18.4 5.6 14.1 3.9 7.8c-.3-1.2.1-2.6 1.1-3.4z"/></svg>';
 function card(l,asset){
   const art=l.art==='map'?MAP_ART:`<img src="${e(asset('bio/'+l.art+'.webp'))}" alt="" width="200" height="100" loading="lazy" decoding="async">`;
   // The call card reads like a phone calling Matthew: his portrait sends out waves, the

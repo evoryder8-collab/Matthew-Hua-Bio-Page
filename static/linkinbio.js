@@ -15,7 +15,7 @@ import {mountDialogAtmosphere} from './dialog-atmosphere.js';
 import {mountAmbientSparks} from './effects.js';
 
 // The template travels with this module's version (see build.mjs).
-const {renderLinkInBio}=await import(new URL('linkinbio-template.js'+new URL(import.meta.url).search,import.meta.url).href);
+const {renderLinkInBio,GLYPHS,CALL_GLYPH}=await import(new URL('linkinbio-template.js'+new URL(import.meta.url).search,import.meta.url).href);
 const base=new URL('../',import.meta.url);
 const asset=file=>new URL('assets/'+file.split('/').map(encodeURIComponent).join('/'),base).href;
 const file=path=>new URL(path,base).href;
@@ -445,9 +445,43 @@ function setupMore(){
     if(open)cue('nav');
   });
 }
+// The call card opens a sheet within the page: Matthew calling, two simple ways to call.
+let callSheet=null;
+function openCallSheet(){
+  if(callSheet)return;
+  const b=dict.bio,phone='+41 76 506 74 88';
+  const chevron='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const dialog=document.createElement('dialog');dialog.className='bio-call-sheet';dialog.setAttribute('aria-labelledby','bio-call-title');
+  dialog.innerHTML=`<div class="bio-call-sheet__scrim" data-call-close></div><div class="bio-call-sheet__panel"><span class="bio-call-sheet__grip" aria-hidden="true"></span><button class="bio-call-sheet__close" type="button" data-call-close aria-label="${e(dict.common.close)}" title="${e(dict.common.close)}">${icon('x')}</button><span class="bio-call-avatar bio-call-avatar--large" aria-hidden="true"><i></i><i></i><i></i><img src="${e(asset('bio/avatar.webp'))}" alt="" width="76" height="76"></span><p class="bio-call-sheet__eyebrow">Matthew Hua · ${phone}</p><h2 id="bio-call-title">${e(b.callTitle)}</h2><div class="bio-call-sheet__choices"><a class="bio-call-choice" data-tone="phone" href="tel:+41765067488"><span class="bio-call-choice__icon">${CALL_GLYPH}</span><span class="bio-call-choice__copy"><strong>${e(b.callPhone)}</strong><small>${phone}</small></span>${chevron}</a><a class="bio-call-choice" data-tone="whatsapp" href="https://wa.me/41765067488" target="_blank" rel="noopener noreferrer"><span class="bio-call-choice__icon">${GLYPHS.whatsapp}</span><span class="bio-call-choice__copy"><strong>${e(b.callWhatsapp)}</strong><small>WhatsApp · ${phone}</small></span>${chevron}</a></div></div>`;
+  overlayRoot.append(dialog);icons();dialog.showModal();callSheet=dialog;
+  const panel=dialog.querySelector('.bio-call-sheet__panel'),scrim=dialog.querySelector('.bio-call-sheet__scrim');
+  if(!motion.matches&&panel.animate){
+    scrim.animate([{opacity:0},{opacity:1}],{duration:420,easing:'ease-out'});
+    panel.animate([{transform:'translateY(105%)'},{transform:'translateY(-6px)',offset:.72},{transform:'none'}],{duration:620,easing:'cubic-bezier(.2,.9,.25,1)'});
+    dialog.querySelectorAll('.bio-call-choice').forEach((choice,i)=>choice.animate([{opacity:0,transform:'translateY(16px)'},{opacity:1,transform:'none'}],{duration:560,delay:220+i*90,easing:'cubic-bezier(.16,1,.3,1)',fill:'backwards'}));
+  }
+  cue('nav');
+  let closing=false;
+  const close=()=>{
+    if(closing)return;closing=true;
+    const done=()=>{dialog.close();dialog.remove();callSheet=null;shell.querySelector('.bio-link--call')?.focus({preventScroll:true});};
+    if(motion.matches||!panel.animate){done();return;}
+    scrim.animate([{opacity:1},{opacity:0}],{duration:300,fill:'forwards'});
+    panel.animate([{transform:'none'},{transform:'translateY(105%)'}],{duration:320,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}).finished.then(done,done);
+  };
+  dialog.addEventListener('click',event=>{if(event.target.closest('[data-call-close]'))close();});
+  dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
+  // Choosing lets the link do its work (the dialler or WhatsApp), then the sheet steps away.
+  dialog.querySelectorAll('.bio-call-choice').forEach(choice=>choice.addEventListener('click',()=>setTimeout(close,350)));
+  const heading=dialog.querySelector('h2');heading.tabIndex=-1;heading.focus({preventScroll:true});
+}
 // Reaching the call card: it arrives with a burst before settling into its ringing.
 function setupCall(){
-  const call=shell.querySelector('.bio-link--call');if(!call||motion.matches||!call.animate||!('IntersectionObserver' in window))return;
+  const call=shell.querySelector('.bio-link--call');if(!call)return;
+  // The card keeps its tel: link for anyone without scripts; here it opens the choice.
+  const choose=event=>{event.preventDefault();openCallSheet();};
+  call.addEventListener('click',choose);cleanups.push(()=>call.removeEventListener('click',choose));
+  if(motion.matches||!call.animate||!('IntersectionObserver' in window))return;
   const observer=new IntersectionObserver(entries=>{
     if(!entries.some(entry=>entry.intersectionRatio>=.6))return;
     observer.disconnect();
@@ -542,7 +576,7 @@ document.addEventListener('click',event=>{
 
 /* Rendering ---------------------------------------------------------------------- */
 function teardown(){
-  closeModal();film?.destroy();film=null;tears?.destroy();tears=null;tabSparks?.destroy();tabSparks=null;wheelIntro?.destroy();wheelIntro=null;wheel?.destroy();wheel=null;
+  closeModal();callSheet?.close();callSheet?.remove();callSheet=null;film?.destroy();film=null;tears?.destroy();tears=null;tabSparks?.destroy();tabSparks=null;wheelIntro?.destroy();wheelIntro=null;wheel?.destroy();wheel=null;
   clearStage();map?.remove();map=null;cleanups.forEach(fn=>fn());cleanups=[];
 }
 // The build ships English markup; another language replaces it (keeping the film's place).
