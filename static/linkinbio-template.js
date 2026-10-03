@@ -14,6 +14,7 @@ export const SOCIAL={
   linkedin:'https://www.linkedin.com/in/matthewhua/',
   maps:'https://maps.google.com/?cid=1527841935863557630'
 };
+export const SOCIAL_TONES=['instagram','facebook','threads','youtube','linkedin','maps'];
 export const ELEMENT_ICONS=['brain','thermometer-snowflake','wind','hand-heart','person-standing','users'];
 // Each element's light on the wheel: [inner, outer] colours of its sector.
 export const ELEMENT_TINTS=[['#ff7cc0','#c81d77'],['#8fdcff','#ffb35c'],['#9fe7ff','#ff9fc4'],['#ffb3cf','#ef84be'],['#ffe09a','#e9a93b'],['#9ff3c8','#38c98a']];
@@ -65,9 +66,14 @@ function wheel(d){
 // A photographic glass card: the platform-toned photo on the right under frosted glass,
 // the platform's mark beside a hairline, a small label, the invitation, and a light that
 // travels round the frame.
+const CALL_GLYPH='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M6.7 3.1c.5-.4 1.3-.3 1.7.2l2.2 2.8c.4.5.4 1.2 0 1.7l-1.3 1.6a11.8 11.8 0 0 0 5.3 5.3l1.6-1.3c.5-.4 1.2-.4 1.7 0l2.8 2.2c.5.4.6 1.2.2 1.7l-1.3 1.7c-.8 1-2.2 1.5-3.4 1.1C9.9 18.4 5.6 14.1 3.9 7.8c-.3-1.2.1-2.6 1.1-3.4z"/></svg>';
 function card(l,asset){
   const art=l.art==='map'?MAP_ART:`<img src="${e(asset('bio/'+l.art+'.webp'))}" alt="" width="200" height="100" loading="lazy" decoding="async">`;
-  return `<a class="bio-link${l.primary?' bio-link--primary':''}" data-tone="${l.tone}" href="${e(l.url)}" ${l.extra||''} data-bio-reveal><span class="bio-link__art" aria-hidden="true">${art}</span><span class="bio-link__glass" aria-hidden="true"></span><span class="bio-link__mark" aria-hidden="true">${GLYPHS[l.tone]}</span><span class="bio-link__copy"><span class="bio-link__eyebrow">${e(l.eyebrow)}</span><strong>${e(l.title)}</strong>${l.detail?`<small>${e(l.detail)}</small>`:''}</span><span class="bio-link__go" aria-hidden="true">${GO}</span></a>`;
+  // The call card reads like a phone calling Matthew: his portrait sends out waves, the
+  // green call button rings.
+  const lead=l.call?`<span class="bio-call-avatar" aria-hidden="true"><i></i><i></i><i></i><img src="${e(asset('bio/avatar.webp'))}" alt="" width="52" height="52" decoding="async"></span>`:`<span class="bio-link__mark" aria-hidden="true">${GLYPHS[l.tone]}</span>`;
+  const end=l.call?`<span class="bio-call-button" aria-hidden="true">${CALL_GLYPH}</span>`:`<span class="bio-link__go" aria-hidden="true">${GO}</span>`;
+  return `<a class="bio-link${l.primary?' bio-link--primary':''}${l.call?' bio-link--call':''}" data-tone="${l.tone}" href="${e(l.url)}" ${l.extra||''} data-bio-reveal><span class="bio-link__art" aria-hidden="true">${art}</span><span class="bio-link__glass" aria-hidden="true"></span>${lead}<span class="bio-link__copy"><span class="bio-link__eyebrow">${e(l.eyebrow)}</span><strong>${e(l.title)}</strong>${l.detail?`<small>${e(l.detail)}</small>`:''}</span>${end}</a>`;
 }
 
 /**
@@ -82,7 +88,7 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
   const links=[
     {tone:'contact',art:'contact',eyebrow:'vCard · Matthew Hua',title:b.save,detail:b.saveDetail,url:file('matthew-hua.vcf'),extra:'download="Matthew-Hua.vcf"'},
     {tone:'phone',art:'phone',eyebrow:phone,title:b.call,detail:d.contact.near,url:'tel:+41765067488'},
-    {tone:'mail',art:'mail',eyebrow:'info@healwell.ch',title:b.email,detail:d.contact.direct,url:`mailto:info@healwell.ch?subject=${encodeURIComponent(b.subject)}`},
+    {tone:'mail',art:'mail',eyebrow:'info@healwell.ch',title:b.email,url:`mailto:info@healwell.ch?subject=${encodeURIComponent(b.subject)}`},
     {tone:'instagram',art:'instagram',eyebrow:'Instagram · @healwell.ch',title:b.instagramDetail,url:SOCIAL.instagram,extra:external},
     {tone:'facebook',art:'facebook',eyebrow:'Facebook',title:b.facebookDetail,url:SOCIAL.facebook,extra:external},
     {tone:'threads',art:'threads',eyebrow:'Threads · @healwell.ch',title:b.threadsDetail,url:SOCIAL.threads,extra:external},
@@ -129,9 +135,11 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
   <div id="element-panel" class="bio-stage" role="tabpanel" aria-labelledby="bio-element-0" tabindex="0" hidden></div>
 </section>
 <nav class="bio-links" aria-label="${e(b.links)}">
-  ${card({tone:'whatsapp',art:'whatsapp',eyebrow:`WhatsApp · ${phone}`,title:b.whatsapp,detail:b.whatsappDetail,url:`https://wa.me/41765067488?text=${greeting}`,extra:external,primary:true},asset)}
   <p class="bio-group-label">${e(b.links)}</p>
-  ${links.map(l=>card(l,asset)).join('')}
+  ${card({tone:'phone',art:'phone',eyebrow:phone,title:b.call,detail:d.contact.direct,url:'tel:+41765067488',primary:true,call:true},asset)}
+  ${links.filter(l=>SOCIAL_TONES.includes(l.tone)).map(l=>card(l,asset)).join('')}
+  <button class="bio-more" type="button" aria-expanded="false" aria-controls="bio-more-links"><span class="bio-more__line" aria-hidden="true"></span><span class="bio-more__label">${e(b.moreContact)}</span><span class="bio-more__chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="m6 9.5 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="bio-more__line" aria-hidden="true"></span></button>
+  <div class="bio-more-links" id="bio-more-links" inert><div class="bio-more-links__inner">${[{tone:'whatsapp',art:'whatsapp',eyebrow:`WhatsApp · ${phone}`,title:b.whatsapp,detail:b.whatsappDetail,url:`https://wa.me/41765067488?text=${greeting}`,extra:external},...links.filter(l=>['contact','mail'].includes(l.tone))].map(l=>card(l,asset)).join('')}</div></div>
 </nav>
 <nav class="bio-links bio-links--site" aria-label="${e(b.explore)}"><p class="bio-group-label">${e(b.explore)}</p>${site.map(l=>card(l,asset)).join('')}</nav>
 <section class="bio-studio" aria-labelledby="bio-studio-title" data-bio-reveal>

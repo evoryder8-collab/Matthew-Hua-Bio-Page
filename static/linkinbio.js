@@ -435,6 +435,29 @@ function setupLinks(){
   cleanups.push(()=>{observer?.disconnect();animations.forEach(animation=>animation.cancel());removers.forEach(fn=>fn());});
 }
 
+// The other contacts unfold beneath the socials; folded, they are inert (not focusable).
+function setupMore(){
+  const button=shell.querySelector('.bio-more'),panel=shell.querySelector('.bio-more-links');if(!button||!panel)return;
+  button.addEventListener('click',()=>{
+    const open=button.getAttribute('aria-expanded')!=='true';
+    button.setAttribute('aria-expanded',String(open));
+    panel.toggleAttribute('data-open',open);panel.inert=!open;
+    if(open)cue('nav');
+  });
+}
+// Reaching the call card: it arrives with a burst before settling into its ringing.
+function setupCall(){
+  const call=shell.querySelector('.bio-link--call');if(!call||motion.matches||!call.animate||!('IntersectionObserver' in window))return;
+  const observer=new IntersectionObserver(entries=>{
+    if(!entries.some(entry=>entry.intersectionRatio>=.6))return;
+    observer.disconnect();
+    call.animate([{transform:'scale(.96)',boxShadow:'0 0 0 0 rgba(52,199,89,.0)'},{transform:'scale(1.025)',boxShadow:'0 0 0 10px rgba(52,199,89,.18)',offset:.45},{transform:'none',boxShadow:'0 0 0 0 rgba(52,199,89,0)'}],{duration:900,easing:'cubic-bezier(.22,1,.36,1)'});
+    call.querySelector('.bio-call-button')?.animate([{transform:'scale(.4)',opacity:0},{transform:'scale(1.18)',opacity:1,offset:.6},{transform:'none',opacity:1}],{duration:800,delay:150,easing:'cubic-bezier(.16,1.4,.3,1)',fill:'backwards'});
+    call.querySelector('.bio-call-avatar img')?.animate([{transform:'scale(.7)',filter:'brightness(1.6)'},{transform:'none',filter:'none'}],{duration:800,easing:'cubic-bezier(.16,1,.3,1)'});
+  },{threshold:[0,.6]});
+  observer.observe(call);cleanups.push(()=>observer.disconnect());
+}
+
 function setupLanguage(){
   const root=shell.querySelector('[data-bio-language]');if(!root)return;
   const trigger=root.querySelector('.bio-language__trigger'),menu=root.querySelector('.bio-language__menu');
@@ -535,7 +558,7 @@ function render({hydrate=false}={}){
   if(tablist)tabSparks=mountTabSparks(tablist,{reducedMotion:motion});
   wheel=mountWheel(shell.querySelector('[data-bio-wheel]'),{onPick:index=>selectElement(index)});
   wheelIntro=mountWheelIntro(shell.querySelector('.bio-elements'),wheel);
-  setupLinks();setupLanguage();setupMap();updateSoundButtons();
+  setupLinks();setupMore();setupCall();setupLanguage();setupMap();updateSoundButtons();
   // Mindset is chosen from the start (its game waits below); the wheel keeps cruising.
   selectElement(keep>=0?keep:0,{quiet:true,instant:true,spin:false});
   document.documentElement.classList.add('ready');
