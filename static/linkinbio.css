@@ -293,7 +293,9 @@ body.bio-page{min-height:100svh}
 .bio-call-avatar--large{width:104px;height:104px;margin:6px auto 18px}
 .bio-call-avatar--large img{width:104px;height:104px;box-shadow:0 0 0 2px rgba(255,255,255,.92),0 16px 34px -12px rgba(0,0,0,.85)}
 /* His colours around him: green on the left, pink on the right. */
-.bio-call-halo{position:absolute;inset:-7px;border-radius:50%;background:linear-gradient(90deg,#34c759 0%,#6dffa8 38%,#ffb4dc 62%,#ef84be 100%);filter:blur(12px);opacity:.85;pointer-events:none}
+.bio-call-halo{position:absolute;inset:-12px;border-radius:50%;background:linear-gradient(90deg,#34c759 0%,#6dffa8 36%,#ffb4dc 64%,#ef84be 100%);filter:blur(18px);opacity:.8;pointer-events:none}
+/* Relaxed glows only in the chooser: no rippling rings. */
+.bio-call-sheet .bio-call-avatar i{display:none}
 .bio-call-avatar--large::after{content:'';position:absolute;inset:-4px;border-radius:50%;background:linear-gradient(90deg,#4fe6a0,#ff8fc6);-webkit-mask:radial-gradient(closest-side,transparent calc(100% - 2.5px),#000 calc(100% - 2px));mask:radial-gradient(closest-side,transparent calc(100% - 2.5px),#000 calc(100% - 2px));pointer-events:none}
 .bio-call-avatar--large i{border:0;background:linear-gradient(90deg,rgba(109,255,168,.9),rgba(255,143,198,.9));-webkit-mask:radial-gradient(closest-side,transparent calc(100% - 2px),#000 calc(100% - 1.5px));mask:radial-gradient(closest-side,transparent calc(100% - 2px),#000 calc(100% - 1.5px))}
 .bio-call-sheet__eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(90deg,#6dffa8,#ffb4dc);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -318,19 +320,19 @@ body.bio-page{min-height:100svh}
   .bio-call-sheet .bio-call-avatar i{animation:bio-call-wave-lg 2.6s cubic-bezier(.2,.6,.3,1) infinite}
   .bio-call-sheet .bio-call-avatar i:nth-child(2){animation-delay:.55s}
   .bio-call-sheet .bio-call-avatar i:nth-child(3){animation-delay:1.1s}
-  .bio-call-halo{animation:bio-halo 3.2s ease-in-out infinite alternate}
+  .bio-call-halo{animation:bio-halo 3.8s ease-in-out infinite alternate}
   .bio-call-choice::before{animation:bio-choice-edge 4.5s linear infinite}
   .bio-call-choice::after{animation:bio-choice-gleam 3.6s cubic-bezier(.4,0,.2,1) infinite}
-  .bio-call-choice__icon{animation:bio-choice-breathe 2.4s ease-in-out infinite}
+  .bio-call-choice__icon{animation:bio-choice-breathe 3.4s ease-in-out infinite}
   .bio-call-choice>svg{animation:bio-choice-nudge 2.4s ease-in-out infinite}
   .bio-call-choice+.bio-call-choice::before{animation-delay:-2.2s}
   .bio-call-choice+.bio-call-choice::after{animation-delay:1.2s}
   .bio-call-choice+.bio-call-choice .bio-call-choice__icon,.bio-call-choice+.bio-call-choice>svg{animation-delay:1.2s}
 }
-@keyframes bio-halo{from{opacity:.6;transform:scale(.96)}to{opacity:1;transform:scale(1.06)}}
+@keyframes bio-halo{from{opacity:.5;transform:scale(.95)}to{opacity:.95;transform:scale(1.1)}}
 @keyframes bio-choice-edge{to{--choice-edge:360deg}}
 @keyframes bio-choice-gleam{0%{transform:translateX(-120%)}45%,100%{transform:translateX(120%)}}
-@keyframes bio-choice-breathe{0%,100%{box-shadow:inset 0 1px 1px rgba(255,255,255,.45),0 0 0 0 rgba(52,199,89,.5),0 10px 22px -10px rgba(52,199,89,.95)}50%{box-shadow:inset 0 1px 1px rgba(255,255,255,.45),0 0 0 8px rgba(52,199,89,0),0 10px 26px -8px rgba(52,199,89,1)}}
+@keyframes bio-choice-breathe{0%,100%{box-shadow:inset 0 1px 1px rgba(255,255,255,.45),0 0 14px 1px rgba(52,199,89,.35),0 10px 22px -10px rgba(52,199,89,.9)}50%{box-shadow:inset 0 1px 1px rgba(255,255,255,.45),0 0 28px 6px rgba(52,199,89,.6),0 10px 26px -8px rgba(52,199,89,1)}}
 @keyframes bio-choice-nudge{0%,100%{transform:none}50%{transform:translateX(3px)}}
 .bio-call-sheet h2:focus,.bio-call-sheet h2:focus-visible{outline:none}
 @keyframes bio-radiate{0%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
@@ -362,8 +364,8 @@ body.bio-spotlit .bio-call-hero{position:relative;z-index:60}
 /* The game's first screen on this page: Begin waits in the middle of the signal field */
 /* (positioned against the copy block below the field, so it moves up by the field's height) */
 .bio-page .mindset-game[data-phase="intro"] .mindset-controls{position:absolute;z-index:4;left:0;right:0;top:calc(var(--field-h,0px) * -1);height:var(--field-h,0px);display:flex;align-items:center;justify-content:center;margin:0;padding:0;pointer-events:none}
-.bio-page .mindset-game[data-phase="intro"] .mindset-controls::before{content:'';position:absolute;left:50%;top:50%;width:250px;height:150px;border-radius:50%;background:radial-gradient(closest-side,rgba(9,7,14,.85),rgba(9,7,14,.4) 60%,transparent);transform:translate(-50%,-50%);pointer-events:none}
-.bio-page .mindset-game[data-phase="intro"] .mindset-controls .mindset-button{position:relative;min-width:150px;min-height:54px;font-size:17px;pointer-events:auto}
+.bio-page .mindset-game[data-phase="intro"] .mindset-controls::before{content:'';position:absolute;left:50%;top:50%;width:330px;height:160px;border-radius:50%;background:radial-gradient(closest-side,rgba(9,7,14,.85),rgba(9,7,14,.4) 60%,transparent);transform:translate(-50%,-50%);pointer-events:none}
+.bio-page .mindset-game[data-phase="intro"] .mindset-controls .mindset-button{position:relative;min-width:150px;max-width:calc(100% - 48px);min-height:54px;padding-inline:26px;font-size:17px;line-height:1.3;text-align:center;pointer-events:auto}
 @media (prefers-reduced-motion:no-preference){
   .bio-page .mindset-game[data-phase="intro"] .mindset-controls .mindset-button{animation:bio-begin 2.4s ease-in-out infinite}
 }

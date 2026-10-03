@@ -223,6 +223,20 @@ function mountWheel(root,{onPick}){
   };
 }
 
+// Starting the experiment brings the whole game frame into view, so its instructions
+// (beneath the field) are never missed.
+// (Captured before the game handles the tap, since the game replaces the button.)
+document.addEventListener('click',event=>{
+  const begin=event.target.closest('#element-panel [data-action="begin"]');if(!begin)return;
+  const game=begin.closest('.mindset-game');if(!game)return;
+  // After the game has moved focus to its next step (which would cut a glide short).
+  setTimeout(()=>{
+    const box=game.getBoundingClientRect(),room=innerHeight;
+    const target=box.height<=room-24?box.top-(room-box.height)/2:box.top-12;
+    if(Math.abs(target)>8)scrollBy({top:target,behavior:motion.matches?'auto':'smooth'});
+  },140);
+},true);
+
 /* The wheel's introduction ------------------------------------------------------------ */
 // On first arrival the wheel waits out of focus while "Tap each element to learn more"
 // assembles in light over its centre, letter by letter. The line then glides up to its
