@@ -123,8 +123,11 @@ body.bio-page{min-height:100svh}
 .bio-elements{margin-top:10px;padding-bottom:12px;text-align:center}
 .bio-section-head .eyebrow{margin-bottom:10px;color:#c81d77}
 .bio-section-head h2{margin:0 0 8px;font-family:var(--serif);font-size:clamp(30px,8.6vw,40px);font-style:italic;font-weight:400;line-height:1.1;color:#1c1018}
-.bio-section-head p{font-size:13px;color:#4c3a48}
-.bio-wheel{position:relative;width:min(100%,430px);aspect-ratio:1;margin:30px auto 24px;container-type:inline-size;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.bio-wheel-hint{display:flex;align-items:center;justify-content:center;gap:12px;margin:22px 0 0;font-size:10.5px;font-weight:600;letter-spacing:.24em;line-height:1.5;text-transform:uppercase}
+.bio-wheel-hint__line{flex:0 0 28px;height:1px;background:linear-gradient(90deg,transparent,#c81d7799)}
+.bio-wheel-hint__line:last-child{background:linear-gradient(270deg,transparent,#c81d7799)}
+.bio-wheel-hint__text{background:linear-gradient(90deg,#5b3f54 0%,#5b3f54 38%,#c81d77 47%,#ff8fc6 50%,#c81d77 53%,#5b3f54 62%,#5b3f54 100%);background-size:260% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.bio-wheel{position:relative;width:min(100%,430px);aspect-ratio:1;margin:22px auto 24px;container-type:inline-size;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .bio-wheel__halo{position:absolute;inset:-9%;z-index:-1;border-radius:50%;background:radial-gradient(circle at 30% 28%,#ff8fc6bb,transparent 58%),radial-gradient(circle at 72% 74%,#4fe6a0aa,transparent 58%);filter:blur(28px);opacity:.75;pointer-events:none}
 .bio-wheel__disc{position:absolute;inset:0;border-radius:50%;transform:rotate(var(--spin,0deg));box-shadow:0 34px 60px -26px rgba(40,10,30,.75),0 0 0 1px rgba(255,255,255,.55);will-change:transform}
 .bio-wheel__art{display:block;width:100%;height:100%;overflow:visible}
@@ -136,13 +139,13 @@ body.bio-page{min-height:100svh}
 .bio-wheel__sector.is-active .bio-wheel__edge{opacity:1}
 .bio-wheel__dust circle{opacity:.25}
 .bio-wheel__labels{position:absolute;inset:0;border-radius:50%}
-.bio-wheel__seg{position:absolute;left:50%;top:50%;display:grid;justify-items:center;gap:5px;padding:0;border-radius:16px;color:#fff5fb;font-size:clamp(9.5px,2.6cqw,11.5px);font-weight:600;line-height:1.15;text-shadow:0 1px 8px rgba(0,0,0,.6);transform:translate(-50%,-50%) rotate(var(--a)) translateY(-31.5cqw) rotate(calc(var(--a) * -1 - var(--spin,0deg)));transition:color .4s}
+.bio-wheel__seg{position:absolute;left:50%;top:50%;display:grid;justify-items:center;gap:5px;min-width:78px;padding:7px 8px;border-radius:16px;color:#fff5fb;font-size:clamp(9.5px,2.6cqw,11.5px);font-weight:600;line-height:1.15;text-shadow:0 1px 8px rgba(0,0,0,.6);transform:translate(-50%,-50%) rotate(var(--a)) translateY(-31.5cqw) rotate(calc(var(--a) * -1 - var(--spin,0deg)));transition:color .4s}
 .bio-wheel__seg svg.lucide{width:clamp(18px,5.6cqw,24px);height:clamp(18px,5.6cqw,24px);color:var(--tint);filter:drop-shadow(0 0 6px var(--tint))}
-.bio-wheel__label{position:relative;display:grid;justify-items:center;gap:5px;min-width:76px;padding:8px 10px 7px;border:1px solid rgba(255,255,255,.2);border-radius:15px;background:rgba(255,255,255,.07);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 8px 18px -10px rgba(0,0,0,.7);transition:transform .5s var(--ease),border-color .4s,background .4s}
-.bio-wheel__label::after{content:'';position:absolute;inset:-1px;border:1.5px solid var(--tint);border-radius:inherit;opacity:0;pointer-events:none}
-.bio-wheel__seg[aria-selected="true"] .bio-wheel__label{border-color:color-mix(in srgb,var(--tint) 75%,transparent);background:color-mix(in srgb,var(--tint) 22%,transparent)}
+.bio-wheel__label{position:relative;display:grid;justify-items:center;gap:5px;transition:transform .5s var(--ease)}
+/* The invitation: a soft burst of the element's own light behind it, never an outline. */
+.bio-wheel__label::after{content:'';position:absolute;left:50%;top:38%;z-index:-1;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--tint) 60%,transparent),transparent 66%);opacity:0;pointer-events:none}
 .bio-wheel__seg.is-pinging .bio-wheel__label{animation:bio-nudge 1.3s cubic-bezier(.2,.7,.3,1)}
-.bio-wheel__seg.is-pinging .bio-wheel__label::after{animation:bio-ping 1.3s cubic-bezier(.2,.7,.3,1)}
+.bio-wheel__seg.is-pinging .bio-wheel__label::after{animation:bio-bloom 1.3s cubic-bezier(.2,.7,.3,1)}
 .bio-wheel__sector.is-pinging:not(.is-active) .bio-wheel__flare{animation:bio-sector-ping 1.3s ease-out}
 .bio-wheel__seg:active .bio-wheel__label{transform:scale(.94)}
 .bio-wheel__seg[aria-selected="true"] .bio-wheel__label{transform:scale(1.14)}
@@ -180,6 +183,9 @@ body.bio-page{min-height:100svh}
   .bio-film__unmute{animation:bio-call 2.4s ease-in-out infinite}
   .bio-film__cover>span::after{content:'';position:absolute;inset:-1px;border:1px solid rgba(255,255,255,.6);border-radius:50%;animation:bio-ring 2.2s ease-out infinite}
   .bio-wheel__halo{animation:bio-glow 6s ease-in-out infinite alternate}
+  .bio-wheel-hint__text{animation:bio-hint-shine 3.4s ease-in-out infinite,bio-hint-breathe 3.4s ease-in-out infinite}
+  .bio-wheel-hint__line{animation:bio-hint-breathe 3.4s ease-in-out infinite}
+  .bio-elements.is-explored .bio-wheel-hint__text,.bio-elements.is-explored .bio-wheel-hint__line{animation:none;opacity:.75}
   .bio-wheel__hub{animation:bio-hub 4.8s ease-in-out infinite alternate}
   .bio-wheel__dust circle{animation:bio-twinkle 3.4s ease-in-out var(--tw) infinite alternate}
   .bio-wheel__sector.is-active .bio-wheel__flare{animation:bio-flare 2.6s ease-in-out infinite alternate}
@@ -219,6 +225,8 @@ body.bio-page{min-height:100svh}
 .bio-sound-dialog.is-leaving .portal-ambient{opacity:0;transition:opacity .4s}
 .bio-sound-dialog .portal-shade{background:rgba(3,2,4,.985)}
 .bio-sound-dialog .sound-yes:focus-visible{outline:1px solid #f3cf9a99;outline-offset:5px}
-@keyframes bio-ping{0%{opacity:.95;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes bio-bloom{0%{opacity:0;transform:scale(.5)}25%{opacity:.95}100%{opacity:0;transform:scale(1.6)}}
 @keyframes bio-nudge{0%,100%{transform:scale(1)}20%{transform:scale(1.1)}}
 @keyframes bio-sector-ping{0%{opacity:0}25%{opacity:.75}100%{opacity:0}}
+@keyframes bio-hint-shine{0%,20%{background-position:100% 0}80%,100%{background-position:0 0}}
+@keyframes bio-hint-breathe{0%,100%{opacity:.5}50%{opacity:1}}

@@ -196,6 +196,7 @@ function mountWheel(root,{onPick}){
   }
   function stopHint(){
     if(hinted)return;hinted=true;clearTimeout(hintTimer);hintTimer=0;
+    root.closest('.bio-elements')?.classList.add('is-explored');
     [...segments,...sectors].forEach(node=>node.classList.remove('is-pinging'));
   }
   const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{
