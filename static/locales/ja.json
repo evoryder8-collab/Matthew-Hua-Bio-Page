@@ -79,7 +79,12 @@
     "awardGermany": "イースタン・フリースタイル部門金賞",
     "awardSwiss": "スイス・フリースタイル王者",
     "awardJury": "国際審査員・指導者",
-    "closing": "自分のための余白を。"
+    "closing": "自分のための余白を。",
+    "awardPlaces": [
+      "ローマ",
+      "ドイツ",
+      "スイス"
+    ]
   },
   "method": {
     "eyebrow": "心身の変化を支えるメソッド",

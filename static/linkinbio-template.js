@@ -38,7 +38,7 @@ export const GLYPHS={
   about:glyph('<circle cx="12" cy="7.9" r="4.1" fill="currentColor"/><path fill="currentColor" d="M4.3 20.3c.8-4.1 3.9-6.5 7.7-6.5s6.9 2.4 7.7 6.5z"/>')
 };
 const GO='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8.2 15.8 15.8 8.2M10.2 8h5.8v5.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-// A drawn street plan for the Maps card (Zurich-like grid, the river, the route in).
+// A drawn street plan for the Maps card (a Zürich-like grid, the river, the route in).
 const MAP_ART='<svg viewBox="0 0 200 100" width="200" height="100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="200" height="100" fill="#e3f0e8"/><path d="M-10 74C40 62 72 84 122 64s70-26 96-18" stroke="#b9dcf4" stroke-width="10" fill="none"/><g stroke="#fff" stroke-width="4.2" stroke-linecap="round"><path d="M22-6 60 106"/><path d="M-6 30 210 17"/><path d="M112-6 96 106"/><path d="M152-6l26 112"/><path d="M-6 90 210 81"/></g><g stroke="#fff" stroke-width="1.7" opacity=".95"><path d="M42-6l5 112"/><path d="M-6 51 210 44"/><path d="M132-6l10 112"/><path d="M80-6 70 106"/><path d="M172-6 186 106"/></g><path d="M28 94C66 74 98 68 128 41" stroke="#c81d77" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-dasharray="1 5.5"/><circle cx="128" cy="41" r="11" fill="#34a853" opacity=".18"/><circle cx="128" cy="41" r="4.6" fill="#34a853" stroke="#fff" stroke-width="1.8"/></svg>';
 
 const polar=(r,deg)=>{const a=deg*Math.PI/180;return [(r*Math.sin(a)).toFixed(2),(-r*Math.cos(a)).toFixed(2)];};
@@ -135,7 +135,7 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
       <div class="bio-film__bar"><button class="bio-film__toggle" type="button" data-action="film-toggle" aria-label="${e(d.common.play)}">${icon('play')}</button><span class="bio-film__track" aria-hidden="true"><i></i></span><span class="bio-film__time" aria-hidden="true">00:28</span><button class="bio-film__sound" type="button" data-action="sound" aria-pressed="false" aria-label="${e(d.nav.soundOff)}" title="${e(d.nav.soundOff)}">${icon('volume-x')}</button><button class="bio-film__expand" type="button" data-action="film-fullscreen" aria-label="${e(b.fullscreen)}" title="${e(b.fullscreen)}">${icon('maximize-2')}</button></div>
     </div>
   </div>
-  <p class="bio-film__caption"><span>${e(d.arrival.eyebrow)}</span><span>Rome · 2024</span></p>
+  <p class="bio-film__caption"><span>${e(d.arrival.eyebrow)}</span><span>${e(String(d.archive.items[0].caption).split(' · ')[0])}</span></p>
 </section>
 <nav class="bio-links" aria-label="${e(b.links)}">
   <p class="bio-group-label">${e(b.links)}</p>

@@ -79,7 +79,12 @@
     "awardGermany": "Huy chương vàng Eastern Freestyle",
     "awardSwiss": "Vô địch Thụy Sĩ nội dung freestyle",
     "awardJury": "Giám khảo và giảng viên quốc tế",
-    "closing": "Dành thời gian cho chính mình."
+    "closing": "Dành thời gian cho chính mình.",
+    "awardPlaces": [
+      "Rome",
+      "Đức",
+      "Thụy Sĩ"
+    ]
   },
   "method": {
     "eyebrow": "Phương pháp trị liệu chuyển hóa",

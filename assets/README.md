@@ -1,6 +1,6 @@
 # Image assets
 
-## Mindset Attention Field — final reveal image
+## Mindset Attention Field: final reveal image
 
 The Mindset element (Six Elements section) ends on an editorial reveal that uses a
 transparent figure of Matthew and Tony Robbins.

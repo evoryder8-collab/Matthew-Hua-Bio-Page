@@ -85,7 +85,12 @@
     "awardGermany": "Oro in Eastern Freestyle",
     "awardSwiss": "Campione svizzero di freestyle",
     "awardJury": "Giudice e formatore internazionale",
-    "closing": "Prenditi del tempo per te."
+    "closing": "Prenditi del tempo per te.",
+    "awardPlaces": [
+      "Roma",
+      "Germania",
+      "Svizzera"
+    ]
   },
   "method": {
     "eyebrow": "Il metodo della terapia trasformativa",

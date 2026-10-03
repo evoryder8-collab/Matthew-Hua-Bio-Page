@@ -66,7 +66,7 @@ async function getLocale(code){
 }
 function setMetadata(){
   document.documentElement.lang=languages.find(l=>l.code===locale)?.html||'en';
-  document.title=route==='home'?dict.seo.title:`${dict.nav[route==='private-practice'?'practice':route]} | Matthew Hua | Zurich`;
+  document.title=route==='home'?dict.seo.title:`${dict.nav[route==='private-practice'?'practice':route]} | Matthew Hua | ${String(dict.home.eyebrow).split(' · ').pop()}`;
   document.querySelector('meta[name="description"]').content=dict.seo.description;
   document.querySelector('meta[property="og:title"]').content=document.title;
   document.querySelector('meta[property="og:description"]').content=dict.seo.description;

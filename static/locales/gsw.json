@@ -79,7 +79,12 @@
     "awardGermany": "Gold i Eastern Freestyle",
     "awardSwiss": "Schwiizer Freestyle-Meischter",
     "awardJury": "Internationale Juror und Dozent",
-    "closing": "Nimm der Ziit für dich."
+    "closing": "Nimm der Ziit für dich.",
+    "awardPlaces": [
+      "Rom",
+      "Dütschland",
+      "Schwiiz"
+    ]
   },
   "method": {
     "eyebrow": "D Methode vo de Transformationstherapie",

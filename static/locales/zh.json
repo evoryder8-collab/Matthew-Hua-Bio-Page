@@ -79,7 +79,12 @@
     "awardGermany": "东方自由式金奖",
     "awardSwiss": "瑞士自由式冠军",
     "awardJury": "国际评委与导师",
-    "closing": "给自己留一点空间。"
+    "closing": "给自己留一点空间。",
+    "awardPlaces": [
+      "罗马",
+      "德国",
+      "瑞士"
+    ]
   },
   "method": {
     "eyebrow": "身心转化调理方法",

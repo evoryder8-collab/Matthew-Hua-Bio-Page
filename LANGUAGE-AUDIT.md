@@ -45,5 +45,8 @@ All nine translations (335 strings each) were reviewed line by line against the 
 
 ## Notes
 
+- The link-in-bio page reads the same dictionaries, so every fix applies there too. Hard-coded English place names in the templates (award ribbon, closing line, tab titles, link-in-bio film caption) were also localized.
+- No em or en dashes are used anywhere in the site copy.
+
 - French already used "Zurich" correctly; Japanese and Chinese keep brand and school names (Wim Hof Method, University of Technology Sydney) in Latin script, as is usual.
 - Native-speaker review is still worthwhile for Swiss German, where written dialect has no single standard spelling, and for Vietnamese, given Matthew's personal connection to it.
