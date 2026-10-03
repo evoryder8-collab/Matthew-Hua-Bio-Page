@@ -264,8 +264,55 @@ function mountWheelIntro(section,wheelApi){
   section.classList.add('is-prelude');
   const animations=[];let started=false,done=false;
   const play=(node,frames,options)=>{const a=node.animate(frames,{fill:'both',...options});animations.push(a);return a;};
+  // Raced past (the wheel's centre already high on the screen, or gone) before the line
+  // has landed: input pauses with the intro, the momentum settles, the wheel glides back
+  // to the middle, the intro resumes, and scrolling returns just before the landing.
+  let landAt=0,anchored=false,locked=false,watching=0;
+  // Held input stops here, before any other scroll handler (the tears brake) can act.
+  const block=event=>{event.preventDefault();event.stopImmediatePropagation();};
+  function lock(){if(locked)return;locked=true;addEventListener('wheel',block,{passive:false,capture:true});addEventListener('touchmove',block,{passive:false,capture:true});}
+  function unlock(){if(!locked)return;locked=false;removeEventListener('wheel',block,{capture:true});removeEventListener('touchmove',block,{capture:true});}
+  // Resolves once scrolling has been still for a moment (or after a ceiling).
+  const settled=(quiet=140,ceiling=900)=>new Promise(resolve=>{
+    let timer=0;const begin=performance.now();
+    const finishWait=()=>{removeEventListener('scroll',onScroll);resolve();};
+    const onScroll=()=>{clearTimeout(timer);timer=setTimeout(finishWait,quiet);if(performance.now()-begin>ceiling){clearTimeout(timer);finishWait();}};
+    addEventListener('scroll',onScroll,{passive:true});timer=setTimeout(finishWait,quiet);
+  });
+  async function anchor(){
+    anchored=true;lock();
+    const toLand=Math.max(0,landAt-performance.now());
+    animations.forEach(a=>{if(a.playState==='running')a.pause();});
+    await settled();
+    if(done){unlock();return;}
+    // A glide driven frame by frame toward the wheel's live position: layout settling
+    // elsewhere (which cancels native smooth scrolls) cannot stop or misplace it.
+    const aim=()=>{const box=root.getBoundingClientRect();return scrollY+box.top+box.height/2-innerHeight/2;};
+    await new Promise(resolve=>{
+      const from=scrollY,start=performance.now(),length=motion.matches?1:700;
+      const step=now=>{
+        const k=Math.min(1,(now-start)/length),ease=1-Math.pow(1-k,3);
+        scrollTo({top:from+(aim()-from)*ease,behavior:'instant'});
+        if(k<1&&!done)requestAnimationFrame(step);else resolve();
+      };
+      requestAnimationFrame(step);
+    });
+    if(done){unlock();return;}
+    animations.forEach(a=>{if(a.playState==='paused')a.play();});
+    landAt=performance.now()+toLand;
+    setTimeout(unlock,toLand);
+  }
+  function watch(){
+    if(watching||anchored||done)return;
+    watching=requestAnimationFrame(()=>{
+      watching=0;if(anchored||done||performance.now()>=landAt)return;
+      const box=root.getBoundingClientRect();
+      if(box.top+box.height/2<=innerHeight*.36)anchor();
+    });
+  }
   function finish(){
     if(done)return;done=true;wheelIntroduced=true;
+    unlock();removeEventListener('scroll',watch);
     observer.disconnect();root.removeEventListener('pointerdown',finish);
     animations.forEach(a=>a.cancel());
     section.classList.remove('is-prelude');
@@ -292,21 +339,23 @@ function mountWheelIntro(section,wheelApi){
     play(root,[{filter:'blur(12px) brightness(.72) saturate(.8)',transform:'scale(.93)'},{filter:'blur(0) brightness(1) saturate(1)',transform:'none'}],{duration:1200,delay:land+120,easing:'cubic-bezier(.22,1,.36,1)'});
     lines.forEach(line=>play(line,[{opacity:0,transform:'scaleX(0)'},{opacity:1,transform:'scaleX(1)'}],{duration:760,delay:land+820,easing:'cubic-bezier(.16,1,.3,1)'}));
     travel.finished.then(()=>setTimeout(finish,700),()=>{});
+    landAt=performance.now()+land;
+    addEventListener('scroll',watch,{passive:true});
   }
-  // It begins once the wheel's centre reaches the middle of the screen (or is above it
-  // while still in view, after a fast scroll).
+  // It begins as the wheel comes into view (its top past three quarters of the screen),
+  // so the line is in full bloom by the time the wheel reaches the middle.
   let pending=0;
   const check=()=>{
     pending=0;if(started||done)return;
     const box=root.getBoundingClientRect();
-    if(box.bottom>0&&box.top+box.height/2<=innerHeight/2)run();
+    if(box.bottom>0&&box.top<=innerHeight*.75)run();
   };
   const schedule=()=>{if(!pending)pending=requestAnimationFrame(check);};
   addEventListener('scroll',schedule,{passive:true});addEventListener('resize',schedule,{passive:true});
   const observer={disconnect(){removeEventListener('scroll',schedule);removeEventListener('resize',schedule);cancelAnimationFrame(pending);}};
   schedule();
   root.addEventListener('pointerdown',finish);
-  return {destroy(){if(!done){done=true;observer.disconnect();root.removeEventListener('pointerdown',finish);animations.forEach(a=>a.cancel());section.classList.remove('is-prelude');}}};
+  return {destroy(){if(!done){done=true;unlock();removeEventListener('scroll',watch);observer.disconnect();root.removeEventListener('pointerdown',finish);animations.forEach(a=>a.cancel());section.classList.remove('is-prelude');}}};
 }
 
 /* The revealed element ------------------------------------------------------------- */
@@ -494,41 +543,26 @@ function setupCall(){
     }
     say.style.setProperty('--words',String(index));
   }
-  let spot=null,pending=0,ready=false,begun=false,waitForMid=false,timer=0;
+  let spot=null,pending=0,ready=false,begun=false;
   const choose=event=>{event.preventDefault();spot?.end();openCallSheet();};
   call.addEventListener('click',choose);cleanups.push(()=>call.removeEventListener('click',choose));
   const goLive=()=>call.classList.add('is-live');
   if(callLive)goLive();
-  function begin(){
-    if(begun)return;begun=true;clearTimeout(timer);
-    callLive=true;goLive();
-    if(callSpotlit||motion.matches)return;
-    const box=call.getBoundingClientRect(),visible=box.top>=0&&box.top<innerHeight;
-    if(!visible){waitForMid=true;schedule();return;}
-    // Partly below the fold on a page nobody has scrolled yet: glide just enough for the
-    // grown card to show whole, then light it.
-    const over=box.top+Math.min(innerHeight*.25,250)+24-innerHeight;
-    if(over>0&&scrollY<8){scrollBy({top:over,behavior:'smooth'});setTimeout(()=>{if(!callSpotlit)spot=spotlight(call);},650);}
-    else spot=spotlight(call);
-  }
+  // It waits, still, until the visitor scrolls it to the middle of the screen (whole on
+  // screen); then the calling suggestion and the spotlight begin.
   const check=()=>{
-    pending=0;if(!ready||callSpotlit||motion.matches||document.querySelector('dialog[open]'))return;
-    const box=call.getBoundingClientRect(),centre=box.top+box.height/2;
-    // Scrolling the card past the middle of the screen starts it at once, but only while
-    // the card is whole on screen: never as it leaves over the top (a fast scroll past).
-    if(!begun){if(box.top>=0&&centre<=innerHeight*.5)begin();return;}
-    if(waitForMid&&box.top>=0&&centre<=innerHeight*.62)spot=spotlight(call);
+    pending=0;if(!ready||begun||document.querySelector('dialog[open]'))return;
+    const box=call.getBoundingClientRect();
+    if(box.top<0||box.top+box.height/2>innerHeight*.5)return;
+    begun=true;callLive=true;goLive();
+    if(!callSpotlit&&!motion.matches)spot=spotlight(call);
   };
   const schedule=()=>{if(!pending)pending=requestAnimationFrame(check);};
   addEventListener('scroll',schedule,{passive:true});
-  cleanups.push(()=>{removeEventListener('scroll',schedule);cancelAnimationFrame(pending);clearTimeout(timer);spot?.end(true);});
+  cleanups.push(()=>{removeEventListener('scroll',schedule);cancelAnimationFrame(pending);spot?.end(true);});
   return {
-    /** The page has settled (sound chosen): one second for the name and headline first. */
-    arm(){
-      if(ready)return;ready=true;
-      timer=setTimeout(begin,callLive?0:1000);
-      schedule();
-    }
+    /** The page has settled (sound chosen): from now on, reaching mid-screen starts it. */
+    arm(){if(ready)return;ready=true;if(callLive)begun=true;schedule();}
   };
 }
 function spotlight(call){
