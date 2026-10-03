@@ -124,7 +124,7 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
 <section class="tears-moment bio-tears" aria-labelledby="tears-title"><div class="tears-layout"><p class="eyebrow">${e(d.emotion.eyebrow)}</p><h2 class="tears-title" id="tears-title">${e(d.emotion.title)}</h2><p class="tears-copy">${e(d.emotion.copy)}</p><div class="tears-footer"><span class="tears-note">${e(d.emotion.note)}</span></div></div><canvas class="tears-canvas" aria-hidden="true"></canvas></section>
 <section class="bio-elements" aria-labelledby="bio-elements-title">
   <header class="bio-section-head"><p class="eyebrow">${e(d.method.eyebrow)}</p><h2 id="bio-elements-title">${e(d.method.title)}</h2></header>
-  <p class="bio-wheel-hint"><span class="bio-wheel-hint__line" aria-hidden="true"></span><span class="bio-wheel-hint__text">${e(b.wheelHint)}</span><span class="bio-wheel-hint__line" aria-hidden="true"></span></p>
+  <p class="bio-wheel-hint"><span class="bio-wheel-hint__line" aria-hidden="true"></span><span class="bio-wheel-hint__text"><span class="bio-wheel-hint__ink">${e(b.wheelHint)}</span><span class="bio-wheel-hint__glow" aria-hidden="true">${e(b.wheelHint)}</span></span><span class="bio-wheel-hint__line" aria-hidden="true"></span></p>
   ${wheel(d)}
   <div id="element-panel" class="bio-stage" role="tabpanel" aria-labelledby="bio-element-0" tabindex="0" hidden></div>
 </section>

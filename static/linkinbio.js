@@ -30,7 +30,7 @@ const write=(key,value)=>{try{local?.setItem(key,value);}catch{}};
 const icons=()=>window.lucide?.createIcons({attrs:{'stroke-width':1.5}});
 
 let dict,locale,soundEnabled=false,film=null,tears=null,tabSparks=null,wheel=null,game=null,visual=null,map=null,modal=null;
-let selected=-1,stageToken=0,cleanups=[];
+let selected=-1,stageToken=0,cleanups=[],wheelIntro=null;
 
 // The game's own sounds and the tear, exactly as on the homepage; only after sound is on.
 const sfx=createSoundEffects({nav:asset('sfx/button-pop.mp3'),drop:asset('sfx/tear-drop.mp3'),wink:asset('sfx/element-wink.mp3'),pick:asset('sfx/signal-pick.mp3'),twinkle:asset('sfx/red-twinkle.mp3'),conclusion:asset('sfx/conclusion-pop.mp3'),whoosh:asset('sfx/slide-whoosh.mp3')});
@@ -182,7 +182,7 @@ function mountWheel(root,{onPick}){
   const wake=()=>{if(destroyed||frame!==null||!visible||document.hidden||motion.matches)return;last=null;frame=requestAnimationFrame(tick);};
   // Until the first tap, a ring pings from each element in turn and its sector glows, so
   // the labels read as things to press rather than decoration.
-  let hintTimer=0,hinted=false,hintIndex=0,active=-1;
+  let hintTimer=0,hinted=false,hintIndex=0,active=-1,hintsAllowed=false;
   function ping(){
     hintTimer=0;
     if(hinted||destroyed)return;
@@ -201,7 +201,7 @@ function mountWheel(root,{onPick}){
   }
   const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{
     visible=entries.some(entry=>entry.isIntersecting);wake();
-    if(visible&&!hinted&&!hintTimer)hintTimer=setTimeout(ping,900);
+    if(visible&&hintsAllowed&&!hinted&&!hintTimer)hintTimer=setTimeout(ping,900);
   }):null;
   observer?.observe(root);if(!observer)visible=true;
   document.addEventListener('visibilitychange',wake);
@@ -231,6 +231,11 @@ function mountWheel(root,{onPick}){
       if(instant||motion.matches){theta=((want%360)+360)%360;omega=0;target=null;holdUntil=performance.now()+1800;apply();return;}
       target=want+360*Math.ceil((theta+120-want)/360);holdUntil=0;wake();
     },
+    /** The pings begin once the wheel has been introduced. */
+    startHints(){
+      if(hintsAllowed||destroyed)return;hintsAllowed=true;
+      if(visible&&!hinted&&!hintTimer)hintTimer=setTimeout(ping,700);
+    },
     setActive(index){
       active=index;root.classList.add('has-active');
       segments.forEach((segment,i)=>{segment.setAttribute('aria-selected',String(i===index));segment.tabIndex=i===index?0:-1;});
@@ -238,6 +243,71 @@ function mountWheel(root,{onPick}){
     },
     destroy(){destroyed=true;clearTimeout(hintTimer);observer?.disconnect();document.removeEventListener('visibilitychange',wake);if(frame!==null)cancelAnimationFrame(frame);}
   };
+}
+
+/* The wheel's introduction ------------------------------------------------------------ */
+// On first arrival the wheel waits out of focus while "Tap each element to learn more"
+// assembles in light over its centre, letter by letter. The line then glides up to its
+// place above the wheel, cooling from light to ink, as the wheel sharpens and steps
+// forward; then the pings begin. Once per visit; a tap on the wheel ends it at once.
+let wheelIntroduced=false;
+function mountWheelIntro(section,wheelApi){
+  const root=section?.querySelector('[data-bio-wheel]'),hint=section?.querySelector('.bio-wheel-hint');
+  if(!root||!hint||wheelIntroduced||motion.matches||!root.animate||!('IntersectionObserver' in window)){wheelApi.startHints();return {destroy(){}};}
+  const ink=hint.querySelector('.bio-wheel-hint__ink'),glow=hint.querySelector('.bio-wheel-hint__glow'),lines=[...hint.querySelectorAll('.bio-wheel-hint__line')];
+  // Both layers are split the same way (words that never break inside), so they align.
+  const graphemes=text=>window.Intl?.Segmenter?[...new Intl.Segmenter(document.documentElement.lang||'en',{granularity:'grapheme'}).segment(text)].map(part=>part.segment):[...text];
+  const split=layer=>{
+    const chars=[];const text=layer.textContent;layer.textContent='';
+    text.split(/(\s+)/).forEach(piece=>{
+      if(!piece)return;
+      if(/^\s+$/.test(piece)){layer.append(document.createTextNode(piece));return;}
+      const word=document.createElement('span');word.className='bio-wheel-hint__word';
+      for(const g of graphemes(piece)){const c=document.createElement('span');c.className='bio-wheel-hint__char';c.textContent=g;word.append(c);chars.push(c);}
+      layer.append(word);
+    });
+    return chars;
+  };
+  split(ink);const chars=split(glow);
+  section.classList.add('is-prelude');
+  const animations=[];let started=false,done=false;
+  const play=(node,frames,options)=>{const a=node.animate(frames,{fill:'both',...options});animations.push(a);return a;};
+  function finish(){
+    if(done)return;done=true;wheelIntroduced=true;
+    observer.disconnect();root.removeEventListener('pointerdown',finish);
+    animations.forEach(a=>a.cancel());
+    section.classList.remove('is-prelude');
+    wheelApi.startHints();
+  }
+  function run(){
+    started=true;
+    const wheelBox=root.getBoundingClientRect(),hintBox=hint.getBoundingClientRect();
+    const dy=(wheelBox.top+wheelBox.height/2)-(hintBox.top+hintBox.height/2);
+    const SCALE=Math.min(1.45,(root.getBoundingClientRect().width*.94)/Math.max(1,hint.querySelector('.bio-wheel-hint__text').getBoundingClientRect().width)),STAGGER=Math.min(30,900/Math.max(1,chars.length));
+    section.classList.remove('is-prelude');   // from here the animations hold every state
+    play(root,[{filter:'blur(12px) brightness(.72) saturate(.8)',transform:'scale(.93)'},{filter:'blur(12px) brightness(.72) saturate(.8)',transform:'scale(.93)'}],{duration:1});
+    play(ink,[{opacity:0},{opacity:0}],{duration:1});
+    lines.forEach(line=>play(line,[{opacity:0,transform:'scaleX(0)'},{opacity:0,transform:'scaleX(0)'}],{duration:1}));
+    // 1. The line assembles over the centre of the blurred wheel.
+    play(hint,[{transform:`translateY(${dy}px) scale(${SCALE})`},{transform:`translateY(${dy}px) scale(${SCALE})`}],{duration:1});
+    play(glow,[{opacity:1},{opacity:1}],{duration:1});
+    chars.forEach((c,i)=>play(c,[{opacity:0,transform:'translateY(12px) scale(.92)',filter:'blur(8px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:760,delay:150+i*STAGGER,easing:'cubic-bezier(.16,1,.3,1)'}));
+    const land=150+chars.length*STAGGER+760+700;
+    // 2. It lands above the wheel, which comes into focus beneath it.
+    const travel=play(hint,[{transform:`translateY(${dy}px) scale(${SCALE})`},{transform:'none'}],{duration:1050,delay:land,easing:'cubic-bezier(.65,0,.35,1)'});
+    play(glow,[{opacity:1},{opacity:0}],{duration:650,delay:land+380,easing:'ease-out'});
+    play(ink,[{opacity:0},{opacity:1}],{duration:650,delay:land+380,easing:'ease-out'});
+    play(root,[{filter:'blur(12px) brightness(.72) saturate(.8)',transform:'scale(.93)'},{filter:'blur(0) brightness(1) saturate(1)',transform:'none'}],{duration:1200,delay:land+120,easing:'cubic-bezier(.22,1,.36,1)'});
+    lines.forEach(line=>play(line,[{opacity:0,transform:'scaleX(0)'},{opacity:1,transform:'scaleX(1)'}],{duration:760,delay:land+820,easing:'cubic-bezier(.16,1,.3,1)'}));
+    travel.finished.then(()=>setTimeout(finish,700),()=>{});
+  }
+  const observer=new IntersectionObserver(entries=>{
+    const entry=entries[entries.length-1];
+    if(!started&&entry.intersectionRatio>=.55)run();
+  },{threshold:[0,.55,.8]});
+  observer.observe(root);
+  root.addEventListener('pointerdown',finish);
+  return {destroy(){if(!done){done=true;observer.disconnect();root.removeEventListener('pointerdown',finish);animations.forEach(a=>a.cancel());section.classList.remove('is-prelude');}}};
 }
 
 /* The revealed element ------------------------------------------------------------- */
@@ -449,7 +519,7 @@ document.addEventListener('click',event=>{
 
 /* Rendering ---------------------------------------------------------------------- */
 function teardown(){
-  closeModal();film?.destroy();film=null;tears?.destroy();tears=null;tabSparks?.destroy();tabSparks=null;wheel?.destroy();wheel=null;
+  closeModal();film?.destroy();film=null;tears?.destroy();tears=null;tabSparks?.destroy();tabSparks=null;wheelIntro?.destroy();wheelIntro=null;wheel?.destroy();wheel=null;
   clearStage();map?.remove();map=null;cleanups.forEach(fn=>fn());cleanups=[];
 }
 // The build ships English markup; another language replaces it (keeping the film's place).
@@ -464,6 +534,7 @@ function render({hydrate=false}={}){
   const tablist=shell.querySelector('.bio-wheel__labels');
   if(tablist)tabSparks=mountTabSparks(tablist,{reducedMotion:motion});
   wheel=mountWheel(shell.querySelector('[data-bio-wheel]'),{onPick:index=>selectElement(index)});
+  wheelIntro=mountWheelIntro(shell.querySelector('.bio-elements'),wheel);
   setupLinks();setupLanguage();setupMap();updateSoundButtons();
   // Mindset is chosen from the start (its game waits below); the wheel keeps cruising.
   selectElement(keep>=0?keep:0,{quiet:true,instant:true,spin:false});
