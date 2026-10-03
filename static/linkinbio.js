@@ -311,9 +311,7 @@ async function showStage(index,{instant=false}={}){
   if(index===0){
     panel.innerHTML='<div id="mindset-host"></div>';
     game=mountMindset(document.getElementById('mindset-host'),{copy:dict.game,asset,reducedMotion:motion.matches,onSound:cue,onContinue:continueFromGame});
-    // On this page Begin sits in the middle of the signal field (CSS); it needs the field's height.
-    const root=panel.querySelector('.mindset-game'),field=panel.querySelector('.mindset-field');
-    if(root&&field){const measure=()=>root.style.setProperty('--field-h',`${field.offsetHeight}px`);measure();if('ResizeObserver' in window){fieldWatch=new ResizeObserver(measure);fieldWatch.observe(field);}}
+    // (The game measures its field into --field-h; this page centres Begin over it in CSS.)
   }else{
     panel.innerHTML=renderElement(index,dict);
     visual=mountElementVisual(document.getElementById('element-visual-host'),index,{reducedMotion:motion.matches});
@@ -482,34 +480,40 @@ function setupCall(){
     }
     say.style.setProperty('--words',String(index));
   }
-  let spot=null,pending=0,armed=false,timer=0;
+  let spot=null,pending=0,ready=false,begun=false,waitForMid=false,timer=0;
   const choose=event=>{event.preventDefault();spot?.end();openCallSheet();};
   call.addEventListener('click',choose);cleanups.push(()=>call.removeEventListener('click',choose));
   const goLive=()=>call.classList.add('is-live');
   if(callLive)goLive();
-  // Later arrivals (after scrolling away) still get their moment at mid-screen.
+  function begin(){
+    if(begun)return;begun=true;clearTimeout(timer);
+    callLive=true;goLive();
+    if(callSpotlit||motion.matches)return;
+    const box=call.getBoundingClientRect(),visible=box.top>=0&&box.top<innerHeight;
+    if(!visible){waitForMid=true;schedule();return;}
+    // Partly below the fold on a page nobody has scrolled yet: glide just enough for the
+    // grown card to show whole, then light it.
+    const over=box.top+Math.min(innerHeight*.25,250)+24-innerHeight;
+    if(over>0&&scrollY<8){scrollBy({top:over,behavior:'smooth'});setTimeout(()=>{if(!callSpotlit)spot=spotlight(call);},650);}
+    else spot=spotlight(call);
+  }
   const check=()=>{
-    pending=0;if(!armed||callSpotlit||motion.matches||document.querySelector('dialog[open]'))return;
-    const box=call.getBoundingClientRect();
-    if(box.bottom>0&&box.top+box.height/2<=innerHeight*.62)spot=spotlight(call);
+    pending=0;if(!ready||callSpotlit||motion.matches||document.querySelector('dialog[open]'))return;
+    const box=call.getBoundingClientRect(),centre=box.top+box.height/2;
+    // Scrolling the card past the middle of the screen starts it at once, but only while
+    // the card is whole on screen: never as it leaves over the top (a fast scroll past).
+    if(!begun){if(box.top>=0&&centre<=innerHeight*.5)begin();return;}
+    if(waitForMid&&box.top>=0&&centre<=innerHeight*.62)spot=spotlight(call);
   };
   const schedule=()=>{if(!pending)pending=requestAnimationFrame(check);};
   addEventListener('scroll',schedule,{passive:true});
   cleanups.push(()=>{removeEventListener('scroll',schedule);cancelAnimationFrame(pending);clearTimeout(timer);spot?.end(true);});
   return {
-    /** The page has settled (sound chosen): give the name and headline a moment first. */
+    /** The page has settled (sound chosen): one second for the name and headline first. */
     arm(){
-      if(armed||timer)return;
-      timer=setTimeout(()=>{
-        armed=true;callLive=true;goLive();
-        if(callSpotlit||motion.matches)return;
-        const box=call.getBoundingClientRect(),visible=box.bottom>0&&box.top<innerHeight;
-        if(!visible){schedule();return;}
-        // Partly below the fold: glide just enough for the grown card to show whole.
-        const over=box.top+Math.min(innerHeight*.25,250)+24-innerHeight;
-        if(over>0&&scrollY<80){scrollBy({top:over,behavior:'smooth'});setTimeout(()=>{if(!callSpotlit)spot=spotlight(call);},650);}
-        else spot=spotlight(call);
-      },callLive?0:2600);
+      if(ready)return;ready=true;
+      timer=setTimeout(begin,callLive?0:1000);
+      schedule();
     }
   };
 }
@@ -520,15 +524,18 @@ function spotlight(call){
   veil.classList.add('is-on');document.body.classList.add('bio-spotlit');call.classList.add('is-spot');
   call.querySelector('.bio-call-avatar img')?.animate([{filter:'brightness(1.7)'},{filter:'none'}],{duration:900,easing:'ease-out'});
   const startY=scrollY;let ended=false;
-  const onScroll=()=>{if(Math.abs(scrollY-startY)>160)end();};
+  // Scrolling back up never ends it; scrolling on down past it fades it away. A tap
+  // anywhere else reaches what it was meant for (the veil lets it through) and ends it.
+  const onScroll=()=>{if(scrollY-startY>220)end();};
+  const onTap=event=>{if(!call.contains(event.target))end();};
   const timer=setTimeout(()=>end(),3600);
   function end(now=false){
-    if(ended)return;ended=true;clearTimeout(timer);removeEventListener('scroll',onScroll);
+    if(ended)return;ended=true;clearTimeout(timer);removeEventListener('scroll',onScroll);document.removeEventListener('pointerdown',onTap,true);
     veil.classList.remove('is-on');document.body.classList.remove('bio-spotlit');call.classList.remove('is-spot');
     if(now)veil.remove();else setTimeout(()=>veil.remove(),700);
   }
-  veil.addEventListener('click',()=>end());
   addEventListener('scroll',onScroll,{passive:true});
+  document.addEventListener('pointerdown',onTap,{capture:true,passive:true});
   return {end};
 }
 

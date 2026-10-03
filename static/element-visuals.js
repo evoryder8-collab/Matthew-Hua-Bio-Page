@@ -1,6 +1,27 @@
 const ELEMENT_KEYS = [null, 'hotcold', 'breath', 'body', 'movement', 'community'];
 const { renderers, palette } = createRenderers();
 
+// Hot / Cold rests on real footage from Matthew's practice: his cold plunge and his
+// sauna. Silent looping clips, never shown themselves; the renderer paints them.
+function createFootage(frame) {
+  const make = (file) => {
+    const video = frame.ownerDocument.createElement('video');
+    video.muted = true; video.defaultMuted = true; video.loop = true; video.playsInline = true; video.preload = 'auto';
+    video.setAttribute('muted', ''); video.setAttribute('playsinline', ''); video.setAttribute('aria-hidden', 'true');
+    video.className = 'element-visual__footage';
+    video.src = new URL(`../assets/footage/${file}`, import.meta.url).href;
+    frame.appendChild(video);
+    return video;
+  };
+  const cold = make('cold-plunge.mp4'), hot = make('sauna.mp4');
+  return {
+    cold, hot,
+    play() { for (const video of [cold, hot]) if (video.paused) video.play()?.catch(() => {}); },
+    pause() { cold.pause(); hot.pause(); },
+    destroy() { for (const video of [cold, hot]) { video.pause(); video.removeAttribute('src'); video.load(); video.remove(); } },
+  };
+}
+
 /** The caller owns localized copy; this mount owns only its decorative canvas. */
 export function mountElementVisual(host, index, { reducedMotion = false } = {}) {
   const key = ELEMENT_KEYS[index];
@@ -21,6 +42,7 @@ export function mountElementVisual(host, index, { reducedMotion = false } = {}) 
   if (!ctx) return { destroy() { frame.remove(); } };
 
   const renderer = renderers[key];
+  const footage = key === 'hotcold' ? createFootage(frame) : null;
   const motion = win.matchMedia?.('(prefers-reduced-motion: reduce)');
   let destroyed = false;
   let intersecting = !win.IntersectionObserver;
@@ -54,6 +76,7 @@ export function mountElementVisual(host, index, { reducedMotion = false } = {}) 
   }
 
   function stop() {
+    footage?.pause();
     if (raf !== null) win.cancelAnimationFrame(raf);
     raf = null;
     previousTime = null;
@@ -75,6 +98,7 @@ export function mountElementVisual(host, index, { reducedMotion = false } = {}) 
       if (geometryChanged) {
         state = {};
         renderer.init(state, width, height);
+        if (footage) state.footage = footage;
       }
       needsDraw = true;
     }
@@ -106,6 +130,7 @@ export function mountElementVisual(host, index, { reducedMotion = false } = {}) 
       return;
     }
     if (needsDraw) draw(elapsed);
+    footage?.play();
     if (raf === null) raf = win.requestAnimationFrame(tick);
   }
 
@@ -146,6 +171,7 @@ export function mountElementVisual(host, index, { reducedMotion = false } = {}) 
       if (destroyed) return;
       destroyed = true;
       stop();
+      footage?.destroy();
       visibilityObserver?.disconnect();
       resizeObserver?.disconnect();
       attributeObserver?.disconnect();
@@ -197,6 +223,15 @@ function createRenderers() {
     if (a <= 0.004 || r <= 0.3) return;
     ctx.globalAlpha = clamp(a);
     ctx.drawImage(sprite(c), x - r, y - r, r * 2, r * 2);
+  }
+  // A video cover-fitted into a rectangle (focusX picks the horizontal crop).
+  function footageInto(ctx, video, x, y, w, h, focusX, alpha) {
+    if (!video || video.readyState < 2 || !video.videoWidth) return;
+    const vw = video.videoWidth, vh = video.videoHeight, scale = Math.max(w / vw, h / vh);
+    const sw = w / scale, sh = h / scale;
+    const sx = clamp((vw - sw) * focusX, 0, vw - sw), sy = clamp((vh - sh) * 0.45, 0, vh - sh);
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(video, sx, sy, sw, sh, x, y, w, h);
   }
   function backdrop(ctx, w, h, top, bottom) {
     const g = ctx.createLinearGradient(0, 0, 0, h);
@@ -302,6 +337,22 @@ function createRenderers() {
       const bg = ctx.createLinearGradient(0, 0, w, 0);
       bg.addColorStop(0, '#05182b'); bg.addColorStop(0.46, '#0a1220'); bg.addColorStop(0.54, '#1a0d0c'); bg.addColorStop(1, '#2a110b');
       ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
+      // Matthew's cold plunge (left) and sauna (right), half-seen beneath the drawing and
+      // fading into the dark seam where the two sides meet.
+      if (st.footage) {
+        ctx.globalCompositeOperation = 'source-over';
+        footageInto(ctx, st.footage.cold, 0, 0, w * 0.5, h, 0.5, 0.5);
+        footageInto(ctx, st.footage.hot, w * 0.5, 0, w * 0.5, h, 0.62, 0.62);
+        // The sauna is a dim, red room: a soft screen pass lifts its warm wood into view.
+        ctx.globalCompositeOperation = 'screen';
+        footageInto(ctx, st.footage.hot, w * 0.5, 0, w * 0.5, h, 0.62, 0.32);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1;
+        const seam = ctx.createLinearGradient(0, 0, w, 0);
+        seam.addColorStop(0, 'rgba(5,24,43,.3)'); seam.addColorStop(0.36, 'rgba(10,18,32,.12)'); seam.addColorStop(0.46, 'rgba(10,18,32,.85)');
+        seam.addColorStop(0.5, 'rgba(14,13,20,.96)'); seam.addColorStop(0.54, 'rgba(26,13,12,.85)'); seam.addColorStop(0.62, 'rgba(26,13,12,.08)'); seam.addColorStop(1, 'rgba(42,17,11,.12)');
+        ctx.fillStyle = seam; ctx.fillRect(0, 0, w, h);
+      }
       ctx.globalCompositeOperation = 'lighter';
       light(ctx, [120, 190, 255], w * 0.12, h * 0.5, w * 0.45, 0.24);
       light(ctx, [255, 140, 90], w * 0.88, h * 0.75, w * 0.5, 0.3);

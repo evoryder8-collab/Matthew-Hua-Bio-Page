@@ -97,6 +97,9 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
   root.classList.toggle('mindset-reduced-motion', Boolean(reducedMotion));
   root.setAttribute('aria-labelledby', `${id}-title`);
   const field = element('div', 'mindset-field');
+  // The field's height, for layouts that place the first Begin over the field (phones).
+  const fieldWatch = win.ResizeObserver ? new win.ResizeObserver(() => root.style.setProperty('--field-h', `${field.offsetHeight}px`)) : null;
+  fieldWatch?.observe(field);
   field.tabIndex = -1;
   field.setAttribute('role', 'group');
   field.setAttribute('aria-label', text('fieldLabel'));
@@ -549,6 +552,7 @@ export function mountMindset(host, { copy, asset, reducedMotion = false, onPhase
       if (destroyed) return;
       destroyed = true;
       stopTimer();
+      fieldWatch?.disconnect();
       doc.removeEventListener('visibilitychange', onVisibilityChange);
       root.removeEventListener('click', onClick);
       root.remove();

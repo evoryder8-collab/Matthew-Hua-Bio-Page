@@ -123,7 +123,7 @@ body.bio-page{min-height:100svh}
 .bio-elements{margin-top:60px;padding-bottom:12px;text-align:center}
 .bio-section-head .eyebrow{margin-bottom:10px;color:#c81d77}
 .bio-section-head h2{margin:0 0 8px;font-family:var(--serif);font-size:clamp(30px,8.6vw,40px);font-style:italic;font-weight:400;line-height:1.1;color:#1c1018}
-.bio-wheel-hint{position:relative;z-index:6;display:flex;align-items:center;justify-content:center;gap:12px;margin:22px 0 0;font-size:10.5px;font-weight:600;letter-spacing:.24em;line-height:1.6;text-transform:uppercase;transform-origin:50% 50%}
+.bio-wheel-hint{position:relative;z-index:6;pointer-events:none;display:flex;align-items:center;justify-content:center;gap:12px;margin:22px 0 0;font-size:10.5px;font-weight:600;letter-spacing:.24em;line-height:1.6;text-transform:uppercase;transform-origin:50% 50%}
 .bio-wheel-hint__line{flex:0 0 28px;height:1px;background:linear-gradient(90deg,transparent,#c81d7799)}
 .bio-wheel-hint__line:last-child{background:linear-gradient(270deg,transparent,#c81d7799)}
 .bio-wheel-hint__text{position:relative;display:block;max-width:270px;text-align:center}
@@ -338,7 +338,7 @@ body.bio-page{min-height:100svh}
 
 /* The call card's moment: the page dims and blurs, the card grows and speaks */
 .bio-spot-veil{position:fixed;inset:0;z-index:55;background:rgba(10,6,12,.52);backdrop-filter:blur(10px) saturate(1.1);-webkit-backdrop-filter:blur(10px) saturate(1.1);opacity:0;transition:opacity .65s var(--ease);pointer-events:none}
-.bio-spot-veil.is-on{opacity:1;pointer-events:auto}
+.bio-spot-veil.is-on{opacity:1}
 .bio-call-hero{margin-top:28px}
 body.bio-spotlit .bio-call-hero{position:relative;z-index:60}
 .bio-link--call{transition:min-height .75s var(--ease),gap .75s var(--ease),padding .75s var(--ease),transform .6s var(--ease),box-shadow .6s var(--ease)}

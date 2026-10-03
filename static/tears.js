@@ -62,6 +62,7 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
     event.preventDefault(); brakeTo(lastTouch - y); lastTouch = y;
   };
   let braking = false;
+  let released = false;   // let go just before the impact; never re-engaged after
   let approach = null;
   function brake(on) {
     if (on === braking) return;
@@ -73,7 +74,7 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
   }
   const setState = (next) => {
     state = next; section.dataset.tearState = next;
-    if (next !== 'idle') brake(next !== 'done' && next !== 'static');
+    if (next !== 'idle') brake(!released && next !== 'done' && next !== 'static');
     if (next === 'done') approach?.disconnect();
   };
 
@@ -515,6 +516,12 @@ export function mountTearsMoment(section, { reducedMotion, onImpact = () => {} }
           context.stroke();
           context.restore();
           drawTear(falling.x, falling.y, bulbRadius, tip, angle, wobble, glass);
+        }
+        // The scroll is freed about 200 ms before the drop meets the paragraph.
+        if (!released) {
+          const gap = Math.max(0, surface.y - (falling.y + bulbRadius));
+          const toImpact = (-falling.vy + Math.sqrt(falling.vy * falling.vy + 2 * GRAVITY * gap)) / GRAVITY;
+          if (toImpact <= 0.2) { released = true; brake(false); }
         }
         if (falling.y + bulbRadius >= surface.y) {
           // 3. Impact: the drop flattens into the surface it meets.

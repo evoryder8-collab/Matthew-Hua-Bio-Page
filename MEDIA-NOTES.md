@@ -180,3 +180,7 @@ ffmpeg -f lavfi -i color=c=white:s=96x96:r=30:d=2 -pix_fmt yuv420p10le -c:v libx
 ## Link-in-bio card photographs
 
 `assets/bio/*.webp` are 640x320 WebP crops (quality 72) for the `/linkinbio/` cards, made from images already in `assets/` and `assets/editorial/` (about-matthew, stillness, workshop, hero-bodywork, European Championship, Champ of the Champs, Advice as a judge, Reignite your inner fire, the group photo, both Swiss championship photos and the Matthew/Tony portrait). Originals are unchanged; the cards tone them in each platform's colour with CSS.
+
+## Hot / Cold footage
+
+`assets/footage/originals/cold.mp4` and `hot.mp4` are the supplied clips (Matthew's cold plunge and sauna; HEVC 10-bit, 1080x1920, kept unchanged). `assets/footage/cold-plunge.mp4` and `sauna.mp4` are the web derivatives used under the Hot / Cold illustration: H.264 8-bit, 540 px wide, slowed to 80%, played forward then reversed so they loop seamlessly, no audio (CRF 26).

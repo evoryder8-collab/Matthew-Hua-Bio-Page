@@ -441,3 +441,10 @@ main h1[tabindex="-1"]:focus {outline:none}
   .instrument-photo .instrument-aura{animation:none}
   .arrival-enter .arrival-link,.arrival-enter .arrival-link::before,.arrival-enter .arrival-link svg{animation:none}
 }
+
+/* Phones: the game's first Begin waits in the middle of the signal field, so it can be
+   reached without scrolling past the copy. Calm here; the link-in-bio page goes bolder. */
+@media (max-width:700px){
+  .mindset-game[data-phase="intro"] .mindset-controls{position:absolute;z-index:4;left:0;right:0;top:calc(var(--field-h,0px) * -1);height:var(--field-h,0px);display:flex;align-items:center;justify-content:center;margin:0;padding:0;pointer-events:none}
+  .mindset-game[data-phase="intro"] .mindset-controls .mindset-button{min-width:132px;min-height:50px;font-size:16px;pointer-events:auto;box-shadow:0 10px 26px -10px #ffd27a99,0 0 0 6px rgba(9,7,14,.55)}
+}
