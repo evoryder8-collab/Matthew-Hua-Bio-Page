@@ -73,7 +73,7 @@ function card(l,asset){
   // green call button rings.
   const lead=l.call?`<span class="bio-call-avatar" aria-hidden="true"><i></i><i></i><i></i><img src="${e(asset('bio/avatar.webp'))}" alt="" width="52" height="52" decoding="async"></span>`:`<span class="bio-link__mark" aria-hidden="true">${GLYPHS[l.tone]}</span>`;
   const end=l.call?`<span class="bio-call-button" aria-hidden="true">${CALL_GLYPH}</span>`:`<span class="bio-link__go" aria-hidden="true">${GO}</span>`;
-  return `<a class="bio-link${l.primary?' bio-link--primary':''}${l.call?' bio-link--call':''}" data-tone="${l.tone}" href="${e(l.url)}" ${l.extra||''} data-bio-reveal><span class="bio-link__art" aria-hidden="true">${art}</span><span class="bio-link__glass" aria-hidden="true"></span>${lead}<span class="bio-link__copy"><span class="bio-link__eyebrow">${e(l.eyebrow)}</span><strong>${e(l.title)}</strong>${l.detail?`<small${l.call?' class="bio-call-say"':''}>${e(l.detail)}</small>`:''}</span>${end}</a>`;
+  return `<a class="bio-link${l.primary?' bio-link--primary':''}${l.call?' bio-link--call':''}" data-tone="${l.tone}" href="${e(l.url)}" ${l.extra||''} data-bio-reveal><span class="bio-link__art" aria-hidden="true">${art}</span><span class="bio-link__glass" aria-hidden="true"></span>${lead}<span class="bio-link__copy">${l.eyebrow?`<span class="bio-link__eyebrow">${e(l.eyebrow)}</span>`:''}<strong>${e(l.title)}</strong>${l.detail?`<small${l.call?' class="bio-call-say"':''}>${e(l.detail)}</small>`:''}</span>${end}</a>`;
 }
 
 /**
@@ -136,7 +136,7 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
 </section>
 <nav class="bio-links" aria-label="${e(b.links)}">
   <p class="bio-group-label">${e(b.links)}</p>
-  ${card({tone:'phone',art:'phone',eyebrow:phone,title:b.call,detail:b.callInvite,url:'tel:+41765067488',primary:true,call:true},asset)}
+  ${card({tone:'phone',art:'phone',title:b.call,detail:b.callInvite,url:'tel:+41765067488',primary:true,call:true},asset)}
   ${links.filter(l=>SOCIAL_TONES.includes(l.tone)).map(l=>card(l,asset)).join('')}
   <button class="bio-more" type="button" aria-expanded="false" aria-controls="bio-more-links"><span class="bio-more__line" aria-hidden="true"></span><span class="bio-more__label">${e(b.moreContact)}</span><span class="bio-more__chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="m14.5 6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="bio-more__line" aria-hidden="true"></span></button>
   <div class="bio-more-links" id="bio-more-links" inert><div class="bio-more-links__inner">${[{tone:'whatsapp',art:'whatsapp',eyebrow:`WhatsApp · ${phone}`,title:b.whatsapp,detail:b.whatsappDetail,url:`https://wa.me/41765067488?text=${greeting}`,extra:external},...links.filter(l=>['contact','mail'].includes(l.tone))].map(l=>card(l,asset)).join('')}</div></div>
