@@ -482,21 +482,57 @@ function openCallSheet(){
   dialog.querySelectorAll('.bio-call-choice').forEach(choice=>choice.addEventListener('click',()=>setTimeout(close,350)));
   const heading=dialog.querySelector('h2');heading.tabIndex=-1;heading.focus({preventScroll:true});
 }
-// Reaching the call card: it arrives with a burst before settling into its ringing.
+// Reaching the call card (once per visit, when it reaches mid-screen): everything else
+// dims and blurs away while the card grows to about a quarter of the screen, then it
+// settles back. A tap, a scroll onward or a few seconds end the moment.
+let callSpotlit=false;
 function setupCall(){
   const call=shell.querySelector('.bio-link--call');if(!call)return;
-  // The card keeps its tel: link for anyone without scripts; here it opens the choice.
-  const choose=event=>{event.preventDefault();openCallSheet();};
+  // The invitation speaks word by word: each word rises and gleams in turn.
+  const say=call.querySelector('.bio-call-say');
+  if(say){
+    const text=say.textContent,lang=document.documentElement.lang||'en';
+    const words=window.Intl?.Segmenter?[...new Intl.Segmenter(lang,{granularity:'word'}).segment(text)].map(part=>part.segment):text.split(/(\s+)/);
+    say.textContent='';let index=0;
+    for(const word of words){
+      if(!word)continue;
+      if(/^\s+$/.test(word)){say.append(document.createTextNode(word));continue;}
+      const span=document.createElement('span');span.className='bio-call-word';span.textContent=word;span.style.setProperty('--w',String(index++));say.append(span);
+    }
+    say.style.setProperty('--words',String(index));
+  }
+  let spot=null;
+  const choose=event=>{event.preventDefault();spot?.end();openCallSheet();};
   call.addEventListener('click',choose);cleanups.push(()=>call.removeEventListener('click',choose));
-  if(motion.matches||!call.animate||!('IntersectionObserver' in window))return;
-  const observer=new IntersectionObserver(entries=>{
-    if(!entries.some(entry=>entry.intersectionRatio>=.6))return;
-    observer.disconnect();
-    call.animate([{transform:'scale(.96)',boxShadow:'0 0 0 0 rgba(52,199,89,.0)'},{transform:'scale(1.025)',boxShadow:'0 0 0 10px rgba(52,199,89,.18)',offset:.45},{transform:'none',boxShadow:'0 0 0 0 rgba(52,199,89,0)'}],{duration:900,easing:'cubic-bezier(.22,1,.36,1)'});
-    call.querySelector('.bio-call-button')?.animate([{transform:'scale(.4)',opacity:0},{transform:'scale(1.18)',opacity:1,offset:.6},{transform:'none',opacity:1}],{duration:800,delay:150,easing:'cubic-bezier(.16,1.4,.3,1)',fill:'backwards'});
-    call.querySelector('.bio-call-avatar img')?.animate([{transform:'scale(.7)',filter:'brightness(1.6)'},{transform:'none',filter:'none'}],{duration:800,easing:'cubic-bezier(.16,1,.3,1)'});
-  },{threshold:[0,.6]});
-  observer.observe(call);cleanups.push(()=>observer.disconnect());
+  if(callSpotlit||motion.matches)return;
+  let pending=0;
+  const check=()=>{
+    pending=0;if(callSpotlit||document.querySelector('dialog[open]'))return;
+    const box=call.getBoundingClientRect();
+    if(box.bottom>0&&box.top+box.height/2<=innerHeight*.55)spot=spotlight(call);
+  };
+  const schedule=()=>{if(!pending)pending=requestAnimationFrame(check);};
+  addEventListener('scroll',schedule,{passive:true});
+  cleanups.push(()=>{removeEventListener('scroll',schedule);cancelAnimationFrame(pending);spot?.end(true);});
+  schedule();
+}
+function spotlight(call){
+  callSpotlit=true;
+  const veil=document.createElement('div');veil.className='bio-spot-veil';veil.setAttribute('aria-hidden','true');
+  document.body.append(veil);void veil.offsetWidth;
+  veil.classList.add('is-on');document.body.classList.add('bio-spotlit');call.classList.add('is-spot');
+  call.querySelector('.bio-call-avatar img')?.animate([{filter:'brightness(1.7)'},{filter:'none'}],{duration:900,easing:'ease-out'});
+  const startY=scrollY;let ended=false;
+  const onScroll=()=>{if(Math.abs(scrollY-startY)>160)end();};
+  const timer=setTimeout(()=>end(),3600);
+  function end(now=false){
+    if(ended)return;ended=true;clearTimeout(timer);removeEventListener('scroll',onScroll);
+    veil.classList.remove('is-on');document.body.classList.remove('bio-spotlit');call.classList.remove('is-spot');
+    if(now)veil.remove();else setTimeout(()=>veil.remove(),700);
+  }
+  veil.addEventListener('click',()=>end());
+  addEventListener('scroll',onScroll,{passive:true});
+  return {end};
 }
 
 function setupLanguage(){

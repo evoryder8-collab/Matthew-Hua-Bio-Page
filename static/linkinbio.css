@@ -316,3 +316,26 @@ body.bio-page{min-height:100svh}
 .bio-call-sheet h2:focus,.bio-call-sheet h2:focus-visible{outline:none}
 @keyframes bio-radiate{0%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
 @keyframes bio-more-glow{0%,100%{box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),0 6px 14px -6px rgba(200,29,119,.55),0 0 0 0 rgba(255,143,198,0)}50%{box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),0 6px 16px -6px rgba(200,29,119,.75),0 0 18px 2px rgba(255,143,198,.45)}}
+
+/* The call card's moment: the page dims and blurs, the card grows and speaks */
+.bio-spot-veil{position:fixed;inset:0;z-index:55;background:rgba(10,6,12,.52);backdrop-filter:blur(10px) saturate(1.1);-webkit-backdrop-filter:blur(10px) saturate(1.1);opacity:0;transition:opacity .65s var(--ease);pointer-events:none}
+.bio-spot-veil.is-on{opacity:1;pointer-events:auto}
+body.bio-spotlit .bio-links{position:relative;z-index:60}
+.bio-links>:not(.bio-link--call){transition:filter .65s var(--ease),opacity .65s var(--ease)}
+body.bio-spotlit .bio-links>:not(.bio-link--call){filter:blur(7px);opacity:.22}
+.bio-link--call{transition:min-height .75s var(--ease),gap .75s var(--ease),padding .75s var(--ease),transform .6s var(--ease),box-shadow .6s var(--ease)}
+.bio-link--call .bio-call-avatar,.bio-link--call .bio-call-button{transition:transform .75s var(--ease)}
+.bio-link--call strong{transition:font-size .75s var(--ease)}
+.bio-link--call small{transition:font-size .75s var(--ease)}
+.bio-link--call.is-spot{min-height:min(25svh,250px);gap:26px;padding-left:28px;padding-right:20px;transform:scale(1.03);box-shadow:0 0 0 1px rgba(110,255,170,.35),0 34px 80px -22px rgba(52,199,89,.7),0 0 70px -12px rgba(52,199,89,.55)}
+.bio-link--call.is-spot .bio-call-avatar{transform:scale(1.35)}
+.bio-link--call.is-spot .bio-call-button{transform:scale(1.22)}
+.bio-link--call.is-spot strong{font-size:24px}
+.bio-link--call.is-spot small{font-size:14.5px}
+.bio-link--call.is-spot .bio-link__copy{padding-left:18px}
+.bio-call-say{color:#cfe9dc}
+.bio-call-word{display:inline-block}
+@media (prefers-reduced-motion:no-preference){
+  .bio-link--call[data-bio-visible="true"] .bio-call-word{animation:bio-say 4.2s ease-in-out infinite;animation-delay:calc(var(--w) * .16s)}
+}
+@keyframes bio-say{0%,26%,100%{transform:none;color:#cfe9dc;text-shadow:none}9%{transform:translateY(-2.5px);color:#fff;text-shadow:0 0 10px rgba(110,255,170,.95),0 0 2px rgba(255,255,255,.8)}}
