@@ -120,7 +120,7 @@ body.bio-page{min-height:100svh}
 .bio-link[data-tone="about"]{--brand:200 60 140;--tint:239 132 190;--ink:190 50 130;--wash:linear-gradient(135deg,#ffc2e4,#c81d77)}
 
 /* The six elements, on a turning wheel */
-.bio-elements{margin-top:10px;padding-bottom:12px;text-align:center}
+.bio-elements{margin-top:60px;padding-bottom:12px;text-align:center}
 .bio-section-head .eyebrow{margin-bottom:10px;color:#c81d77}
 .bio-section-head h2{margin:0 0 8px;font-family:var(--serif);font-size:clamp(30px,8.6vw,40px);font-style:italic;font-weight:400;line-height:1.1;color:#1c1018}
 .bio-wheel-hint{position:relative;z-index:6;display:flex;align-items:center;justify-content:center;gap:12px;margin:22px 0 0;font-size:10.5px;font-weight:600;letter-spacing:.24em;line-height:1.6;text-transform:uppercase;transform-origin:50% 50%}
@@ -262,12 +262,12 @@ body.bio-page{min-height:100svh}
 .bio-more-links[data-open] .bio-more-links__inner{overflow:visible;padding-bottom:4px}
 
 @media (prefers-reduced-motion:no-preference){
-  .bio-link--call[data-bio-visible="true"] .bio-call-avatar i{animation:bio-call-wave 2.6s cubic-bezier(.2,.6,.3,1) infinite}
-  .bio-link--call[data-bio-visible="true"] .bio-call-avatar i:nth-child(2){animation-delay:.55s}
-  .bio-link--call[data-bio-visible="true"] .bio-call-avatar i:nth-child(3){animation-delay:1.1s}
-  .bio-link--call[data-bio-visible="true"] .bio-call-button{animation:bio-call-glow 2.6s ease-out infinite}
-  .bio-link--call[data-bio-visible="true"] .bio-call-button svg{animation:bio-call-ring 2.6s ease-in-out infinite}
-  .bio-link--call[data-bio-visible="true"] strong{animation:bio-call-shine 2.6s cubic-bezier(.45,0,.55,1) infinite}
+  .bio-link--call.is-live[data-bio-visible="true"] .bio-call-avatar i{animation:bio-call-wave 2.6s cubic-bezier(.2,.6,.3,1) infinite}
+  .bio-link--call.is-live[data-bio-visible="true"] .bio-call-avatar i:nth-child(2){animation-delay:.55s}
+  .bio-link--call.is-live[data-bio-visible="true"] .bio-call-avatar i:nth-child(3){animation-delay:1.1s}
+  .bio-link--call.is-live[data-bio-visible="true"] .bio-call-button{animation:bio-call-glow 2.6s ease-out infinite}
+  .bio-link--call.is-live[data-bio-visible="true"] .bio-call-button svg{animation:bio-call-ring 2.6s ease-in-out infinite}
+  .bio-link--call.is-live[data-bio-visible="true"] strong{animation:bio-call-shine 2.6s cubic-bezier(.45,0,.55,1) infinite}
   .bio-more[aria-expanded="false"] .bio-more__chevron{animation:bio-more-glow 2.4s ease-in-out infinite}
   .bio-more[aria-expanded="false"] .bio-more__chevron::before{animation:bio-radiate 2.4s cubic-bezier(.2,.6,.3,1) infinite}
   .bio-more[aria-expanded="false"] .bio-more__chevron::after{animation:bio-radiate 2.4s cubic-bezier(.2,.6,.3,1) .8s infinite}
@@ -339,9 +339,8 @@ body.bio-page{min-height:100svh}
 /* The call card's moment: the page dims and blurs, the card grows and speaks */
 .bio-spot-veil{position:fixed;inset:0;z-index:55;background:rgba(10,6,12,.52);backdrop-filter:blur(10px) saturate(1.1);-webkit-backdrop-filter:blur(10px) saturate(1.1);opacity:0;transition:opacity .65s var(--ease);pointer-events:none}
 .bio-spot-veil.is-on{opacity:1;pointer-events:auto}
-body.bio-spotlit .bio-links{position:relative;z-index:60}
-.bio-links>:not(.bio-link--call){transition:filter .65s var(--ease),opacity .65s var(--ease)}
-body.bio-spotlit .bio-links>:not(.bio-link--call){filter:blur(7px);opacity:.22}
+.bio-call-hero{margin-top:28px}
+body.bio-spotlit .bio-call-hero{position:relative;z-index:60}
 .bio-link--call{transition:min-height .75s var(--ease),gap .75s var(--ease),padding .75s var(--ease),transform .6s var(--ease),box-shadow .6s var(--ease)}
 .bio-link--call .bio-call-avatar,.bio-link--call .bio-call-button{transition:transform .75s var(--ease)}
 .bio-link--call strong{transition:font-size .75s var(--ease)}
@@ -355,7 +354,7 @@ body.bio-spotlit .bio-links>:not(.bio-link--call){filter:blur(7px);opacity:.22}
 .bio-call-say{color:#cfe9dc}
 .bio-call-word{display:inline-block}
 @media (prefers-reduced-motion:no-preference){
-  .bio-link--call[data-bio-visible="true"] .bio-call-word{animation:bio-say 4.2s ease-in-out infinite;animation-delay:calc(var(--w) * .16s)}
+  .bio-link--call.is-live[data-bio-visible="true"] .bio-call-word{animation:bio-say 4.2s ease-in-out infinite;animation-delay:calc(var(--w) * .16s)}
 }
 @keyframes bio-say{0%,26%,100%{transform:none;color:#cfe9dc;text-shadow:none}9%{transform:translateY(-2.5px);color:#fff;text-shadow:0 0 10px rgba(110,255,170,.95),0 0 2px rgba(255,255,255,.8)}}
 @keyframes bio-call-wave-lg{0%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:scale(1.6)}}

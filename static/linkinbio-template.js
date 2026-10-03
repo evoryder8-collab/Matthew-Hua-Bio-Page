@@ -115,11 +115,21 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
   <p class="bio-headline">${e(d.home.headline)}</p>
   <ul class="bio-honours" aria-label="${e(d.home.awardsLabel)}">${honours.map(x=>`<li>${icon('star')}${e(x)}</li>`).join('')}</ul>
 </section>
+<div class="bio-call-hero">
+  ${card({tone:'phone',art:'phone',title:b.call,detail:b.callInvite,url:'tel:+41765067488',primary:true,call:true},asset)}
+</div>
+<section class="bio-elements" aria-labelledby="bio-elements-title">
+  <header class="bio-section-head"><p class="eyebrow">${e(d.method.eyebrow)}</p><h2 id="bio-elements-title">${e(d.method.title)}</h2></header>
+  <p class="bio-wheel-hint"><span class="bio-wheel-hint__line" aria-hidden="true"></span><span class="bio-wheel-hint__text"><span class="bio-wheel-hint__ink">${e(b.wheelHint)}</span><span class="bio-wheel-hint__glow" aria-hidden="true">${e(b.wheelHint)}</span></span><span class="bio-wheel-hint__line" aria-hidden="true"></span></p>
+  ${wheel(d)}
+  <div id="element-panel" class="bio-stage" role="tabpanel" aria-labelledby="bio-element-0" tabindex="0" hidden></div>
+</section>
+<section class="tears-moment bio-tears" aria-labelledby="tears-title"><div class="tears-layout"><p class="eyebrow">${e(d.emotion.eyebrow)}</p><h2 class="tears-title" id="tears-title">${e(d.emotion.title)}</h2><p class="tears-copy">${e(d.emotion.copy)}</p><div class="tears-footer"><span class="tears-note">${e(d.emotion.note)}</span></div></div><canvas class="tears-canvas" aria-hidden="true"></canvas></section>
 <section class="bio-film" aria-label="${e(d.arrival.eyebrow)}">
   <div class="bio-film__frame" data-bio-film>
     <span class="bio-film__glow" aria-hidden="true"></span>
     <div class="bio-film__screen">
-      <video playsinline webkit-playsinline preload="auto" poster="${e(asset(BIO_POSTER))}" src="${e(asset(BIO_FILM))}" aria-label="${e(d.arrival.eyebrow)} · ${e(d.arrival.title)}"></video>
+      <video playsinline webkit-playsinline preload="metadata" poster="${e(asset(BIO_POSTER))}" src="${e(asset(BIO_FILM))}" aria-label="${e(d.arrival.eyebrow)} · ${e(d.arrival.title)}"></video>
       <button class="bio-film__cover" type="button" data-action="film-play" aria-label="${e(d.common.play)}" hidden><span>${icon('play')}</span></button>
       <button class="bio-film__unmute" type="button" data-action="film-unmute" hidden>${icon('volume-2')}<span>${e(b.tapSound)}</span></button>
       <div class="bio-film__bar"><button class="bio-film__toggle" type="button" data-action="film-toggle" aria-label="${e(d.common.play)}">${icon('play')}</button><span class="bio-film__track" aria-hidden="true"><i></i></span><span class="bio-film__time" aria-hidden="true">00:28</span><button class="bio-film__sound" type="button" data-action="sound" aria-pressed="false" aria-label="${e(d.nav.soundOff)}" title="${e(d.nav.soundOff)}">${icon('volume-x')}</button><button class="bio-film__expand" type="button" data-action="film-fullscreen" aria-label="${e(b.fullscreen)}" title="${e(b.fullscreen)}">${icon('maximize-2')}</button></div>
@@ -127,16 +137,8 @@ export function renderLinkInBio(d,{asset,href,file,flag}){
   </div>
   <p class="bio-film__caption"><span>${e(d.arrival.eyebrow)}</span><span>Rome · 2024</span></p>
 </section>
-<section class="tears-moment bio-tears" aria-labelledby="tears-title"><div class="tears-layout"><p class="eyebrow">${e(d.emotion.eyebrow)}</p><h2 class="tears-title" id="tears-title">${e(d.emotion.title)}</h2><p class="tears-copy">${e(d.emotion.copy)}</p><div class="tears-footer"><span class="tears-note">${e(d.emotion.note)}</span></div></div><canvas class="tears-canvas" aria-hidden="true"></canvas></section>
-<section class="bio-elements" aria-labelledby="bio-elements-title">
-  <header class="bio-section-head"><p class="eyebrow">${e(d.method.eyebrow)}</p><h2 id="bio-elements-title">${e(d.method.title)}</h2></header>
-  <p class="bio-wheel-hint"><span class="bio-wheel-hint__line" aria-hidden="true"></span><span class="bio-wheel-hint__text"><span class="bio-wheel-hint__ink">${e(b.wheelHint)}</span><span class="bio-wheel-hint__glow" aria-hidden="true">${e(b.wheelHint)}</span></span><span class="bio-wheel-hint__line" aria-hidden="true"></span></p>
-  ${wheel(d)}
-  <div id="element-panel" class="bio-stage" role="tabpanel" aria-labelledby="bio-element-0" tabindex="0" hidden></div>
-</section>
 <nav class="bio-links" aria-label="${e(b.links)}">
   <p class="bio-group-label">${e(b.links)}</p>
-  ${card({tone:'phone',art:'phone',title:b.call,detail:b.callInvite,url:'tel:+41765067488',primary:true,call:true},asset)}
   ${links.filter(l=>SOCIAL_TONES.includes(l.tone)).map(l=>card(l,asset)).join('')}
   <button class="bio-more" type="button" aria-expanded="false" aria-controls="bio-more-links"><span class="bio-more__line" aria-hidden="true"></span><span class="bio-more__label">${e(b.moreContact)}</span><span class="bio-more__chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="m14.5 6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="bio-more__line" aria-hidden="true"></span></button>
   <div class="bio-more-links" id="bio-more-links" inert><div class="bio-more-links__inner">${[{tone:'whatsapp',art:'whatsapp',eyebrow:`WhatsApp · ${phone}`,title:b.whatsapp,detail:b.whatsappDetail,url:`https://wa.me/41765067488?text=${greeting}`,extra:external},...links.filter(l=>['contact','mail'].includes(l.tone))].map(l=>card(l,asset)).join('')}</div></div>

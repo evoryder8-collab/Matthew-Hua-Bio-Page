@@ -123,33 +123,11 @@ function mountFilm(frame,resume){
       if(resume.playing)play();else sync();
       return;
     }
-    if(motion.matches){cover.hidden=false;return;}
-    // Some in-app browsers allow audible autoplay: let play() decide, keep an earlier
-    // "sound off", and fall back to muted playback with a visible way to turn it on.
-    video.muted=read('matthew-bio-sound')==='off';
-    try{await video.play();if(!destroyed)setSound(!video.muted,{remember:false});}
-    catch{
-      if(destroyed)return;
-      if(video.muted){cover.hidden=false;return;}
-      video.muted=true;
-      try{await video.play();if(!destroyed){setSound(false,{remember:false});unmute.hidden=false;}}
-      catch{if(!destroyed)cover.hidden=false;}
-    }
-  }
-  // Called from the sound prompt's tap, so audible playback is allowed.
-  function begin(withSound){
-    if(destroyed)return;
-    if(motion.matches){cover.hidden=false;sync();return;}
-    video.muted=!withSound;
-    const attempt=video.play();
-    attempt?.catch(()=>{
-      if(destroyed)return;
-      if(!video.muted){video.muted=true;video.play()?.then(()=>{unmute.hidden=false;},()=>{cover.hidden=false;sync();});}
-      else{cover.hidden=false;sync();}
-    });
+    // It no longer plays by itself (it sits low on the page now): the play button waits.
+    cover.hidden=false;sync();
   }
   return {
-    start,begin,
+    start,
     setMuted(muted){video.muted=muted;if(!muted)unmute.hidden=true;},
     state:()=>({time:video.currentTime||0,playing:playing()||autoPaused}),
     destroy(){destroyed=true;observer?.disconnect();cancelAnimationFrame(frameId);video.pause();video.removeAttribute('src');video.load();}
@@ -382,7 +360,7 @@ function continueFromGame(image){
 // The website's own question, asked once per visit: the page waits beneath a near-black,
 // blurred layer of drifting sparks. Yes unlocks the effects and starts the film with
 // sound inside the same tap; No starts it quietly.
-function askSound(){
+function askSound(){return new Promise(resolve=>{
   const dialog=document.createElement('dialog');
   dialog.className='portal bio-sound-dialog';dialog.setAttribute('aria-label',dict.portal.sound);
   dialog.innerHTML=`<div class="portal-shade is-arriving" aria-hidden="true"></div><canvas class="portal-ambient is-arriving" aria-hidden="true"></canvas><div class="portal-frost is-arriving" aria-hidden="true"></div><div class="portal-focus is-in"><div class="portal-focus-content sound-stage"><span class="mh-monogram bio-sound-mark" aria-hidden="true">mh</span><div class="sound-symbol">${icon('audio-lines')}</div><h2 class="portal-title">${e(dict.portal.sound)}</h2><p class="portal-sub">${e(dict.portal.soundCopy)}</p><div class="sound-choices"><button class="sound-yes" type="button"><span>${e(dict.portal.yes)}<small>${e(dict.portal.recommended)}</small></span>${icon('arrow-right')}</button><button class="sound-no" type="button">${e(dict.portal.no)}</button></div></div></div>`;
@@ -393,10 +371,9 @@ function askSound(){
     if(chosen)return;chosen=true;
     try{sessionStorage.setItem('matthew-bio-asked','1');}catch{}
     setSound(on);
-    film?.begin(on);
     if(on)cue('nav');
     dialog.querySelectorAll('button').forEach(button=>button.disabled=true);
-    const finish=()=>{stopSparks?.();dialog.close();dialog.remove();};
+    const finish=()=>{stopSparks?.();dialog.close();dialog.remove();resolve();};
     if(motion.matches){finish();return;}
     dialog.classList.add('is-leaving');
     for(const layer of dialog.querySelectorAll('.portal-shade,.portal-frost')){layer.classList.remove('is-arriving');layer.classList.add('is-leaving');}
@@ -406,7 +383,7 @@ function askSound(){
   dialog.querySelector('.sound-no').addEventListener('click',()=>choose(false));
   dialog.addEventListener('cancel',event=>{event.preventDefault();choose(false);});
   dialog.querySelector('.sound-yes').focus({preventScroll:true});
-}
+});}
 
 /* Links, language, map, dialogs ------------------------------------------------------ */
 function setupLinks(){
@@ -485,7 +462,7 @@ function openCallSheet(){
 // Reaching the call card (once per visit, when it reaches mid-screen): everything else
 // dims and blurs away while the card grows to about a quarter of the screen, then it
 // settles back. A tap, a scroll onward or a few seconds end the moment.
-let callSpotlit=false;
+let callSpotlit=false,callLive=false,callApi=null;
 function setupCall(){
   const call=shell.querySelector('.bio-link--call');if(!call)return;
   // The invitation speaks word by word: each word rises and gleams in turn.
@@ -501,20 +478,36 @@ function setupCall(){
     }
     say.style.setProperty('--words',String(index));
   }
-  let spot=null;
+  let spot=null,pending=0,armed=false,timer=0;
   const choose=event=>{event.preventDefault();spot?.end();openCallSheet();};
   call.addEventListener('click',choose);cleanups.push(()=>call.removeEventListener('click',choose));
-  if(callSpotlit||motion.matches)return;
-  let pending=0;
+  const goLive=()=>call.classList.add('is-live');
+  if(callLive)goLive();
+  // Later arrivals (after scrolling away) still get their moment at mid-screen.
   const check=()=>{
-    pending=0;if(callSpotlit||document.querySelector('dialog[open]'))return;
+    pending=0;if(!armed||callSpotlit||motion.matches||document.querySelector('dialog[open]'))return;
     const box=call.getBoundingClientRect();
-    if(box.bottom>0&&box.top+box.height/2<=innerHeight*.55)spot=spotlight(call);
+    if(box.bottom>0&&box.top+box.height/2<=innerHeight*.62)spot=spotlight(call);
   };
   const schedule=()=>{if(!pending)pending=requestAnimationFrame(check);};
   addEventListener('scroll',schedule,{passive:true});
-  cleanups.push(()=>{removeEventListener('scroll',schedule);cancelAnimationFrame(pending);spot?.end(true);});
-  schedule();
+  cleanups.push(()=>{removeEventListener('scroll',schedule);cancelAnimationFrame(pending);clearTimeout(timer);spot?.end(true);});
+  return {
+    /** The page has settled (sound chosen): give the name and headline a moment first. */
+    arm(){
+      if(armed||timer)return;
+      timer=setTimeout(()=>{
+        armed=true;callLive=true;goLive();
+        if(callSpotlit||motion.matches)return;
+        const box=call.getBoundingClientRect(),visible=box.bottom>0&&box.top<innerHeight;
+        if(!visible){schedule();return;}
+        // Partly below the fold: glide just enough for the grown card to show whole.
+        const over=box.top+Math.min(innerHeight*.25,250)+24-innerHeight;
+        if(over>0&&scrollY<80){scrollBy({top:over,behavior:'smooth'});setTimeout(()=>{if(!callSpotlit)spot=spotlight(call);},650);}
+        else spot=spotlight(call);
+      },callLive?0:2600);
+    }
+  };
 }
 function spotlight(call){
   callSpotlit=true;
@@ -635,12 +628,13 @@ function render({hydrate=false}={}){
   if(tablist)tabSparks=mountTabSparks(tablist,{reducedMotion:motion});
   wheel=mountWheel(shell.querySelector('[data-bio-wheel]'),{onPick:index=>selectElement(index)});
   wheelIntro=mountWheelIntro(shell.querySelector('.bio-elements'),wheel);
-  setupLinks();setupMore();setupCall();setupLanguage();setupMap();updateSoundButtons();
+  setupLinks();setupMore();callApi=setupCall();setupLanguage();setupMap();updateSoundButtons();
   // Mindset is chosen from the start (its game waits below); the wheel keeps cruising.
   selectElement(keep>=0?keep:0,{quiet:true,instant:true,spin:false});
   document.documentElement.classList.add('ready');
   let asked=false;try{asked=!!sessionStorage.getItem('matthew-bio-asked');}catch{}
-  if(resume||asked)film.start();else askSound();
+  film.start();
+  if(resume||asked)callApi?.arm();else askSound().then(()=>callApi?.arm());
 }
 
 async function init(){
