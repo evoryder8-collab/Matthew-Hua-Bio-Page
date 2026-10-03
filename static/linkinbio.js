@@ -285,14 +285,14 @@ function mountWheelIntro(section,wheelApi){
     const dy=(wheelBox.top+wheelBox.height/2)-(hintBox.top+hintBox.height/2);
     const SCALE=Math.min(1.45,(root.getBoundingClientRect().width*.94)/Math.max(1,hint.querySelector('.bio-wheel-hint__text').getBoundingClientRect().width)),STAGGER=Math.min(30,900/Math.max(1,chars.length));
     section.classList.remove('is-prelude');   // from here the animations hold every state
-    play(root,[{filter:'blur(12px) brightness(.72) saturate(.8)',transform:'scale(.93)'},{filter:'blur(12px) brightness(.72) saturate(.8)',transform:'scale(.93)'}],{duration:1});
+    play(root,[{filter:'blur(0) brightness(1) saturate(1)',transform:'none'},{filter:'blur(12px) brightness(.72) saturate(.8)',transform:'scale(.93)'}],{duration:560,easing:'cubic-bezier(.4,0,.2,1)'});
     play(ink,[{opacity:0},{opacity:0}],{duration:1});
     lines.forEach(line=>play(line,[{opacity:0,transform:'scaleX(0)'},{opacity:0,transform:'scaleX(0)'}],{duration:1}));
     // 1. The line assembles over the centre of the blurred wheel.
     play(hint,[{transform:`translateY(${dy}px) scale(${SCALE})`},{transform:`translateY(${dy}px) scale(${SCALE})`}],{duration:1});
     play(glow,[{opacity:1},{opacity:1}],{duration:1});
-    chars.forEach((c,i)=>play(c,[{opacity:0,transform:'translateY(12px) scale(.92)',filter:'blur(8px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:760,delay:150+i*STAGGER,easing:'cubic-bezier(.16,1,.3,1)'}));
-    const land=150+chars.length*STAGGER+760+700;
+    chars.forEach((c,i)=>play(c,[{opacity:0,transform:'translateY(12px) scale(.92)',filter:'blur(8px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:760,delay:380+i*STAGGER,easing:'cubic-bezier(.16,1,.3,1)'}));
+    const land=380+chars.length*STAGGER+760+700;
     // 2. It lands above the wheel, which comes into focus beneath it.
     const travel=play(hint,[{transform:`translateY(${dy}px) scale(${SCALE})`},{transform:'none'}],{duration:1050,delay:land,easing:'cubic-bezier(.65,0,.35,1)'});
     play(glow,[{opacity:1},{opacity:0}],{duration:650,delay:land+380,easing:'ease-out'});
@@ -301,11 +301,18 @@ function mountWheelIntro(section,wheelApi){
     lines.forEach(line=>play(line,[{opacity:0,transform:'scaleX(0)'},{opacity:1,transform:'scaleX(1)'}],{duration:760,delay:land+820,easing:'cubic-bezier(.16,1,.3,1)'}));
     travel.finished.then(()=>setTimeout(finish,700),()=>{});
   }
-  const observer=new IntersectionObserver(entries=>{
-    const entry=entries[entries.length-1];
-    if(!started&&entry.intersectionRatio>=.55)run();
-  },{threshold:[0,.55,.8]});
-  observer.observe(root);
+  // It begins once the wheel's centre reaches the middle of the screen (or is above it
+  // while still in view, after a fast scroll).
+  let pending=0;
+  const check=()=>{
+    pending=0;if(started||done)return;
+    const box=root.getBoundingClientRect();
+    if(box.bottom>0&&box.top+box.height/2<=innerHeight/2)run();
+  };
+  const schedule=()=>{if(!pending)pending=requestAnimationFrame(check);};
+  addEventListener('scroll',schedule,{passive:true});addEventListener('resize',schedule,{passive:true});
+  const observer={disconnect(){removeEventListener('scroll',schedule);removeEventListener('resize',schedule);cancelAnimationFrame(pending);}};
+  schedule();
   root.addEventListener('pointerdown',finish);
   return {destroy(){if(!done){done=true;observer.disconnect();root.removeEventListener('pointerdown',finish);animations.forEach(a=>a.cancel());section.classList.remove('is-prelude');}}};
 }

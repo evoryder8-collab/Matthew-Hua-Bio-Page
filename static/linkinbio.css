@@ -132,8 +132,7 @@ body.bio-page{min-height:100svh}
 .bio-wheel-hint__glow{position:absolute;inset:0;display:block;color:#fff5fb;-webkit-text-fill-color:#fff5fb;text-shadow:0 0 16px rgba(255,143,198,.95),0 0 3px rgba(255,255,255,.9);opacity:0;pointer-events:none}
 .bio-wheel-hint__word{display:inline-block;white-space:nowrap}
 .bio-wheel-hint__char{display:inline-block;white-space:pre}
-/* Before the intro plays: the wheel waits out of focus, the line unseen. */
-.bio-elements.is-prelude .bio-wheel{filter:blur(12px) brightness(.72) saturate(.8);transform:scale(.93)}
+/* Before the intro plays: the line waits unseen (it lands there). */
 .bio-elements.is-prelude .bio-wheel-hint__ink,.bio-elements.is-prelude .bio-wheel-hint__line,.bio-elements.is-prelude .bio-wheel-hint__glow{opacity:0}
 .bio-wheel{position:relative;width:min(100%,430px);aspect-ratio:1;margin:22px auto 24px;container-type:inline-size;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .bio-wheel__halo{position:absolute;inset:-9%;z-index:-1;border-radius:50%;background:radial-gradient(circle at 30% 28%,#ff8fc6bb,transparent 58%),radial-gradient(circle at 72% 74%,#4fe6a0aa,transparent 58%);filter:blur(28px);opacity:.75;pointer-events:none}
@@ -254,7 +253,9 @@ body.bio-page{min-height:100svh}
 .bio-more__line{flex:1 1 auto;max-width:56px;height:1px;background:linear-gradient(90deg,transparent,#c81d7780)}
 .bio-more__line:last-child{background:linear-gradient(270deg,transparent,#c81d7780)}
 .bio-more__chevron{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.7);color:#c81d77;box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),0 6px 14px -6px rgba(200,29,119,.55);transition:transform .5s var(--ease)}
-.bio-more[aria-expanded="true"] .bio-more__chevron{transform:rotate(180deg)}
+.bio-more[aria-expanded="true"] .bio-more__chevron{transform:rotate(-90deg)}
+.bio-more__chevron{position:relative}
+.bio-more__chevron::before,.bio-more__chevron::after{content:'';position:absolute;inset:0;border:1.5px solid rgba(200,29,119,.6);border-radius:50%;opacity:0;pointer-events:none}
 .bio-more-links{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s var(--ease)}
 .bio-more-links[data-open]{grid-template-rows:1fr}
 .bio-more-links__inner{display:grid;gap:14px;min-height:0;overflow:hidden}
@@ -267,6 +268,9 @@ body.bio-page{min-height:100svh}
   .bio-link--call[data-bio-visible="true"] .bio-call-button{animation:bio-call-glow 2.6s ease-out infinite}
   .bio-link--call[data-bio-visible="true"] .bio-call-button svg{animation:bio-call-ring 2.6s ease-in-out infinite}
   .bio-link--call[data-bio-visible="true"] strong{animation:bio-call-shine 2.6s cubic-bezier(.45,0,.55,1) infinite}
+  .bio-more[aria-expanded="false"] .bio-more__chevron{animation:bio-more-glow 2.4s ease-in-out infinite}
+  .bio-more[aria-expanded="false"] .bio-more__chevron::before{animation:bio-radiate 2.4s cubic-bezier(.2,.6,.3,1) infinite}
+  .bio-more[aria-expanded="false"] .bio-more__chevron::after{animation:bio-radiate 2.4s cubic-bezier(.2,.6,.3,1) .8s infinite}
   .bio-more-links[data-open] .bio-link{animation:bio-unfold .7s cubic-bezier(.16,1,.3,1) both}
   .bio-more-links[data-open] .bio-link:nth-child(2){animation-delay:.08s}
   .bio-more-links[data-open] .bio-link:nth-child(3){animation-delay:.16s}
@@ -310,3 +314,5 @@ body.bio-page{min-height:100svh}
   .bio-call-sheet .bio-call-avatar i:nth-child(3){animation-delay:1.1s}
 }
 .bio-call-sheet h2:focus,.bio-call-sheet h2:focus-visible{outline:none}
+@keyframes bio-radiate{0%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
+@keyframes bio-more-glow{0%,100%{box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),0 6px 14px -6px rgba(200,29,119,.55),0 0 0 0 rgba(255,143,198,0)}50%{box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),0 6px 16px -6px rgba(200,29,119,.75),0 0 18px 2px rgba(255,143,198,.45)}}
