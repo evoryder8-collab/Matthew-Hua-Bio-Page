@@ -234,6 +234,7 @@ Chromium/WebKit browser automation is not the same as physical iPhone/Android ve
 | `assets/films/`, `assets/editorial/` | Compatible video derivatives and selected documentary photographs. |
 | `static/favicon.svg` | Lowercase mh site mark. |
 | `CNAME`, `.nojekyll`, `robots.txt`, `sitemap.xml` | Domain, Pages serving and search-discovery files. |
+| `ccideas/index.html`, `ccideas/README.md` | Hand-written, unlinked `noindex` frame of Constantin Barbu's CB Viral Content Hub (GitHub Pages, `evoryder8-collab/cb-viral-content-hub`). Outside the build; uses no site asset, template or dictionary. |
 
 CSS order matters: Leaflet, base styles, Mindset, technology, element visuals, identity, refinements. Later source order alone does not beat a more specific earlier selector. Inspect computed styles and actual boxes before adding another override.
 
@@ -458,6 +459,7 @@ git diff --check
 - Public biography, insurance and credential wording depend on supplied information. Reconfirm time-sensitive claims and avoid adding unsupported treatment guarantees or client endorsements.
 - Domain/DNS/mail: current website HTTPS works. The domain was configured through the user's Infomaniak account. This release made no DNS or mailbox changes; do not delete MX/TXT records while adjusting a website record in future.
 - Global quality: no claim of universal zero errors, full WCAG conformance, real-world performance targets or verified business conversion metrics has been made.
+- `/ccideas/` (2026-11-09): implemented; checked locally in Chromium at phone (390x844) and desktop sizes (the frame loads, `#favourites` opens All-time favourites, the address bar follows the hub's section). It depends on GitHub Pages serving the hub without frame restrictions. Physical-device checks (Safari bottom bar, clipboard inside the frame) are not done.
 
 ## 11. Handoff Maintenance
 

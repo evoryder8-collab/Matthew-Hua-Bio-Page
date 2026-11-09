@@ -106,6 +106,7 @@ Status terms used below: **Implemented** means present in the source; **Verified
 | `/archive/` | Filterable photo/film archive with modal viewing and navigation. |
 | `/contact/` | Email, WhatsApp, phone, address, enquiry form, styled map, driving chooser, insurance information. |
 | `/linkinbio/` | Social-profile landing page: portrait, self-playing European Championship film (framed, breathing glow), tears moment with scroll brake, WhatsApp-first platform links and contact card, spinning six-element wheel revealing each element's visual and the game, studio map, footer. Standalone module; not part of the six-route navigation. |
+| `/ccideas/` | Not part of Matthew's site experience: an unlinked, `noindex` page that frames Constantin Barbu's CB Viral Content Hub (hosted on GitHub Pages from `evoryder8-collab/cb-viral-content-hub`). Hand-written single file outside the build; see `ccideas/README.md`. Added 2026-11-09. |
 
 All six have independently addressable generated English HTML. Runtime localisation and navigation enhance them. New page ideas must deepen relevance, not duplicate existing pages to inflate page count.
 
